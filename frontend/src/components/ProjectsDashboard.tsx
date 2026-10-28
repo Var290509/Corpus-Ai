@@ -792,11 +792,20 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                               </span>
                             )}
 
-                            {art.extractedTopics && art.extractedTopics.slice(0, 3).map((top, ti) => (
-                              <span key={ti} className="text-[10px] text-[#E6E0F0] font-mono bg-[#352318] px-1.5 py-0.5 rounded border border-[#E6E0F0]/10">
-                                #{top}
-                              </span>
-                            ))}
+                            {art.extractedSubtopics && art.extractedSubtopics.length > 0 ? (
+                              art.extractedSubtopics.slice(0, 4).map((sub, ti) => (
+                                <span key={ti} className="text-[10px] text-[#FAF9F8] font-mono bg-[#352318] px-1.5 py-0.5 rounded border border-[#E6E0F0]/15" title={`${sub.category}: ${sub.name}`}>
+                                  <span className="text-[#E5E4E2]/60 mr-1">[{sub.category.slice(0, 4).toUpperCase()}]</span>
+                                  <span>{sub.name}</span>
+                                </span>
+                              ))
+                            ) : (
+                              art.extractedTopics && art.extractedTopics.slice(0, 3).map((top, ti) => (
+                                <span key={ti} className="text-[10px] text-[#E6E0F0] font-mono bg-[#352318] px-1.5 py-0.5 rounded border border-[#E6E0F0]/10">
+                                  #{top}
+                                </span>
+                              ))
+                            )}
                           </div>
                         </div>
                       ))}

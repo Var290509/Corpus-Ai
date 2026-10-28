@@ -626,6 +626,9 @@ export const App: React.FC = () => {
           setSelectedBadge(null);
           setSelectedBadgePaper(null);
         }}
+        onDecide={(paperId, status, reason) => {
+          handleDecide(paperId, status, reason);
+        }}
       />
 
       {/* Audit Log Modal */}

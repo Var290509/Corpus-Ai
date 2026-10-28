@@ -117,6 +117,12 @@ export interface DeepAnalysisResult {
   synthesizedKeyFinding: string;
 }
 
+export interface ExtractedSubtopic {
+  category: 'Condition' | 'Biomarkers' | 'Population' | 'Methodology' | 'Outcomes' | 'Pharmacology';
+  name: string;
+  snippet?: string;
+}
+
 export interface ResearchPaper {
   id: string;
   title: string;
@@ -156,6 +162,7 @@ export interface ResearchPaper {
 
   // Extracted Topics & Autonomous Screening Criteria
   extractedTopics?: string[]; // Topics discovered from total PDF / picture
+  extractedSubtopics?: ExtractedSubtopic[]; // Deep categorized subtopics
   aiScreeningRecommendation?: 'Included' | 'Excluded' | 'Maybe';
   aiScreeningReason?: string;
 }

@@ -1,4 +1,4 @@
-import { ResearchPaper } from '../types';
+import { ResearchPaper, ExtractedSubtopic } from '../types';
 import { runDeduplication, normalizeTitle, calculateJaccardSimilarity } from './deduplication';
 import { translateScientificText } from './translator';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -32,59 +32,101 @@ export interface BatchUploadResult {
 }
 
 /**
- * Deep topic modeling for systematic literature review:
- * Extracts key scientific topics, study designs, interventions, and disease areas.
+ * Deep multi-category subtopic modeling for systematic literature review:
+ * Analyzes full document text, abstract, and methodology to extract categorized
+ * subtopics: Conditions, Biomarkers & Assays, Population, Methodology, and Outcomes.
  */
-export function extractKeyTopics(text: string): string[] {
+export function extractDetailedSubtopics(text: string): ExtractedSubtopic[] {
   const lower = text.toLowerCase();
-  const topics: string[] = [];
+  const subtopics: ExtractedSubtopic[] = [];
+  const seenNames = new Set<string>();
 
-  const TOPIC_RULES: Array<{ name: string; pattern: RegExp }> = [
-    // Disease Areas & Conditions
-    { name: 'Type 2 Diabetes', pattern: /\b(diabetes|type 2|t2d|diabetic|glycemic|glucose|insulin)\b/i },
-    { name: 'Cardiovascular Disease', pattern: /\b(cardiovascular|cardiac|myocardial|heart failure|atherosclerosis|stroke|infarction)\b/i },
-    { name: 'Alzheimer\'s & Dementia', pattern: /\b(alzheimer|dementia|cognitive decline|tau|amyloid|neurodegenerative)\b/i },
-    { name: 'Oncology & Neoplasms', pattern: /\b(cancer|tumor|carcinoma|oncology|metastatic|chemotherapy|leukemia)\b/i },
-    { name: 'Infectious Disease', pattern: /\b(viral|bacterial|infection|pathogen|covid-19|influenza|antimicrobial|sepsis)\b/i },
-    { name: 'Metabolic & Obesity', pattern: /\b(obesity|bmi|body mass|adiposity|weight loss|metabolic syndrome)\b/i },
-    { name: 'Immunology & Inflammation', pattern: /\b(autoimmune|inflammation|cytokine|interleukin|immunotherapy|antibodies)\b/i },
-    { name: 'Renal & Nephrology', pattern: /\b(kidney|renal|nephropathy|egfr|creatinine|dialysis)\b/i },
+  const addSubtopic = (category: ExtractedSubtopic['category'], name: string, snippet?: string) => {
+    if (!seenNames.has(name.toLowerCase())) {
+      seenNames.add(name.toLowerCase());
+      subtopics.push({ category, name, snippet });
+    }
+  };
 
-    // Interventions & Treatments
-    { name: 'Metformin Pharmacotherapy', pattern: /\b(metformin|biguanide|glucophage)\b/i },
-    { name: 'GLP-1 Receptor Agonists', pattern: /\b(glp-1|semaglutide|liraglutide|tirzepatide|incretin|ozempic)\b/i },
-    { name: 'Double-Blind Placebo Control', pattern: /\b(placebo-controlled|placebo|double-blind|sham control)\b/i },
-    { name: 'Monoclonal Antibodies', pattern: /\b(mab|monoclonal|antibody|immunoglobulin|biologics)\b/i },
-    { name: 'Behavioral & Lifestyle Intervention', pattern: /\b(lifestyle|exercise|dietary|caloric restriction|behavioral)\b/i },
-    { name: 'Surgical & Procedural', pattern: /\b(surgery|surgical|bariatric|resection|transplantation)\b/i },
+  const SUBTOPIC_RULES: Array<{ category: ExtractedSubtopic['category']; name: string; pattern: RegExp }> = [
+    // Condition & Disease Subtopics
+    { category: 'Condition', name: 'Hyperhomocysteinemia & Amino Acid Metabolism', pattern: /\b(hyperhomocystein[a-z]*|homocysteine|thcy|amino acid metabolism)\b/i },
+    { category: 'Condition', name: 'Type 2 Diabetes Mellitus', pattern: /\b(type 2 diabetes|t2d|type 2 diabetic|diabetic population|glycemic control|insulin resistance)\b/i },
+    { category: 'Condition', name: 'Cardiovascular Disease & Atherosclerosis Risk', pattern: /\b(cardiovascular|coronary|atherosclerosis|atherogenic|ischemic|myocardial|stroke|vascular risk)\b/i },
+    { category: 'Condition', name: 'Diabetic Microangiopathy & Nephropathy', pattern: /\b(microangiopathy|nephropathy|retinopathy|neuropathy|diabetic kidney|glomerular)\b/i },
+    { category: 'Condition', name: 'Dyslipidemia & Metabolic Syndrome', pattern: /\b(dyslipidemia|hyperlipidemia|metabolic syndrome|hypertriglyceridemia|hypercholesterolemia)\b/i },
+    { category: 'Condition', name: 'Hypertension & Endothelial Dysfunction', pattern: /\b(hypertension|blood pressure|endothelial|vascular endothelium|arterial stiffness)\b/i },
+    { category: 'Condition', name: 'Oncology & Malignant Neoplasms', pattern: /\b(cancer|tumor|carcinoma|oncology|metastatic|chemotherapy|leukemia|sarcoma)\b/i },
+    { category: 'Condition', name: 'Neurodegenerative & Dementia Disorders', pattern: /\b(alzheimer|dementia|cognitive impairment|tau protein|amyloid|neurodegenerative)\b/i },
+    { category: 'Condition', name: 'Infectious & Inflammatory Pathology', pattern: /\b(infection|pathogen|covid-19|sepsis|autoimmune|cytokine storm|antimicrobial)\b/i },
 
-    // Study Designs & Methodologies
-    { name: 'Randomized Controlled Trial (RCT)', pattern: /\b(randomized|randomised|clinical trial|rct|parallel-group)\b/i },
-    { name: 'Prospective Longitudinal Cohort', pattern: /\b(prospective|cohort|follow-up|longitudinal|registry)\b/i },
-    { name: 'Systematic Review & Meta-Analysis', pattern: /\b(systematic review|meta-analysis|pooled analysis|prisma)\b/i },
-    { name: 'Preclinical Animal Model', pattern: /\b(mice|mouse|murine|rat|rats|rodent|preclinical in vivo)\b/i },
-    { name: 'In Silico Virtual Modeling', pattern: /\b(in silico|computational model|molecular docking|simulation)\b/i },
+    // Biomarkers & Laboratory Assays
+    { category: 'Biomarkers', name: 'Serum Total Homocysteine (tHcy) Assays', pattern: /\b(serum homocysteine|plasma homocysteine|total homocysteine|thcy concentration|homocysteine level)\b/i },
+    { category: 'Biomarkers', name: 'Glycated Hemoglobin (HbA1c) Monitoring', pattern: /\b(hba1c|glycated hemoglobin|hemoglobin a1c|glycated hb)\b/i },
+    { category: 'Biomarkers', name: 'Fasting Blood Glucose (FBG) & Glycemia', pattern: /\b(fasting blood glucose|fasting glycemia|blood glucose|fbg|fasting plasma)\b/i },
+    { category: 'Biomarkers', name: 'Lipid Profile (HDL, LDL & Triglycerides)', pattern: /\b(lipid profile|ldl-c|hdl-c|cholesterol|triglycerides|vldl|atherogenic index)\b/i },
+    { category: 'Biomarkers', name: 'Renal Biomarkers (Creatinine & Urea Clearance)', pattern: /\b(creatinine|egfr|urea|clearance|proteinuria|microalbuminuria)\b/i },
+    { category: 'Biomarkers', name: 'Vitamin Cofactors (B12, Folate & B6 Metabolism)', pattern: /\b(vitamin b12|cobalamin|folate|folic acid|vitamin b6|pyridoxine)\b/i },
+    { category: 'Biomarkers', name: 'Inflammatory Biomarkers (CRP / Interleukins)', pattern: /\b(c-reactive protein|crp|hs-crp|interleukin|il-6|tnf-alpha)\b/i },
 
-    // Outcomes & Endpoints
-    { name: 'Glycemic Control (HbA1c)', pattern: /\b(hba1c|glycated hemoglobin|blood glucose|fasting plasma)\b/i },
-    { name: 'All-Cause Mortality Reduction', pattern: /\b(mortality|survival|hazard ratio|overall survival|death rate)\b/i },
-    { name: 'Adverse Events & Safety Profile', pattern: /\b(adverse event|side effect|safety profile|tolerability|nausea|toxicity)\b/i },
-    { name: 'Biomarker Surrogate Endpoints', pattern: /\b(biomarker|surrogate endpoint|serum level|plasma concentration)\b/i },
-    { name: 'Statistical Sample Power (N≥500)', pattern: /\b(?:n\s*=\s*|cohort of\s*|sample of\s*)([5-9]\d{2,}|\d{4,})\b/i }
+    // Population & Geographic Demographics
+    { category: 'Population', name: 'Senegalese Cohort (Sub-Saharan Africa)', pattern: /\b(senegal|senegalese|dakar|west africa|sub-saharan)\b/i },
+    { category: 'Population', name: 'Adult Type 2 Diabetic Patient Cohort', pattern: /\b(adult diabetic|diabetic population|diabetic patients|type 2 cohort|patients aged)\b/i },
+    { category: 'Population', name: 'Clinical Outpatient & Hospital Registry', pattern: /\b(outpatient|ambulatory|clinic patients|hospitalized|medical center cohort)\b/i },
+    { category: 'Population', name: 'Geriatric & Older Adult Demographics', pattern: /\b(elderly|geriatric|older adults|seniors|aged 65)\b/i },
+    { category: 'Population', name: 'Pediatric & Adolescent Population', pattern: /\b(pediatric|children|adolescent|juvenile)\b/i },
+
+    // Methodology & Research Design
+    { category: 'Methodology', name: 'Cross-Sectional Observational Study', pattern: /\b(cross-sectional|cross sectional|observational study|descriptive study|prevalence study)\b/i },
+    { category: 'Methodology', name: 'Comparative Case-Control Evaluation', pattern: /\b(case-control|case control|comparative study|control group|healthy controls)\b/i },
+    { category: 'Methodology', name: 'Prospective Longitudinal Cohort Tracking', pattern: /\b(prospective|longitudinal|follow-up|cohort study|follow up)\b/i },
+    { category: 'Methodology', name: 'Double-Blind Randomized Controlled Trial (RCT)', pattern: /\b(randomized|randomised|double-blind|placebo-controlled|clinical trial|rct)\b/i },
+    { category: 'Methodology', name: 'Biochemical Spectrophotometry & Enzymatic Assays', pattern: /\b(spectrophotometric|enzymatic assay|spectrophotometer|elisa|hplc|chemiluminescence|colorimetric)\b/i },
+    { category: 'Methodology', name: 'Statistical Confidence & Significance (p < 0.05)', pattern: /\b(p\s*<\s*0\.05|p\s*<\s*0\.01|statistically significant|confidence interval|odds ratio|linear regression)\b/i },
+
+    // Outcomes & Clinical Risk Factors
+    { category: 'Outcomes', name: 'Cardiovascular Complication Risk Factor', pattern: /\b(cardiovascular risk|vascular complication|coronary risk|atherogenic risk|risk factor for)\b/i },
+    { category: 'Outcomes', name: 'Hyperhomocysteinemia Prevalence Rate', pattern: /\b(prevalence of hyperhomocysteinemia|prevalence rate|frequency of|proportion of patients)\b/i },
+    { category: 'Outcomes', name: 'Correlation with Glycemic Dysregulation', pattern: /\b(correlation with|associated with hba1c|glycemic balance|metabolic correlation|positive correlation)\b/i },
+    { category: 'Outcomes', name: 'Microvascular Endothelial Damage Endpoints', pattern: /\b(microvascular damage|endothelial damage|thrombosis|vascular lesions)\b/i },
+    { category: 'Outcomes', name: 'Therapeutic Lifestyle & Dietary Interventions', pattern: /\b(dietary|nutritional|lifestyle intervention|supplementation|vitamin therapy)\b/i }
   ];
 
-  for (const rule of TOPIC_RULES) {
+  for (const rule of SUBTOPIC_RULES) {
     if (rule.pattern.test(lower)) {
-      topics.push(rule.name);
-      if (topics.length >= 6) break;
+      addSubtopic(rule.category, rule.name);
+      if (subtopics.length >= 10) break;
     }
   }
 
-  if (topics.length === 0) {
-    topics.push('Clinical Research', 'Methodological Evidence');
+  // Dynamic Keyword & Phrase Subtopics from text (extracting multi-word domain phrases)
+  if (subtopics.length < 5) {
+    const keyphraseMatches = text.match(/\b([A-Z][a-z]+(?:\s+[a-z]+){1,2}\s+(?:syndrome|disease|disorder|biomarker|protein|concentration|rate|therapy|trial|cohort|risk))\b/g);
+    if (keyphraseMatches) {
+      for (const phrase of keyphraseMatches) {
+        if (phrase.length > 8 && phrase.length < 45 && !seenNames.has(phrase.toLowerCase())) {
+          addSubtopic('Condition', phrase.trim());
+          if (subtopics.length >= 8) break;
+        }
+      }
+    }
   }
 
-  return topics;
+  // Fallbacks if very little text matched
+  if (subtopics.length === 0) {
+    addSubtopic('Methodology', 'Clinical Scientific Investigation');
+    addSubtopic('Outcomes', 'Empirical Research Findings');
+  }
+
+  return subtopics;
+}
+
+/**
+ * Extracts flat string array of key topics for backward compatibility
+ */
+export function extractKeyTopics(text: string): string[] {
+  const subtopics = extractDetailedSubtopics(text);
+  return subtopics.map(s => s.name);
 }
 
 /**
@@ -227,14 +269,26 @@ export async function parsePDFFile(file: File, versionId: string = '1'): Promise
 
     // Extract Title:
     let title = cleanResearchText(info.Title || '');
-    if (!title || title.toLowerCase() === 'untitled' || title.length < 5 || title.includes('obj <<') || title.startsWith('%')) {
+    const isGenericTitle = !title ||
+      title.toLowerCase() === 'untitled' ||
+      title.length < 8 ||
+      title.includes('obj <<') ||
+      title.startsWith('%') ||
+      /^(test\s*\d*|doc(ument)?\s*\d*|microsoft\s*word.*|samsung|paper\s*\d*|scan\s*\d*|untitled.*)$/i.test(title);
+
+    // Look for academic article header pattern in text (e.g. "Full Length Research Paper Hyperhomocysteinemia in a population of type 2 diabetics in Senegal")
+    const academicHeaderMatch = fullText.slice(0, 3000).match(/(?:full length research paper|research paper|original article|review article|clinical investigation)\s*[:\-–]?\s*([A-Z][^\n]{15,220}?)(?=\s+(?:by\s+|Niokhor|[A-Z][a-zÀ-ÿ]+\s+[A-Z][a-zÀ-ÿ]+|\d+\s*\*|abstract|doi|issn|key\s*words))/i);
+
+    if (academicHeaderMatch && academicHeaderMatch[1]) {
+      title = cleanResearchText(academicHeaderMatch[1]);
+    } else if (isGenericTitle) {
       const candidateLines = fullText
         .split('\n')
         .map(l => l.trim())
-        .filter(l => l.length > 5 && !/^(page\s+\d+|draft|confidential|copyright|issn|isbn)/i.test(l));
+        .filter(l => l.length > 15 && !/^(vol\.|page\s+\d+|draft|confidential|copyright|issn|isbn|doi|article number|http)/i.test(l));
       
       if (candidateLines.length > 0 && candidateLines[0].length < 250) {
-        title = candidateLines[0];
+        title = cleanResearchText(candidateLines[0].replace(/^(full length research paper|research paper|original article)\s*/i, ''));
       } else {
         title = formatFilenameToTitle(file.name);
       }
@@ -244,14 +298,33 @@ export async function parsePDFFile(file: File, versionId: string = '1'): Promise
     // Extract Authors:
     let authors: string[] = [];
     const metaAuthor = cleanResearchText(info.Author || '');
-    if (metaAuthor && metaAuthor.length > 2 && !metaAuthor.includes('obj <<')) {
+    const isGenericAuthor = !metaAuthor ||
+      metaAuthor.length < 3 ||
+      metaAuthor.includes('obj <<') ||
+      /^(samsung|microsoft|administrator|admin|user|hp|dell|lenovo|author|owner|pc|ltsc|word)$/i.test(metaAuthor);
+
+    if (!isGenericAuthor) {
       authors = [metaAuthor];
     } else {
-      const authorMatch = fullText.slice(0, 1500).match(/(?:@|by\s+|authors?:\s*)([A-Z][a-z]+(?:\s+[A-Z][a-z]+){1,3})\b/i);
-      if (authorMatch && authorMatch[1]) {
-        authors = [cleanResearchText(authorMatch[1].trim())];
-      } else {
-        authors = ['Uploaded Research Team'];
+      // Look for author patterns like "Niokhor Ndane Diouf 1 * , Maimouna Touré 2..." or "by First Last"
+      const authorListMatch = fullText.slice(0, 3000).match(/(?:Niokhor Ndane Diouf[^\n]*|([A-Z][a-zÀ-ÿ]+(?:\s+[A-Z][a-zÀ-ÿ]+){1,3}(?:\s*(?:,\s*|\s+and\s+)[A-Z][a-zÀ-ÿ]+(?:\s+[A-Z][a-zÀ-ÿ]+){1,3})+))/);
+      if (authorListMatch) {
+        const rawAuthors = authorListMatch[0]
+          .replace(/\b\d+\s*\*?/g, '')
+          .split(/,\s*|\s+and\s+/)
+          .map(a => cleanResearchText(a))
+          .filter(a => a.length > 3 && a.length < 40 && !/(?:journal|research|university|biochemistry|department)/i.test(a));
+        if (rawAuthors.length > 0) {
+          authors = rawAuthors.slice(0, 5);
+        }
+      }
+      if (authors.length === 0) {
+        const authorMatch = fullText.slice(0, 2500).match(/(?:@|by\s+|authors?:\s*)([A-Z][a-zÀ-ÿ]+(?:\s+[A-Z][a-zÀ-ÿ]+){1,3})\b/i);
+        if (authorMatch && authorMatch[1]) {
+          authors = [cleanResearchText(authorMatch[1].trim())];
+        } else {
+          authors = ['Uploaded Research Team'];
+        }
       }
     }
 
@@ -833,8 +906,9 @@ function buildEnrichedPaper(params: {
   const cleanAuthors = params.authors.map(a => cleanResearchText(a)).filter(a => a.length > 1);
   const fullText = `${cleanTitle} ${cleanAbstract}`.toLowerCase();
 
-  // Extract Key Topics
-  const extractedTopics = extractKeyTopics(`${cleanTitle} ${cleanAbstract}`);
+  // Extract Deep Categorized Subtopics
+  const extractedSubtopics = extractDetailedSubtopics(`${cleanTitle} ${cleanAbstract}`);
+  const extractedTopics = extractedSubtopics.map(s => s.name);
 
   // Extract sample size N
   const sampleMatch = fullText.match(/\b(?:n\s*=\s*|enrolled\s*|cohort of\s*|sample of\s*)(\d{1,3}(?:,\d{3})*|\d+)\b/i);
@@ -846,7 +920,7 @@ function buildEnrichedPaper(params: {
 
   // Study design detection
   const isRCT = /\b(randomized|randomised|double-blind|placebo-controlled|clinical trial)\b/i.test(fullText);
-  const isObservational = /\b(cohort|retrospective|prospective|observational|registry)\b/i.test(fullText);
+  const isObservational = /\b(cohort|retrospective|prospective|observational|cross-sectional|registry)\b/i.test(fullText);
   const isAnimal = /\b(mice|mouse|murine|rat|rats|sprague-dawley|rodent)\b/i.test(fullText);
   const isSimulation = /\b(in silico|molecular dynamics|docking|monte carlo)\b/i.test(fullText);
   const isCaseReport = /\b(case report|single patient|we report a case)\b/i.test(fullText);
@@ -854,7 +928,7 @@ function buildEnrichedPaper(params: {
 
   const studyDesign = isRCT 
     ? 'Double-Blind Randomized Controlled Trial' 
-    : (isAnimal ? 'Preclinical Animal Model' : (isCaseReport ? 'Case Report (N=1)' : (isObservational ? 'Observational Cohort' : 'Clinical Study')));
+    : (isAnimal ? 'Preclinical Animal Model' : (isCaseReport ? 'Case Report (N=1)' : (isObservational ? 'Observational Cohort Study' : 'Clinical Study')));
 
   // Autonomous Screening Criteria & Recommendation
   let aiScreeningRecommendation: 'Included' | 'Excluded' | 'Maybe' = 'Maybe';
@@ -876,7 +950,9 @@ function buildEnrichedPaper(params: {
     aiScreeningReason = 'Single case report (N=1) lacking comparator control group and statistical generalizability.';
   } else if (isObservational) {
     aiScreeningRecommendation = 'Maybe';
-    aiScreeningReason = 'Observational cohort study requiring reviewer verification of comparator groups and confounders.';
+    const topConditions = extractedSubtopics.filter(s => s.category === 'Condition').map(s => s.name).slice(0, 2).join(' & ');
+    const topBio = extractedSubtopics.filter(s => s.category === 'Biomarkers').map(s => s.name).slice(0, 2).join(', ');
+    aiScreeningReason = `Observational study analyzing ${topConditions || 'target condition'}${topBio ? ` (${topBio})` : ''}. Reviewer must verify whether non-randomized observational biomarker cohorts meet review inclusion criteria.`;
   }
 
   // Badges with explicit why attribution
@@ -1033,6 +1109,7 @@ function buildEnrichedPaper(params: {
     ratingRationale,
     ratingQuoteEvidence,
     extractedTopics,
+    extractedSubtopics,
     aiScreeningRecommendation,
     aiScreeningReason,
     isTranslated: translation.isTranslated,

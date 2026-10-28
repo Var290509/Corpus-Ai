@@ -16,6 +16,7 @@ import {
   Quote
 } from 'lucide-react';
 import { ResearchPaper, ReviewerDecision, AIBadge, PICOSpan } from '../types';
+import { extractDetailedSubtopics } from '../services/fileParser';
 
 interface PaperCardProps {
   paper: ResearchPaper;
@@ -46,12 +47,14 @@ export const PaperCard: React.FC<PaperCardProps> = ({
   const status = decision?.status || 'unscreened';
 
   const exclusionOptions = [
+    { code: 'EXC-DESIGN', label: 'Ineligible Study Design (Observational / Non-RCT)' },
+    { code: 'EXC-POPULATION', label: 'Wrong Patient Population or Demographic Cohort' },
+    { code: 'EXC-OUTCOME', label: 'Missing Primary Clinical / Biochemical Endpoints' },
     { code: 'EXC-ANIMAL', label: 'Animal / Rodent Preclinical Model' },
-    { code: 'EXC-NON-ENG', label: 'Non-English Text' },
     { code: 'EXC-SIM', label: 'In Silico / Computational Simulation' },
     { code: 'EXC-CASE', label: 'Single Case Report (N=1)' },
-    { code: 'EXC-NO-PICO', label: 'Irrelevant Population or Endpoints' },
-    { code: 'EXC-REVIEW', label: 'Narrative Review / Editorial' },
+    { code: 'EXC-NON-ENG', label: 'Non-English or Incomplete Translation' },
+    { code: 'EXC-REVIEW', label: 'Narrative Review / Editorial / Commentary' },
   ];
 
   // Helper to render abstract with PICO highlighted spans
@@ -109,6 +112,29 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       ? 'Awarded 4 Stars (85/100): Strong prospective observational cohort with characterized endpoints and statistical significance.' 
       : 'Assigned Standard Rating (70/100): Observational trial parameters requiring full-text cross validation.'
   );
+
+  // Dynamically resolve subtopics if not already enriched
+  const subtopics = paper.extractedSubtopics && paper.extractedSubtopics.length > 0
+    ? paper.extractedSubtopics
+    : extractDetailedSubtopics(`${paper.title} ${paper.abstract}`);
+
+  // Display title cleaning: if title is a generic Word artifact ("Test 1", "Document 1"), extract academic title from abstract
+  let displayTitle = paper.title;
+  if (/^(test\s*\d*|doc(ument)?\s*\d*|untitled.*|microsoft\s*word.*)$/i.test(displayTitle.trim())) {
+    const candidateMatch = paper.abstract.match(/(?:full length research paper|research paper|original article)\s*[:\-–]?\s*([A-Z][^\n]{15,220}?)(?=\s+(?:by\s+|Niokhor|[A-Z][a-zÀ-ÿ]+\s+[A-Z][a-zÀ-ÿ]+|\d+\s*\*|abstract|doi|issn))/i);
+    if (candidateMatch && candidateMatch[1]) {
+      displayTitle = candidateMatch[1].trim();
+    }
+  }
+
+  // Display author cleaning: if author is "Samsung" or "Administrator"
+  let displayAuthors = paper.authors;
+  if (displayAuthors.length === 1 && /^(samsung|microsoft|administrator|admin|user|hp|dell|lenovo)$/i.test(displayAuthors[0].trim())) {
+    const authorMatch = paper.abstract.match(/(?:Niokhor Ndane Diouf[^\n,]*|([A-Z][a-zÀ-ÿ]+(?:\s+[A-Z][a-zÀ-ÿ]+){1,3}(?:\s*(?:,\s*|\s+and\s+)[A-Z][a-zÀ-ÿ]+(?:\s+[A-Z][a-zÀ-ÿ]+){1,3})+))/);
+    if (authorMatch) {
+      displayAuthors = [authorMatch[0].replace(/\b\d+\s*\*?/g, '').trim()];
+    }
+  }
 
   return (
     <div className={`glass-card rounded-2xl p-5 border transition-all text-left relative ${
@@ -207,12 +233,12 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
       {/* Paper Title */}
       <h4 className="text-sm font-bold text-[#FAF9F8] leading-snug hover:text-white transition-colors">
-        {paper.title}
+        {displayTitle}
       </h4>
 
       {/* Authors & Identifiers */}
       <div className="text-xs text-[#E5E4E2]/70 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span>{paper.authors.slice(0, 3).join(', ')}{paper.authors.length > 3 ? ' et al.' : ''}</span>
+        <span>{displayAuthors.slice(0, 3).join(', ')}{displayAuthors.length > 3 ? ' et al.' : ''}</span>
         {paper.doi && (
           <a
             href={`https://doi.org/${paper.doi}`}
@@ -231,61 +257,183 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         )}
       </div>
 
-      {/* Extracted Topics from PDF / Picture */}
-      {paper.extractedTopics && paper.extractedTopics.length > 0 && (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5">
-          <span className="text-[10px] font-mono uppercase text-[#E5E4E2]/60 mr-0.5">Topics:</span>
-          {paper.extractedTopics.map((topic, ti) => (
-            <span
-              key={ti}
-              className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#241710] border border-[#E6E0F0]/15 text-[#E6E0F0] hover:border-[#E6E0F0]/40 transition-colors"
-            >
-              #{topic}
-            </span>
-          ))}
+      {/* Extracted Deep Subtopics from PDF / Full-Text Analysis */}
+      <div className="mt-3 p-3.5 rounded-xl bg-[#241710]/95 border border-[#E6E0F0]/25 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-bold text-[#FAF9F8] uppercase tracking-wider flex items-center space-x-1.5 font-mono">
+            <Layers className="w-3.5 h-3.5 text-amber-300" />
+            <span>Analyzed Subtopics in this Paper ({subtopics.length}):</span>
+          </span>
+          <span className="text-[10px] text-[#E5E4E2]/60 hidden sm:inline">Categorized Clinical & Methodological Features</span>
         </div>
-      )}
 
-      {/* AI Screening Recommendation (Included / Excluded / Maybe) */}
-      {paper.aiScreeningRecommendation && (
-        <div className="mt-2.5 p-2 rounded-xl bg-[#241710]/90 border border-[#E6E0F0]/20 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <div className="flex items-center space-x-2">
-            <span className="text-[10px] font-mono uppercase text-[#E5E4E2]/70">AI Recommendation:</span>
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border flex items-center space-x-1 ${
-              paper.aiScreeningRecommendation === 'Included'
-                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50'
-                : (paper.aiScreeningRecommendation === 'Excluded'
-                    ? 'bg-rose-950/80 text-rose-300 border-rose-500/50'
-                    : 'bg-amber-950/80 text-amber-300 border-amber-500/50')
-            }`}>
-              {paper.aiScreeningRecommendation === 'Included' && <Check className="w-3 h-3 mr-0.5" />}
-              {paper.aiScreeningRecommendation === 'Excluded' && <X className="w-3 h-3 mr-0.5" />}
-              {paper.aiScreeningRecommendation === 'Maybe' && <HelpCircle className="w-3 h-3 mr-0.5" />}
-              <span>{paper.aiScreeningRecommendation}</span>
-            </span>
-            {paper.aiScreeningReason && (
-              <span className="text-[11px] text-[#E5E4E2]/80 italic hidden sm:inline truncate max-w-sm" title={paper.aiScreeningReason}>
-                — {paper.aiScreeningReason}
+        {/* Categorized Subtopics Pills */}
+        <div className="flex flex-wrap gap-1.5 items-center">
+          {subtopics.map((sub, si) => {
+            const badgeStyle = 
+              sub.category === 'Condition'
+                ? 'bg-rose-950/70 text-rose-200 border-rose-500/40'
+                : (sub.category === 'Biomarkers'
+                    ? 'bg-cyan-950/70 text-cyan-200 border-cyan-500/40'
+                    : (sub.category === 'Population'
+                        ? 'bg-amber-950/70 text-amber-200 border-amber-500/40'
+                        : (sub.category === 'Methodology'
+                            ? 'bg-indigo-950/70 text-indigo-200 border-indigo-500/40'
+                            : 'bg-emerald-950/70 text-emerald-200 border-emerald-500/40')));
+            return (
+              <span
+                key={si}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-medium border flex items-center space-x-1 ${badgeStyle}`}
+                title={`${sub.category}: ${sub.name}`}
+              >
+                <span className="font-bold opacity-75 font-mono">[{sub.category.toUpperCase()}]</span>
+                <span>{sub.name}</span>
               </span>
-            )}
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Interactive AI Screening Assistant: Prominently Asking to Include or Exclude */}
+      <div className="mt-3.5 p-4 rounded-2xl bg-gradient-to-r from-[#2B1B12] via-[#352317] to-[#2B1B12] border-2 border-[#E6E0F0]/30 shadow-lg space-y-3">
+        {/* Header & Question */}
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center space-x-2">
+            <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-xs font-bold text-[#FAF9F8] uppercase tracking-wider block">
+                AI Screening Assistant: Do you want to INCLUDE or EXCLUDE this study?
+              </span>
+              <span className="text-[11px] text-[#E5E4E2]/80">
+                Evaluate against your systematic review criteria using the analyzed subtopics above
+              </span>
+            </div>
           </div>
 
-          {/* Quick Apply Button */}
-          {status === 'unscreened' && (
-            <button
-              onClick={() => {
-                const targetStatus = paper.aiScreeningRecommendation === 'Included' ? 'include' : (paper.aiScreeningRecommendation === 'Excluded' ? 'exclude' : 'maybe');
-                onDecide(paper.id, targetStatus, paper.aiScreeningReason);
-              }}
-              className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#4A3324] hover:bg-[#5C3F2D] text-[#FAF9F8] border border-[#E6E0F0]/30 transition-all flex items-center space-x-1 cursor-pointer shrink-0"
-              title="Accept the AI recommendation directly"
-            >
-              <Sparkles className="w-2.5 h-2.5 text-amber-300" />
-              <span>Apply AI Suggestion</span>
-            </button>
+          {/* AI Suggested Decision Pill */}
+          {paper.aiScreeningRecommendation && (
+            <div className="flex items-center space-x-1.5 bg-[#1C110B] px-2.5 py-1 rounded-xl border border-[#E6E0F0]/20 text-xs">
+              <span className="text-[10px] font-mono text-[#E5E4E2]/70 uppercase">AI Suggestion:</span>
+              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border flex items-center space-x-1 ${
+                paper.aiScreeningRecommendation === 'Included'
+                  ? 'bg-emerald-950 text-emerald-300 border-emerald-500/50'
+                  : (paper.aiScreeningRecommendation === 'Excluded'
+                      ? 'bg-rose-950 text-rose-300 border-rose-500/50'
+                      : 'bg-amber-950 text-amber-300 border-amber-500/50')
+              }`}>
+                <span>{paper.aiScreeningRecommendation}</span>
+              </span>
+            </div>
           )}
         </div>
-      )}
+
+        {/* Clinical Screening Rationale */}
+        {paper.aiScreeningReason && (
+          <div className="p-2.5 rounded-xl bg-[#1C110B] border border-[#E6E0F0]/15 text-xs text-[#FAF9F8] flex items-start space-x-2">
+            <Info className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
+            <div className="text-[11px] leading-relaxed">
+              <strong className="text-amber-200">Screening Rationale: </strong>
+              <span className="text-[#E5E4E2]/90">{paper.aiScreeningReason}</span>
+            </div>
+          </div>
+        )}
+
+        {/* The Action Buttons Prompt */}
+        <div className="pt-2 border-t border-[#E6E0F0]/20 flex flex-wrap items-center justify-between gap-3">
+          <span className="text-xs font-bold text-[#FAF9F8] flex items-center space-x-1.5">
+            <HelpCircle className="w-4 h-4 text-emerald-400" />
+            <span>Select Screening Decision:</span>
+          </span>
+
+          <div className="flex flex-wrap items-center gap-2 relative">
+            {/* Include Button */}
+            <button
+              onClick={() => onDecide(paper.id, 'include', 'Matches review criteria & target subtopics')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md ${
+                status === 'include'
+                  ? 'bg-emerald-600 text-white ring-2 ring-emerald-400 shadow-emerald-900/50'
+                  : 'bg-emerald-950/80 hover:bg-emerald-700 text-emerald-200 border border-emerald-500/60'
+              }`}
+              title="Include this paper in systematic review"
+            >
+              <Check className="w-4 h-4" />
+              <span>{status === 'include' ? '✓ Included in Review' : 'Include Paper'}</span>
+            </button>
+
+            {/* Exclude Button with Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowReasonDropdown(!showReasonDropdown)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md ${
+                  status === 'exclude'
+                    ? 'bg-rose-600 text-white ring-2 ring-rose-400 shadow-rose-900/50'
+                    : 'bg-rose-950/80 hover:bg-rose-700 text-rose-200 border border-rose-500/60'
+                }`}
+                title="Exclude this paper and provide exclusion criterion"
+              >
+                <X className="w-4 h-4" />
+                <span>{status === 'exclude' ? '✕ Excluded' : 'Exclude Paper'}</span>
+                <ChevronDown className="w-3.5 h-3.5 ml-0.5" />
+              </button>
+
+              {showReasonDropdown && (
+                <div className="absolute right-0 top-full mt-2 w-72 bg-[#362419] border border-[#E6E0F0]/30 rounded-xl shadow-2xl p-2 z-40 text-xs animate-fade-in">
+                  <span className="text-[10px] font-mono text-[#E5E4E2]/70 px-2 py-1 block border-b border-[#E6E0F0]/15 mb-1">
+                    Select Specific Reason to Exclude:
+                  </span>
+                  {exclusionOptions.map((opt) => (
+                    <button
+                      key={opt.code}
+                      onClick={() => {
+                        onDecide(paper.id, 'exclude', `${opt.code}: ${opt.label}`);
+                        setShowReasonDropdown(false);
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-rose-950/80 hover:text-rose-200 transition-colors block text-[11px] cursor-pointer"
+                    >
+                      <span className="font-mono font-bold mr-1 text-[#E6E0F0]">{opt.code}</span>
+                      <span>{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Maybe / Hold Button */}
+            <button
+              onClick={() => onDecide(paper.id, 'maybe', 'Requires full-text appraisal against subtopic criteria')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all cursor-pointer ${
+                status === 'maybe'
+                  ? 'bg-[#4A3324] text-[#E6E0F0] ring-2 ring-[#E6E0F0]/50'
+                  : 'bg-[#271911] hover:bg-[#4A3324] text-[#E5E4E2] border border-[#E6E0F0]/25'
+              }`}
+              title="Mark as Maybe for team consensus"
+            >
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>{status === 'maybe' ? '? Marked as Maybe' : 'Maybe / Hold'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Current Decision Pill if already reviewed */}
+        {status !== 'unscreened' && (
+          <div className={`p-2.5 rounded-xl border text-xs flex items-center justify-between ${
+            status === 'include'
+              ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-200'
+              : (status === 'exclude'
+                  ? 'bg-rose-950/60 border-rose-500/40 text-rose-200'
+                  : 'bg-[#3A281E] border-[#E6E0F0]/30 text-[#E6E0F0]')
+          }`}>
+            <span className="font-semibold flex items-center space-x-1.5">
+              <span>Current Review Decision:</span>
+              <strong className="uppercase underline tracking-wider">{status}</strong>
+              {decision?.reason && <span>— "{decision.reason}"</span>}
+            </span>
+            <span className="text-[10px] opacity-75">(Click any button above to change)</span>
+          </div>
+        )}
+      </div>
 
       {/* AI Badges Row & Recommender Button */}
       <div className="mt-3 flex flex-wrap gap-2 items-center justify-between">

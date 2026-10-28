@@ -18,12 +18,14 @@ interface AIBadgeModalProps {
   badge: AIBadge | null;
   paper: ResearchPaper | null;
   onClose: () => void;
+  onDecide?: (paperId: string, status: 'include' | 'exclude' | 'maybe', reason?: string) => void;
 }
 
 export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
   badge,
   paper,
-  onClose
+  onClose,
+  onDecide
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -218,24 +220,46 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
                 </div>
               )}
 
-              {/* Topics Discovered */}
-              {paper.extractedTopics && paper.extractedTopics.length > 0 && (
-                <div className="space-y-1.5">
-                  <span className="text-xs font-bold text-[#FAF9F8] block">
-                    Topics Discovered from Full PDF / Picture:
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {paper.extractedTopics.map((top, idx) => (
+              {/* Analyzed Subtopics from Full PDF */}
+              <div className="space-y-2 pt-2 border-t border-[#E6E0F0]/15">
+                <span className="text-xs font-bold text-[#FAF9F8] block">
+                  Analyzed Subtopics in this Paper ({paper.extractedSubtopics?.length || paper.extractedTopics?.length || 0}):
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {paper.extractedSubtopics && paper.extractedSubtopics.length > 0 ? (
+                    paper.extractedSubtopics.map((sub, idx) => {
+                      const badgeStyle = 
+                        sub.category === 'Condition'
+                          ? 'bg-rose-950/70 text-rose-200 border-rose-500/40'
+                          : (sub.category === 'Biomarkers'
+                              ? 'bg-cyan-950/70 text-cyan-200 border-cyan-500/40'
+                              : (sub.category === 'Population'
+                                  ? 'bg-amber-950/70 text-amber-200 border-amber-500/40'
+                                  : (sub.category === 'Methodology'
+                                      ? 'bg-indigo-950/70 text-indigo-200 border-indigo-500/40'
+                                      : 'bg-emerald-950/70 text-emerald-200 border-emerald-500/40')));
+                      return (
+                        <span 
+                          key={idx} 
+                          className={`px-2.5 py-1 rounded-lg text-[10px] font-medium border flex items-center space-x-1 ${badgeStyle}`}
+                        >
+                          <span className="font-bold opacity-75 font-mono">[{sub.category.toUpperCase()}]</span>
+                          <span>{sub.name}</span>
+                        </span>
+                      );
+                    })
+                  ) : (
+                    paper.extractedTopics && paper.extractedTopics.map((top, idx) => (
                       <span 
                         key={idx} 
                         className="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-[#4A3324] border border-[#E6E0F0]/25 text-[#FAF9F8]"
                       >
                         #{top}
                       </span>
-                    ))}
-                  </div>
+                    ))
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* Multilingual Translation Details */}
               {paper.isTranslated && (
@@ -253,8 +277,41 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
 
         </div>
 
-        {/* Footer */}
-        <div className="p-4 bg-[#271911] border-t border-[#E6E0F0]/20 flex justify-end">
+        {/* Footer with Screening Decision Action Buttons */}
+        <div className="p-4 bg-[#271911] border-t border-[#E6E0F0]/20 flex flex-wrap items-center justify-between gap-3">
+          {onDecide && paper ? (
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-bold text-[#FAF9F8] hidden sm:inline">Screening Action:</span>
+              <button
+                onClick={() => {
+                  onDecide(paper.id, 'include', 'Matches review criteria & target subtopics');
+                  onClose();
+                }}
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all cursor-pointer shadow-md"
+              >
+                ✓ Include Paper
+              </button>
+              <button
+                onClick={() => {
+                  onDecide(paper.id, 'exclude', 'Ineligible Study Design or Endpoints');
+                  onClose();
+                }}
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-rose-700 hover:bg-rose-600 text-white transition-all cursor-pointer shadow-md"
+              >
+                ✕ Exclude Paper
+              </button>
+              <button
+                onClick={() => {
+                  onDecide(paper.id, 'maybe', 'Hold for secondary consensus review');
+                  onClose();
+                }}
+                className="px-3 py-2 rounded-xl text-xs font-bold bg-[#4A3324] hover:bg-[#5C3F2D] text-[#E6E0F0] border border-[#E6E0F0]/30 transition-all cursor-pointer"
+              >
+                ? Maybe
+              </button>
+            </div>
+          ) : <div />}
+
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-bold bg-[#E5E4E2] text-[#2C1E16] hover:bg-white transition-all cursor-pointer shadow-md"
