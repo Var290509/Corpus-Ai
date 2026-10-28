@@ -414,9 +414,9 @@ export const App: React.FC = () => {
 
   const includedCount = papers.filter(p => p.isRepresentative && decisions[p.id]?.status === 'include').length;
 
-  // 3. Render Active Project Workspace in Inverted Theme
+  // 3. Render Active Project Workspace in Warm Coffee Theme
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-radial from-[#24160E] via-[#160E09] to-[#0D0704] text-[#E5E4E2]">
+    <div className="min-h-screen flex flex-col font-sans bg-radial from-[#4A3324] via-[#352318] to-[#241710] text-[#FAF9F8]">
       
       {/* Navigation Bar */}
       <Navbar
@@ -634,17 +634,17 @@ export const App: React.FC = () => {
       />
 
       {/* Footer */}
-      <footer className="w-full bg-[#120B07] border-t border-[#E6E0F0]/10 py-4 mt-8 text-xs text-[#8E8680]">
+      <footer className="w-full bg-[#271911] border-t border-[#E6E0F0]/20 py-4 mt-8 text-xs text-[#E5E4E2]/70">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-[#FAF9F8]">Corpus AI</span>
             <span>•</span>
             <span>Review: {currentProject.name}</span>
           </div>
-          <div className="flex items-center space-x-4 text-[11px] text-[#A59E98]">
+          <div className="flex items-center space-x-4 text-[11px] text-[#E5E4E2]/80">
             <span>Google Cloud Firestore Integrated</span>
             <span>•</span>
-            <span>Theme: Deep Coffee #6F4E37 | Platinum #E5E4E2 | Lavender #E6E0F0</span>
+            <span>Theme: Medium Coffee #6F4E37 | Platinum #E5E4E2 | Lavender #E6E0F0</span>
           </div>
         </div>
       </footer>

@@ -9,7 +9,8 @@ import {
   Layers, 
   Sparkles,
   ArrowRight,
-  ClipboardPaste
+  ClipboardPaste,
+  Star
 } from 'lucide-react';
 import { ResearchPaper } from '../types';
 import { parseUploadedFile, parseRawText } from '../services/fileParser';
@@ -28,6 +29,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
   const [uploadStats, setUploadStats] = useState<{
     filename: string;
     count: number;
+    duplicatesRemoved: number;
     format: string;
   } | null>(null);
 
@@ -43,6 +45,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
       const allExtracted: ResearchPaper[] = [];
       let lastFilename = '';
       let lastFormat = '';
+      let totalDupesRemoved = 0;
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -50,6 +53,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
         allExtracted.push(...res.papers);
         lastFilename = res.filename;
         lastFormat = res.format.toUpperCase();
+        totalDupesRemoved += res.duplicatesRemoved || 0;
       }
 
       if (allExtracted.length > 0) {
@@ -57,6 +61,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
         setUploadStats({
           filename: lastFilename,
           count: allExtracted.length,
+          duplicatesRemoved: totalDupesRemoved,
           format: lastFormat
         });
       }
@@ -78,6 +83,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
         setUploadStats({
           filename: 'Pasted Citations',
           count: papers.length,
+          duplicatesRemoved: 0,
           format: 'RAW / RIS'
         });
         setPastedText('');
@@ -104,10 +110,10 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
           setIsDragging(false);
           handleFiles(e.dataTransfer.files);
         }}
-        className={`glass-panel-elevated rounded-2xl p-8 sm:p-12 border-2 border-dashed transition-all text-center relative overflow-hidden bg-[#1F140D]/90 ${
+        className={`glass-panel-elevated rounded-2xl p-8 sm:p-12 border-2 border-dashed transition-all text-center relative overflow-hidden bg-[#362419]/90 ${
           isDragging 
-            ? 'border-[#E6E0F0] bg-[#2E1C12]/90 scale-[1.01]' 
-            : 'border-[#E6E0F0]/25 hover:border-[#E6E0F0]/40'
+            ? 'border-[#E6E0F0] bg-[#4A3324]/95 scale-[1.01]' 
+            : 'border-[#E6E0F0]/30 hover:border-[#E6E0F0]/50'
         }`}
       >
         <input
@@ -128,27 +134,27 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
             <h3 className="text-base font-bold text-[#FAF9F8]">
               Drop your citation or paper files here
             </h3>
-            <p className="text-xs text-[#A59E98] mt-1 leading-relaxed">
+            <p className="text-xs text-[#E5E4E2]/80 mt-1 leading-relaxed">
               Accepts <strong>.RIS</strong> (Rayyan/EndNote/Zotero), <strong>.CSV</strong>, <strong>.BIB</strong> (BibTeX), <strong>.JSON</strong>, or raw text.
             </p>
           </div>
 
-          <div className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#160E08] shadow-md">
+          <div className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold bg-[#E5E4E2] text-[#2C1E16] shadow-md">
             <span>Browse Citation Files on Computer</span>
           </div>
         </div>
 
         {isProcessing && (
-          <div className="absolute inset-0 bg-[#0E0704]/80 backdrop-blur-sm flex flex-col items-center justify-center space-y-2 z-20">
+          <div className="absolute inset-0 bg-[#271911]/90 backdrop-blur-sm flex flex-col items-center justify-center space-y-2 z-20">
             <div className="w-8 h-8 border-2 border-[#E6E0F0] border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs font-semibold text-[#FAF9F8]">Extracting & Enriching Papers with AI Badges...</span>
+            <span className="text-xs font-bold text-[#FAF9F8]">Deduplicating & Computing AI Ratings with Evidence...</span>
           </div>
         )}
       </div>
 
       {/* Upload Confirmation Stats */}
       {uploadStats && (
-        <div className="p-4 rounded-2xl bg-emerald-950/70 border border-emerald-700/50 flex items-center justify-between animate-fade-in text-xs">
+        <div className="p-4 rounded-2xl bg-emerald-950/85 border border-emerald-600/60 flex items-center justify-between animate-fade-in text-xs">
           <div className="flex items-center space-x-3">
             <CheckCircle className="w-5 h-5 text-emerald-300 shrink-0" />
             <div>
@@ -156,37 +162,37 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
                 Successfully imported {uploadStats.count} research papers!
               </span>
               <p className="text-[11px] text-emerald-200 mt-0.5">
-                Source: {uploadStats.filename} • Format: {uploadStats.format} • Extracted PICO spans & deep rigor metrics
+                Source: {uploadStats.filename} • Format: {uploadStats.format} • {uploadStats.duplicatesRemoved} duplicates removed • AI ratings & citations computed
               </p>
             </div>
           </div>
 
           <span className="px-3 py-1 rounded-lg bg-emerald-900 text-emerald-200 font-mono font-bold text-xs border border-emerald-700">
-            +{uploadStats.count} Ready to Screen
+            +{uploadStats.count} Ready
           </span>
         </div>
       )}
 
       {/* Quick Paste Alternative */}
-      <div className="glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 bg-[#1F140D]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="glass-panel rounded-2xl p-5 border border-[#E6E0F0]/20 bg-[#362419]/85 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center space-x-3">
           <ClipboardPaste className="w-5 h-5 text-[#E6E0F0]" />
           <div>
             <h4 className="text-xs font-bold text-[#FAF9F8]">Have raw text or copied RIS entries?</h4>
-            <p className="text-[11px] text-[#A59E98]">Paste citations directly without saving a file.</p>
+            <p className="text-[11px] text-[#E5E4E2]/70">Paste citations directly without saving a file.</p>
           </div>
         </div>
 
         <button
           onClick={() => setShowPasteBox(!showPasteBox)}
-          className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#2B1B12] hover:bg-[#3B2518] text-[#E5E4E2] border border-[#E6E0F0]/20 transition-all cursor-pointer"
+          className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#4A3324] hover:bg-[#5C3F2D] text-[#FAF9F8] border border-[#E6E0F0]/25 transition-all cursor-pointer"
         >
           {showPasteBox ? 'Hide Paste Box' : 'Open Paste Box'}
         </button>
       </div>
 
       {showPasteBox && (
-        <div className="glass-panel-elevated rounded-2xl p-5 border border-[#E6E0F0]/20 bg-[#1F140D]/95 space-y-3 animate-fade-in">
+        <div className="glass-panel-elevated rounded-2xl p-5 border border-[#E6E0F0]/25 bg-[#362419]/95 space-y-3 animate-fade-in">
           <textarea
             value={pastedText}
             onChange={(e) => setPastedText(e.target.value)}
@@ -198,7 +204,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
             <button
               onClick={handlePasteSubmit}
               disabled={!pastedText.trim() || isProcessing}
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#160E08] hover:bg-white transition-all cursor-pointer shadow-md disabled:opacity-50"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-[#E5E4E2] text-[#2C1E16] hover:bg-white transition-all cursor-pointer shadow-md disabled:opacity-50"
             >
               Parse Pasted Citations
             </button>

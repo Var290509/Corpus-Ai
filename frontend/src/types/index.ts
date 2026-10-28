@@ -92,7 +92,9 @@ export interface AIBadge {
   label: string;
   variant: 'gold' | 'blue' | 'purple' | 'amber' | 'rose' | 'emerald';
   badgeIcon: string;
-  whySnippet: string; // STRICT requirement: explains why the AI gave this badge
+  ratingScore?: number; // 0 - 100
+  ratingStars?: number; // 1 - 5 stars
+  whySnippet: string; // STRICT requirement: explains why the AI gave this badge / rating
   textEvidence: string; // Quote from text
   confidence: number; // 0-1
   category: 'Quality' | 'Sample' | 'Relevance' | 'Risk' | 'Finding';
@@ -134,6 +136,13 @@ export interface ResearchPaper {
   publicationTypes?: string[];
   url?: string;
   
+  // AI Quality Rating & Why it received this rating
+  overallRatingScore?: number; // 0 - 100
+  overallRatingStars?: number; // 1 - 5 stars
+  ratingBadgeLabel?: string; // e.g. "5-Star Gold RCT Rigor", "4-Star Observational Cohort"
+  ratingRationale?: string; // Detailed explanation of why this rating was assigned
+  ratingQuoteEvidence?: string; // Verbatim quote from the paper supporting the rating
+
   // Enriched AI data
   picoSpans: PICOSpan[];
   aiBadges: AIBadge[];

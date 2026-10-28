@@ -44,7 +44,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Pavel Dobryakov WebGL Fluid Simulation Engine
     let destroySim: (() => void) | undefined;
     try {
       destroySim = initFluidSimulation(canvas);
@@ -62,20 +61,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
-      // Nav bar slide down
       tl.fromTo('.landing-nav', 
         { y: -20, opacity: 0 }, 
         { y: 0, opacity: 1, duration: 0.6, delay: 0.1 }
       );
 
-      // Badge pill fade up
       tl.fromTo('.landing-badge', 
         { y: 20, opacity: 0 }, 
         { y: 0, opacity: 1, duration: 0.5 }, 
         '-=0.3'
       );
 
-      // Word by word heading stagger
       if (headingWordsRef.current.length > 0) {
         tl.fromTo(headingWordsRef.current,
           { opacity: 0, y: 24 },
@@ -84,7 +80,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         );
       }
 
-      // Word by word subline stagger
       if (sublineWordsRef.current.length > 0) {
         tl.fromTo(sublineWordsRef.current,
           { opacity: 0, y: 14 },
@@ -93,14 +88,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         );
       }
 
-      // Action form slide up
-      tl.fromTo('.landing-actions',
+      tl.fromTo('.landing-cta-group',
         { y: 25, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.6 },
         '-=0.2'
       );
 
-      // Feature cards stagger
       tl.fromTo('.landing-feature-card',
         { y: 30, opacity: 0 },
         { y: 0, opacity: 1, stagger: 0.08, duration: 0.5 },
@@ -143,26 +136,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div ref={heroRef} className="min-h-screen flex flex-col font-sans bg-[#0E0704] text-[#E5E4E2] relative overflow-hidden">
+    <div ref={heroRef} className="min-h-screen flex flex-col font-sans bg-radial from-[#4A3324] via-[#352318] to-[#241710] text-[#FAF9F8] relative overflow-hidden">
       
       {/* 1. Fluid simulation canvas (z-0) */}
       <canvas 
         ref={canvasRef} 
-        className="absolute inset-0 w-full h-full z-0 pointer-events-auto"
+        className="absolute inset-0 w-full h-full z-0 pointer-events-auto opacity-70"
         aria-hidden="true"
       />
 
-      {/* 2. Scrim (z-1) for text legibility and deep coffee obsidian vignette */}
+      {/* 2. Soft Scrim for legibility (warm coffee mocha vignette, less dark) */}
       <div 
         className="absolute inset-0 z-1 pointer-events-none" 
         style={{
-          background: 'radial-gradient(115% 95% at 50% 46%, rgba(14, 7, 4, 0.72) 0%, rgba(14, 7, 4, 0.85) 45%, rgba(14, 7, 4, 0.96) 100%)'
+          background: 'radial-gradient(115% 95% at 50% 46%, rgba(53, 35, 24, 0.45) 0%, rgba(42, 28, 19, 0.70) 50%, rgba(30, 20, 13, 0.88) 100%)'
         }}
         aria-hidden="true"
       />
 
       {/* 3. Top Navbar (z-20) */}
-      <header className="landing-nav sticky top-0 z-30 w-full border-b border-[#E6E0F0]/15 bg-[#170E08]/70 backdrop-blur-xl">
+      <header className="landing-nav sticky top-0 z-30 w-full border-b border-[#E6E0F0]/20 bg-[#352318]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             
@@ -175,7 +168,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                 <span className="font-extrabold text-base tracking-tight text-[#FAF9F8]">
                   CORPUS <span className="text-[#E6E0F0] font-light">AI</span>
                 </span>
-                <span className="ml-2.5 hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#2B1B12] text-[#E6E0F0] border border-[#E6E0F0]/25">
+                <span className="ml-2.5 hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/25">
                   Autonomous Agentic RAG
                 </span>
               </div>
@@ -183,23 +176,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
             {/* Cloud Status & Auth Actions */}
             <div className="flex items-center space-x-3">
-              <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#24160E] border border-emerald-500/30 text-emerald-300 text-xs font-medium">
+              <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#4A3324] border border-emerald-400/40 text-emerald-200 text-xs font-medium">
                 <Cloud className="w-3.5 h-3.5" />
                 <span>Google Cloud Firestore Integrated</span>
               </div>
 
               <button
                 onClick={() => { setIsSignUp(false); setShowAuthModal(true); }}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#E5E4E2] hover:text-white hover:bg-[#2B1B12] transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#E5E4E2] hover:text-white hover:bg-[#4A3324] transition-all cursor-pointer"
               >
                 Sign In
               </button>
 
               <button
-                onClick={() => { setIsSignUp(true); setShowAuthModal(true); }}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] hover:bg-white text-[#160E08] shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
+                onClick={handleQuickDemoLogin}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] hover:bg-white text-[#2C1E16] shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
               >
-                <span>Get Started</span>
+                <span>Enter Workspace</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -212,7 +205,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 flex flex-col items-center text-center relative z-10">
         
         {/* Badge Pill */}
-        <div className="landing-badge inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#2B1B12]/80 border border-[#E6E0F0]/20 text-[#E6E0F0] text-xs font-medium backdrop-blur-md shadow-md mb-6">
+        <div className="landing-badge inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#4A3324]/85 border border-[#E6E0F0]/25 text-[#E6E0F0] text-xs font-medium backdrop-blur-md shadow-md mb-6">
           <Sparkles className="w-3.5 h-3.5 text-[#E5E4E2]" />
           <span>Next-Generation Systematic Review & Multi-Index Recommender</span>
         </div>
@@ -231,7 +224,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </h1>
 
         {/* Word-by-Word Revealed Subline */}
-        <p className="mt-5 text-sm sm:text-base lg:text-lg text-[#C5BFB8] max-w-2xl leading-relaxed">
+        <p className="mt-5 text-sm sm:text-base lg:text-lg text-[#E5E4E2] max-w-2xl leading-relaxed opacity-90">
           {sublineText.split(" ").map((word, index) => (
             <span
               key={index}
@@ -243,79 +236,54 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
           ))}
         </p>
 
-        {/* Action Form / Waitlist Pill */}
-        <div className="landing-actions mt-9 w-full max-w-xl">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (email.trim()) {
-                handleAuthSubmit(e);
-              } else {
-                handleQuickDemoLogin();
-              }
-            }}
-            className="flex items-center p-1.5 rounded-full bg-[#24160E]/90 border border-[#E6E0F0]/30 shadow-2xl backdrop-blur-xl"
+        {/* Clean CTA Group (Image 1 email input removed!) */}
+        <div className="landing-cta-group mt-9 flex flex-wrap items-center justify-center gap-3.5">
+          <button
+            onClick={handleQuickDemoLogin}
+            className="px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-[#E5E4E2] to-[#E6E0F0] text-[#2C1E16] hover:brightness-105 shadow-xl flex items-center space-x-2 cursor-pointer transition-all"
           >
-            <div className="pl-4 pr-2 flex items-center text-[#B8B3AC]">
-              <Mail className="w-4 h-4 text-[#E6E0F0]" />
-            </div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter institutional email to enter workspace..."
-              className="flex-1 bg-transparent border-none text-xs sm:text-sm text-[#FAF9F8] placeholder-[#8E8680] focus:outline-none px-2"
-            />
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-gradient-to-r from-[#E5E4E2] to-[#E6E0F0] text-[#160E08] hover:brightness-105 shadow-md flex items-center space-x-1.5 cursor-pointer shrink-0 transition-all"
-            >
-              <span>Launch Studio</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </form>
+            <span>Launch Review Studio</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
 
-          {/* Quick Instant Access Button */}
-          <div className="mt-4 flex items-center justify-center space-x-2 text-xs text-[#A59E98]">
-            <span>Or explore immediately without email:</span>
-            <button
-              onClick={handleQuickDemoLogin}
-              className="text-[#E6E0F0] font-semibold underline underline-offset-4 hover:text-white transition-colors cursor-pointer"
-            >
-              Instant 1-Click Guest Access →
-            </button>
-          </div>
+          <button
+            onClick={() => { setIsSignUp(true); setShowAuthModal(true); }}
+            className="px-6 py-3 rounded-xl font-semibold text-sm bg-[#4A3324]/80 text-[#FAF9F8] border border-[#E6E0F0]/30 hover:bg-[#5C3F2D] hover:border-[#E6E0F0]/50 shadow-md flex items-center space-x-2 cursor-pointer transition-all"
+          >
+            <User className="w-4 h-4 text-[#E6E0F0]" />
+            <span>Create Account / Sign In</span>
+          </button>
         </div>
 
         {/* Feature Highlights Grid */}
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 text-left">
           
-          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 space-y-2 hover:border-[#E6E0F0]/40 transition-all">
-            <div className="w-8 h-8 rounded-lg bg-[#3B2518] text-[#E6E0F0] flex items-center justify-center">
+          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/20 space-y-2 hover:border-[#E6E0F0]/50 transition-all">
+            <div className="w-8 h-8 rounded-lg bg-[#5A3D29] text-[#E6E0F0] flex items-center justify-center">
               <Cpu className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-bold text-[#FAF9F8]">Autonomous Agentic RAG</h3>
-            <p className="text-xs text-[#C5BFB8] leading-relaxed">
+            <p className="text-xs text-[#E5E4E2]/80 leading-relaxed">
               Reads the full text of thousands of research papers, identifies consensus versus contradictions, and provides quotation evidence.
             </p>
           </div>
 
-          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 space-y-2 hover:border-[#E6E0F0]/40 transition-all">
-            <div className="w-8 h-8 rounded-lg bg-[#3B2518] text-amber-300 flex items-center justify-center">
+          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/20 space-y-2 hover:border-[#E6E0F0]/50 transition-all">
+            <div className="w-8 h-8 rounded-lg bg-[#5A3D29] text-amber-300 flex items-center justify-center">
               <Database className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-bold text-[#FAF9F8]">Multi-Database Discovery</h3>
-            <p className="text-xs text-[#C5BFB8] leading-relaxed">
-              Autonomous recommender queries Scopus, Web of Science, PubMed/MEDLINE, and IEEE Xplore to suggest high-impact papers.
+            <p className="text-xs text-[#E5E4E2]/80 leading-relaxed">
+              Autonomous recommender queries Scopus, Web of Science, PubMed/MEDLINE, and IEEE Xplore Digital Library based on your papers.
             </p>
           </div>
 
-          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 space-y-2 hover:border-[#E6E0F0]/40 transition-all">
-            <div className="w-8 h-8 rounded-lg bg-[#3B2518] text-emerald-300 flex items-center justify-center">
+          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/20 space-y-2 hover:border-[#E6E0F0]/50 transition-all">
+            <div className="w-8 h-8 rounded-lg bg-[#5A3D29] text-emerald-300 flex items-center justify-center">
               <Cloud className="w-4 h-4" />
             </div>
             <h3 className="text-sm font-bold text-[#FAF9F8]">Google Cloud Firestore</h3>
-            <p className="text-xs text-[#C5BFB8] leading-relaxed">
+            <p className="text-xs text-[#E5E4E2]/80 leading-relaxed">
               Backed by Google Cloud Firestore (Spark Free Tier) for zero-cost, real-time persistence with offline-first synchronization.
             </p>
           </div>
@@ -325,16 +293,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
       </main>
 
       {/* Footer (z-20) */}
-      <footer className="border-t border-[#E6E0F0]/10 bg-[#120B07] py-6 text-center text-xs text-[#8E8680] relative z-20">
+      <footer className="border-t border-[#E6E0F0]/15 bg-[#2B1B12]/80 py-6 text-center text-xs text-[#C5BFB8] relative z-20">
         © 2026 Corpus AI — Autonomous Systematic Literature Review & Agentic RAG Platform.
       </footer>
 
       {/* Auth Modal (Sign In / Sign Up) */}
       {showAuthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div 
             ref={authModalRef}
-            className="w-full max-w-md bg-[#1F140D] border border-[#E6E0F0]/25 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-left"
+            className="w-full max-w-md bg-[#3B281D] border border-[#E6E0F0]/30 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-left"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center space-y-1 pb-2">
@@ -344,7 +312,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               <h3 className="text-lg font-bold text-[#FAF9F8]">
                 {isSignUp ? 'Create Corpus AI Account' : 'Sign In to Review Workspace'}
               </h3>
-              <p className="text-xs text-[#A59E98]">
+              <p className="text-xs text-[#E5E4E2]/80">
                 {isSignUp 
                   ? 'Access multi-database screening and agentic synthesis'
                   : 'Welcome back! Enter your research credentials'}
@@ -392,22 +360,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl font-semibold text-xs bg-[#E5E4E2] text-[#160E08] hover:bg-white shadow-md transition-all cursor-pointer mt-2"
+                className="w-full py-2.5 rounded-xl font-semibold text-xs bg-[#E5E4E2] text-[#2C1E16] hover:bg-white shadow-md transition-all cursor-pointer mt-2"
               >
                 {isSignUp ? 'Create Free Account' : 'Sign In to Workspace'}
               </button>
             </form>
 
-            <div className="pt-2 border-t border-[#E6E0F0]/15 flex items-center justify-between text-xs text-[#A59E98]">
+            <div className="pt-2 border-t border-[#E6E0F0]/15 flex items-center justify-between text-xs text-[#E5E4E2]/80">
               <button
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="hover:text-[#FAF9F8] transition-colors"
+                className="hover:text-white transition-colors cursor-pointer"
               >
                 {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
               </button>
               <button
                 onClick={() => setShowAuthModal(false)}
-                className="hover:text-[#FAF9F8] transition-colors"
+                className="hover:text-white transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -420,7 +388,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   );
 };
 
-// WebGL Fluid Simulation Engine Implementation for React
 function initFluidSimulation(canvas: HTMLCanvasElement): () => void {
   canvas.width = canvas.clientWidth || window.innerWidth;
   canvas.height = canvas.clientHeight || window.innerHeight;
@@ -429,13 +396,10 @@ function initFluidSimulation(canvas: HTMLCanvasElement): () => void {
   if (!gl) return () => {};
 
   let animationFrameId = 0;
-  let time = 0;
 
-  // Gentle swirling ambient background loop
   const render = () => {
-    time += 0.01;
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.06, 0.03, 0.02, 1.0);
+    gl.clearColor(0.20, 0.13, 0.09, 1.0); // Warm medium coffee clear color
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     animationFrameId = requestAnimationFrame(render);

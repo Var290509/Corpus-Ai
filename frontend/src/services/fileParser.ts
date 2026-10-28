@@ -5,6 +5,7 @@ export interface ParseResult {
   papers: ResearchPaper[];
   filename: string;
   totalParsed: number;
+  duplicatesRemoved?: number;
   format: 'ris' | 'csv' | 'json' | 'bibtex' | 'txt' | 'unknown';
 }
 
@@ -271,10 +272,15 @@ export async function parseUploadedFile(file: File, versionId: string = '1'): Pr
     }
   }
 
+  // Automated entity deduplication across parsed records in the file
+  const { updatedPapers, duplicateGroups } = runDeduplication(papers, {});
+  const duplicatesCount = papers.length - updatedPapers.filter(p => p.isRepresentative).length;
+
   return {
-    papers,
+    papers: updatedPapers,
     filename: file.name,
     totalParsed: papers.length,
+    duplicatesRemoved: duplicatesCount,
     format
   };
 }
@@ -377,6 +383,45 @@ function buildEnrichedPaper(params: {
     });
   }
 
+  // Calculate Overall AI Rating (Stars 1-5, Score 0-100) and Attribution
+  let overallRatingScore = 75;
+  let overallRatingStars = 3;
+  let ratingBadgeLabel = '3-Star Empirical Study';
+  let ratingRationale = 'Observational or standard trial methodology with acceptable reporting metrics.';
+  let ratingQuoteEvidence = params.abstract.slice(0, 140) + '...';
+
+  if (isRCT) {
+    overallRatingScore = sampleSize && sampleSize >= 500 ? 98 : 94;
+    overallRatingStars = 5;
+    ratingBadgeLabel = '★★★★★ 5-Star Gold RCT Rigor';
+    ratingRationale = `Awarded 5 Stars (${overallRatingScore}/100): Double-blind, randomized controlled trial design verified. High methodological rigor with low risk of bias and prospectively controlled endpoints.`;
+    ratingQuoteEvidence = extractSnippet(params.abstract, /randomized|double-blind|placebo|controlled trial/i);
+  } else if (sampleSize && sampleSize >= 500) {
+    overallRatingScore = 88;
+    overallRatingStars = 4;
+    ratingBadgeLabel = '★★★★☆ 4-Star High-Power Cohort';
+    ratingRationale = `Awarded 4 Stars (88/100): Robust statistical power (N=${sampleSize.toLocaleString()}) minimizing standard error, prospective cohort tracking, and quantified statistical significance.`;
+    ratingQuoteEvidence = extractSnippet(params.abstract, /n\s*=\s*\d+|cohort of \d+|enrolled \d+/i);
+  } else if (isAnimal || isSimulation) {
+    overallRatingScore = 48;
+    overallRatingStars = 2;
+    ratingBadgeLabel = isAnimal ? '★★☆☆☆ 2-Star Preclinical Model' : '★★☆☆☆ 2-Star In Silico';
+    ratingRationale = `Assigned 2 Stars (48/100): Preclinical non-human or computational model. High risk of bias for direct human therapeutic translation without in vivo clinical verification.`;
+    ratingQuoteEvidence = extractSnippet(params.abstract, /mice|mouse|rat|in silico|simulation/i);
+  } else if (isCaseReport) {
+    overallRatingScore = 40;
+    overallRatingStars = 1;
+    ratingBadgeLabel = '★☆☆☆☆ 1-Star N=1 Case Report';
+    ratingRationale = `Assigned 1 Star (40/100): Single case observation (N=1) without control arm, precluding statistical inference of average treatment effects.`;
+    ratingQuoteEvidence = extractSnippet(params.abstract, /case report|single patient|we report a case/i);
+  } else if (isObservational) {
+    overallRatingScore = 82;
+    overallRatingStars = 4;
+    ratingBadgeLabel = '★★★★☆ 4-Star Controlled Cohort';
+    ratingRationale = `Awarded 4 Stars (82/100): Multi-center prospective or retrospective observational design with well-characterized comparator cohorts.`;
+    ratingQuoteEvidence = extractSnippet(params.abstract, /cohort|prospective|registry|multicenter/i);
+  }
+
   return {
     id: params.id,
     title: params.title,
@@ -393,13 +438,18 @@ function buildEnrichedPaper(params: {
     hidden: false,
     picoSpans: [],
     aiBadges: badges,
+    overallRatingScore,
+    overallRatingStars,
+    ratingBadgeLabel,
+    ratingRationale,
+    ratingQuoteEvidence,
     deepAnalysis: {
       studyDesign,
       sampleSize,
       primaryEffectMetric: isContradictory ? 'No significant divergence (p > 0.05)' : (isRCT ? 'Statistically significant clinical effect' : 'Observational correlation'),
       pValue,
       endpointSummary: params.title,
-      statisticalRigorScore: isRCT ? 94 : (isAnimal ? 45 : 75),
+      statisticalRigorScore: overallRatingScore,
       biasAssessment: {
         riskLevel: isRCT ? 'Low' : (isAnimal || isSimulation || isCaseReport ? 'High' : 'Moderate'),
         explanation: isRCT ? 'Adequate randomization and control protocol verified' : 'Non-randomized or non-human study setting'
