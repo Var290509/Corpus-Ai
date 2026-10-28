@@ -37,8 +37,8 @@ interface ProjectsDashboardProps {
   onLogout: () => void;
 }
 
-// Exact Review Types from Image 2 (media_1793178839908_1ca34a37.jpg)
-export const RAYYAN_REVIEW_TYPES = [
+// Standard Systematic & Literature Review Types
+const STANDARD_REVIEW_TYPES = [
   'Not applicable',
   'Systematic review',
   'Literature review',
@@ -50,6 +50,7 @@ export const RAYYAN_REVIEW_TYPES = [
   'Mixed study review',
   'Meta-analysis'
 ];
+const RAYYAN_REVIEW_TYPES = STANDARD_REVIEW_TYPES;
 
 export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
   user,
