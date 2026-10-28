@@ -63,6 +63,12 @@ const LANGUAGE_PROFILES: Record<string, { name: string; patterns: RegExp[] }> = 
   ru: {
     name: 'Russian',
     patterns: [/([\u0400-\u04FF]{3,})/]
+  },
+  hr: {
+    name: 'Croatian / Slavic',
+    patterns: [
+      /\b(ovaj|ova|istraživanje|studija|bolesnici|bolesnika|ispitanika|pacijenti|rezultati|metode|zaključak|učestalost|prevalencija|dijabetičara|dijabetes|liječenje|sindrom|pretilost|lipidi|glukoza)\b/i
+    ]
   }
 };
 
@@ -124,6 +130,31 @@ const ACADEMIC_DICTIONARY: Record<string, string> = {
   "patients": "patients",
   "pacientes": "patients",
   "patienten": "patients",
+  "bolesnici": "patients",
+  "bolesnika": "patients",
+  "ispitanika": "subjects / participants",
+  "metabolički sindrom": "metabolic syndrome",
+  "metabolički sindrom u dijabetičara tipa 2": "Metabolic syndrome in type 2 diabetics",
+  "dijabetes tipa 2": "type 2 diabetes",
+  "kardiovaskularni rizik": "cardiovascular risk",
+  "učestalost": "prevalence / frequency",
+  "prevalencija": "prevalence",
+  "istraživanje": "investigation / study",
+  "istraživanje je obuhvatilo": "the study included",
+  "prema kriterijima": "according to criteria",
+  "rezultati": "results",
+  "zaključak": "conclusion",
+  "usporedba": "comparison",
+  "ordinacija": "clinic / practice",
+  "obiteljske medicine": "family medicine",
+  "pretilost": "obesity",
+  "glukoza": "glucose",
+  "tlak": "blood pressure",
+  "arterijski tlak": "arterial blood pressure",
+  "učestalost metaboličkog sindroma": "prevalence of metabolic syndrome",
+  "statistički značajna": "statistically significant",
+  "učestalost je bila": "prevalence was",
+  "učestalost metaboličkog sindroma u dijabetičara": "prevalence of metabolic syndrome in diabetics",
   "efficacité": "efficacy",
   "eficacia": "efficacy",
   "wirksamkeit": "efficacy"

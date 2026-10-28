@@ -1,4 +1,5 @@
 import { ExtractedSubtopic } from '../types';
+import { getSubtopicClinicalReason } from './fileParser';
 
 export const DEFAULT_GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || '';
 
@@ -69,7 +70,7 @@ Your tasks:
    - "relevanceScore": integer 60-100 (exact clinical importance to this specific paper)
    - "priority": "High" | "Medium" | "Low"
    - "recommendation": "Include" | "Exclude" | "Maybe" (whether this subtopic warrants inclusion in a systematic review of this study)
-   - "reasoning": 1 concise sentence explaining the clinical rationale.
+   - "reasoning": A UNIQUE, DISTINCT, EASY-TO-UNDERSTAND clinical explanation (1-2 sentences) explaining WHY this priority badge and score was given, and what role this topic plays in the study. DO NOT use generic or repeated phrases. Every single topic MUST receive a different substantive reason.
 
 Return ONLY a valid JSON array of objects with keys:
 "name", "category", "priority", "relevanceScore", "recommendation", "reasoning".`;
@@ -101,6 +102,11 @@ Return ONLY a valid JSON array of objects with keys:
             const cleanName = item.name?.trim() || 'Subtopic';
             const original = originalMap.get(cleanName.toLowerCase()) || 
               subtopics.find(s => s.name.toLowerCase().includes(cleanName.toLowerCase()) || cleanName.toLowerCase().includes(s.name.toLowerCase()));
+            
+            const cleanReason = (item.reasoning && item.reasoning.length > 20 && !item.reasoning.includes('clinical and methodological alignment'))
+              ? item.reasoning
+              : (original?.aiReasoning || getSubtopicClinicalReason(cleanName, item.category || 'Condition', title));
+
             return {
               id: original?.id || `sub-${idx}-${Date.now()}`,
               name: cleanName,
@@ -108,7 +114,7 @@ Return ONLY a valid JSON array of objects with keys:
               relevanceScore: typeof item.relevanceScore === 'number' ? item.relevanceScore : 85,
               aiPriority: item.priority || 'Medium',
               recommendation: item.recommendation || 'Include',
-              aiReasoning: item.reasoning || 'Evaluated for clinical and methodological alignment.',
+              aiReasoning: cleanReason,
               userDecision: original?.userDecision || (item.recommendation === 'Exclude' ? 'excluded' : 'included')
             };
           });
@@ -118,9 +124,9 @@ Return ONLY a valid JSON array of objects with keys:
             if (!sortedSubtopics.some(s => s.name.toLowerCase().trim() === orig.name.toLowerCase().trim())) {
               sortedSubtopics.push({
                 ...orig,
-                relevanceScore: 70,
+                relevanceScore: 75,
                 aiPriority: 'Medium',
-                aiReasoning: 'Retained from deep document extraction.',
+                aiReasoning: orig.aiReasoning || getSubtopicClinicalReason(orig.name, orig.category, title),
                 userDecision: orig.userDecision || 'neutral'
               });
             }
@@ -158,7 +164,9 @@ Return ONLY a valid JSON array of objects with keys:
     relevanceScore: s.relevanceScore ?? Math.max(50, 96 - idx * 4),
     aiPriority: (idx < 2 ? 'High' : (idx < 4 ? 'Medium' : 'Low')) as any,
     recommendation: s.category === 'Methodology' && s.name.toLowerCase().includes('observational') ? 'Maybe' : 'Include',
-    aiReasoning: `Prioritized according to ${s.category} hierarchy for systematic literature review synthesis.`,
+    aiReasoning: (s.aiReasoning && !s.aiReasoning.includes('hierarchy') && !s.aiReasoning.includes('clinical and methodological alignment'))
+      ? s.aiReasoning
+      : getSubtopicClinicalReason(s.name, s.category, title),
     userDecision: s.userDecision || 'neutral'
   }));
 
