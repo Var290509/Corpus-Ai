@@ -931,7 +931,8 @@ async function tryBackendParsePDF(file: File, versionId: string = '1'): Promise<
   try {
     const formData = new FormData();
     formData.append('file', file);
-    const resp = await fetch('http://localhost:8000/api/parse-document', {
+    const apiUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/parse-document` : '/api/parse-document';
+    const resp = await fetch(apiUrl, {
       method: 'POST',
       body: formData
     });
