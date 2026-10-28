@@ -1,0 +1,284 @@
+import React, { useState, useMemo } from 'react';
+import { 
+  Filter, 
+  Search, 
+  Sparkles, 
+  CheckCircle2, 
+  XCircle, 
+  HelpCircle, 
+  Layers, 
+  SlidersHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  Bot
+} from 'lucide-react';
+import { ResearchPaper, ReviewerDecision, AIBadge, Criterion } from '../types';
+import { PaperCard } from './PaperCard';
+
+interface ScreeningDeskProps {
+  papers: ResearchPaper[];
+  decisions: Record<string, ReviewerDecision>;
+  onDecide: (paperId: string, status: 'include' | 'exclude' | 'maybe', reason?: string, note?: string) => void;
+  onInspectBadge: (badge: AIBadge, paper: ResearchPaper) => void;
+  onRunBatchAutoScreen: () => void;
+  activeCriteria: Criterion[];
+}
+
+export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
+  papers,
+  decisions,
+  onDecide,
+  onInspectBadge,
+  onRunBatchAutoScreen,
+  activeCriteria
+}) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'include' | 'exclude' | 'maybe' | 'unscreened'>('all');
+  const [badgeFilter, setBadgeFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 15;
+
+  // Filter papers (only show representative records; duplicates are safely grouped and hidden)
+  const filteredPapers = useMemo(() => {
+    return papers.filter((paper) => {
+      // Must be representative
+      if (!paper.isRepresentative) return false;
+
+      // Status filter
+      const dec = decisions[paper.id]?.status || 'unscreened';
+      if (statusFilter !== 'all' && dec !== statusFilter) return false;
+
+      // Badge filter
+      if (badgeFilter !== 'all') {
+        const hasBadge = paper.aiBadges?.some(b => b.type === badgeFilter);
+        if (!hasBadge) return false;
+      }
+
+      // Search text query
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const textMatch = 
+          paper.title.toLowerCase().includes(q) ||
+          paper.abstract.toLowerCase().includes(q) ||
+          paper.authors.some(a => a.toLowerCase().includes(q)) ||
+          paper.journal.toLowerCase().includes(q) ||
+          (paper.pmid && paper.pmid.includes(q)) ||
+          (paper.doi && paper.doi.toLowerCase().includes(q));
+        if (!textMatch) return false;
+      }
+
+      return true;
+    });
+  }, [papers, decisions, statusFilter, badgeFilter, searchQuery]);
+
+  // Pagination calculation
+  const totalPages = Math.max(1, Math.ceil(filteredPapers.length / pageSize));
+  const paginatedPapers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredPapers.slice(start, start + pageSize);
+  }, [filteredPapers, currentPage, pageSize]);
+
+  // Summary counts
+  const totalRepresentative = papers.filter(p => p.isRepresentative).length;
+  const includedCount = papers.filter(p => p.isRepresentative && decisions[p.id]?.status === 'include').length;
+  const excludedCount = papers.filter(p => p.isRepresentative && decisions[p.id]?.status === 'exclude').length;
+  const maybeCount = papers.filter(p => p.isRepresentative && decisions[p.id]?.status === 'maybe').length;
+  const unscreenedCount = papers.filter(p => p.isRepresentative && (!decisions[p.id] || decisions[p.id]?.status === 'unscreened')).length;
+
+  return (
+    <div className="space-y-6 text-left">
+      
+      {/* Top Controls & Metrics Bar */}
+      <div className="glass-panel-elevated rounded-2xl p-5 border border-[#E6E0F0] space-y-4">
+        
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-base font-bold text-[#462E1E] flex items-center space-x-2">
+              <CheckCircle2 className="w-5 h-5 text-[#6F4E37]" />
+              <span>Step 4, 5 & 6: Deduplication, Screening & PICO Tagging</span>
+            </h2>
+            <p className="text-xs text-[#7E7A72] mt-0.5">
+              Review records, inspect explainable AI badges, override automated decisions, and verify PICO spans.
+            </p>
+          </div>
+
+          {/* Batch Auto-Screen Button */}
+          <button
+            onClick={onRunBatchAutoScreen}
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#6F4E37] text-white hover:bg-[#5A3D29] shadow-md shadow-[#6F4E37]/20 transition-all shrink-0"
+          >
+            <Bot className="w-4 h-4 text-[#E6E0F0]" />
+            <span>Auto-Screen All via Protocol Rules</span>
+          </button>
+        </div>
+
+        {/* Status Count Tally Tabs */}
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-[#E6E0F0]">
+          <button
+            onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+              statusFilter === 'all'
+                ? 'bg-[#6F4E37] text-white shadow-xs'
+                : 'bg-white/80 text-[#5F5C56] hover:bg-white border border-[#E5E4E2]'
+            }`}
+          >
+            All Screenable ({totalRepresentative})
+          </button>
+
+          <button
+            onClick={() => { setStatusFilter('include'); setCurrentPage(1); }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center space-x-1.5 transition-all ${
+              statusFilter === 'include'
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'bg-white/80 text-emerald-700 hover:bg-emerald-50 border border-emerald-200'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Included ({includedCount})</span>
+          </button>
+
+          <button
+            onClick={() => { setStatusFilter('exclude'); setCurrentPage(1); }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center space-x-1.5 transition-all ${
+              statusFilter === 'exclude'
+                ? 'bg-rose-600 text-white shadow-xs'
+                : 'bg-white/80 text-rose-700 hover:bg-rose-50 border border-rose-200'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-rose-500" />
+            <span>Excluded ({excludedCount})</span>
+          </button>
+
+          <button
+            onClick={() => { setStatusFilter('maybe'); setCurrentPage(1); }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center space-x-1.5 transition-all ${
+              statusFilter === 'maybe'
+                ? 'bg-[#8169A3] text-white shadow-xs'
+                : 'bg-white/80 text-[#8169A3] hover:bg-[#FAF9FD] border border-[#d4c8e4]'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-[#8169A3]" />
+            <span>Maybe ({maybeCount})</span>
+          </button>
+
+          <button
+            onClick={() => { setStatusFilter('unscreened'); setCurrentPage(1); }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center space-x-1.5 transition-all ${
+              statusFilter === 'unscreened'
+                ? 'bg-[#5F5C56] text-white shadow-xs'
+                : 'bg-white/80 text-[#7E7A72] hover:bg-white border border-[#E5E4E2]'
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-[#B8B5AE]" />
+            <span>Unscreened ({unscreenedCount})</span>
+          </button>
+        </div>
+
+        {/* Search & AI Badge Facet Filter */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+          
+          {/* Free Text Search */}
+          <div className="md:col-span-2 relative">
+            <Search className="w-4 h-4 text-[#7E7A72] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+              placeholder="Search across title, abstract, authors, DOI or PMID..."
+              className="w-full glass-input rounded-xl pl-10 pr-4 py-2 text-xs text-[#2D2521] placeholder-[#9B978F]"
+            />
+          </div>
+
+          {/* AI Badge Filter Dropdown */}
+          <div className="relative">
+            <select
+              value={badgeFilter}
+              onChange={(e) => { setBadgeFilter(e.target.value); setCurrentPage(1); }}
+              className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#462E1E] font-medium"
+            >
+              <option value="all">All AI Badges</option>
+              <option value="rct_gold">🏆 Gold Standard RCT</option>
+              <option value="high_power">📊 High Sample Power (N ≥ 500)</option>
+              <option value="pico_concordance">🎯 Direct PICO Concordance</option>
+              <option value="contradiction">⚡ Divergent / Null Finding</option>
+              <option value="bias_risk">⚠️ Preclinical Animal / High Risk</option>
+            </select>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* Showing Count & Pagination Header */}
+      <div className="flex items-center justify-between text-xs text-[#7E7A72]">
+        <span>
+          Showing <strong>{filteredPapers.length}</strong> matching studies (Page {currentPage} of {totalPages})
+        </span>
+
+        <div className="flex items-center space-x-1.5">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="p-1.5 rounded-lg bg-white border border-[#E5E4E2] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <span className="font-mono text-xs font-semibold px-2">
+            {currentPage} / {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="p-1.5 rounded-lg bg-white border border-[#E5E4E2] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Papers Stream */}
+      <div className="space-y-4">
+        {paginatedPapers.map((paper) => (
+          <PaperCard
+            key={paper.id}
+            paper={paper}
+            decision={decisions[paper.id]}
+            onDecide={onDecide}
+            onInspectBadge={onInspectBadge}
+          />
+        ))}
+
+        {paginatedPapers.length === 0 && (
+          <div className="glass-panel rounded-2xl p-12 text-center border border-[#E6E0F0]">
+            <p className="text-sm font-semibold text-[#462E1E]">No research papers match the current filters</p>
+            <p className="text-xs text-[#7E7A72] mt-1">Try resetting the status or badge facet filters above.</p>
+          </div>
+        )}
+      </div>
+
+      {/* Bottom Pagination */}
+      {totalPages > 1 && (
+        <div className="pt-4 flex items-center justify-center space-x-2">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E4E2] text-xs text-[#462E1E] disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <span className="text-xs text-[#5F5C56]">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E4E2] text-xs text-[#462E1E] disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+    </div>
+  );
+};
