@@ -29,7 +29,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuditLog
 }) => {
   const tabs = [
-    { id: 'overview', label: 'Pipeline & PICO', icon: Compass },
+    { id: 'overview', label: 'Protocol & PICO', icon: Compass },
     { id: 'search', label: 'Search & Query V' + activeVersionNumber, icon: Search },
     { id: 'screening', label: 'Screening & Badges', icon: CheckSquare },
     { id: 'agentic_rag', label: 'Agentic RAG Copilot', icon: Cpu, isSpecial: true },

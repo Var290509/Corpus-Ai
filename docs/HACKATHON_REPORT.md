@@ -1,7 +1,7 @@
 # Corpus AI — Technical Hackathon Report
 
 **System Name:** Corpus AI  
-**Challenge:** Mini-Rayyan 72-Hour Hackathon Challenge  
+**Challenge:** 72-Hour Autonomous Systematic Literature Review Challenge  
 **Domain Topic Evaluated:** GLP-1 Receptor Agonists in Mild Cognitive Impairment & Early Alzheimer's Disease  
 **Key Innovations:** Autonomous Agentic RAG Copilot, Explainable AI Badges, Non-Destructive Level 2 Loop Engine  
 

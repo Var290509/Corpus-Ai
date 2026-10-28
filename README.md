@@ -1,7 +1,7 @@
 # 🧠 Corpus AI
 
 ### Autonomous Systematic Literature Review & Agentic RAG Platform
-*A next-generation systematic review system built for the Mini-Rayyan 72-Hour Hackathon Challenge.*
+*A next-generation autonomous systematic review and deep literature synthesis platform.*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Google Colab Ready](https://img.shields.io/badge/Google_Colab-Free_Tier_Ready-F9AB00?logo=googlecolab&logoColor=white)](notebooks/Corpus_AI_Google_Colab.ipynb)

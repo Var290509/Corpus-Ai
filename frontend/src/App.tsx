@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
-import { PICOFlowchart } from './components/PICOFlowchart';
 import { SearchStudio } from './components/SearchStudio';
 import { ScreeningDesk } from './components/ScreeningDesk';
 import { AgenticRAGDesk } from './components/AgenticRAGDesk';
@@ -316,18 +315,6 @@ export const App: React.FC = () => {
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
-        {/* Step Flowchart Bar */}
-        <PICOFlowchart
-          currentStepIndex={
-            activeTab === 'overview' ? 0 :
-            activeTab === 'search' ? 1 :
-            activeTab === 'screening' ? 4 :
-            activeTab === 'agentic_rag' ? 5 :
-            activeTab === 'level2_loop' ? 4 : 7
-          }
-          onSelectStep={(tab) => setActiveTab(tab)}
-        />
-
         {/* Tab 0 / Overview: Systematic Review Protocol & Architecture */}
         {activeTab === 'overview' && (
           <div className="space-y-6 text-left">
