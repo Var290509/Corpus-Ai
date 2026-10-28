@@ -81,13 +81,17 @@ export const Navbar: React.FC<NavbarProps> = ({
                 C
               </div>
               <div>
-                <div className="flex items-center space-x-1.5">
-                  <span className="font-extrabold text-sm tracking-tight text-[#FAF9F8]">
+                <div className="flex items-center space-x-2">
+                  <span className="font-extrabold text-sm tracking-tight text-[#FAF9F8] shrink-0">
                     CORPUS <span className="text-[#E6E0F0] font-light">AI</span>
                   </span>
                   {projectName && (
-                    <span className="max-w-[130px] md:max-w-[170px] truncate text-xs font-medium text-[#E5E4E2]/80 border-l border-[#E6E0F0]/25 pl-2">
-                      {projectName}
+                    <span 
+                      title={`Current Systematic Review Project: ${projectName}`}
+                      className="hidden md:inline-flex items-center space-x-1 text-[11px] font-medium text-[#FAF9F8] bg-[#3B261A] border border-[#E6E0F0]/25 px-2 py-0.5 rounded-lg shrink-0 max-w-[140px] truncate"
+                    >
+                      <span className="text-[10px] opacity-70">Review:</span>
+                      <strong className="truncate">{projectName}</strong>
                     </span>
                   )}
                 </div>
