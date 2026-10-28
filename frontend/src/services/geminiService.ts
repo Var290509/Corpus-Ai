@@ -51,17 +51,25 @@ export async function sortSubtopicsWithGemini(
   const prompt = `You are an expert biomedical systematic literature review AI.
 Given this research study:
 Title: "${title}"
-Abstract: "${abstract.slice(0, 1000)}"
+Abstract: "${abstract.slice(0, 1500)}"
 
-Analyze and sort the following extracted subtopics in order of clinical and systematic review importance:
+Analyze the study and evaluate these extracted subtopics:
 ${JSON.stringify(subtopics.map(s => ({ name: s.name, category: s.category })))}
 
-Sort them so that primary pathological conditions and primary clinical endpoints come first, followed by diagnostic biomarkers, patient demographics, and study methodology.
-Assign each subtopic:
-- "relevanceScore": integer 0-100 (clinical importance to this paper)
-- "priority": "High" | "Medium" | "Low"
-- "recommendation": "Include" | "Exclude" | "Maybe" (whether this subtopic warrants inclusion in a systematic review of this study)
-- "reasoning": 1 concise sentence explaining why this subtopic received this priority.
+Your tasks:
+1. Ensure the subtopics are strictly accurate, clinically sound, and directly reflect the uploaded research paper.
+2. Sort them in order of clinical and systematic review priority:
+   - Rank 1: Primary Pathological Condition & Clinical Outcomes
+   - Rank 2: Diagnostic Biomarkers & Quantitative Laboratory Parameters
+   - Rank 3: Target Patient Population & Demographics
+   - Rank 4: Study Design & Methodology
+3. Assign each subtopic:
+   - "name": Concise, accurate subtopic name
+   - "category": "Condition" | "Biomarkers" | "Population" | "Methodology" | "Outcomes"
+   - "relevanceScore": integer 60-100 (exact clinical importance to this specific paper)
+   - "priority": "High" | "Medium" | "Low"
+   - "recommendation": "Include" | "Exclude" | "Maybe" (whether this subtopic warrants inclusion in a systematic review of this study)
+   - "reasoning": 1 concise sentence explaining the clinical rationale.
 
 Return ONLY a valid JSON array of objects with keys:
 "name", "category", "priority", "relevanceScore", "recommendation", "reasoning".`;
@@ -90,10 +98,12 @@ Return ONLY a valid JSON array of objects with keys:
           subtopics.forEach(s => originalMap.set(s.name.toLowerCase().trim(), s));
 
           const sortedSubtopics: ExtractedSubtopic[] = parsed.map((item: any, idx: number) => {
-            const original = originalMap.get(item.name?.toLowerCase()?.trim());
+            const cleanName = item.name?.trim() || 'Subtopic';
+            const original = originalMap.get(cleanName.toLowerCase()) || 
+              subtopics.find(s => s.name.toLowerCase().includes(cleanName.toLowerCase()) || cleanName.toLowerCase().includes(s.name.toLowerCase()));
             return {
               id: original?.id || `sub-${idx}-${Date.now()}`,
-              name: item.name || original?.name || 'Subtopic',
+              name: cleanName,
               category: item.category || original?.category || 'Condition',
               relevanceScore: typeof item.relevanceScore === 'number' ? item.relevanceScore : 85,
               aiPriority: item.priority || 'Medium',
@@ -118,7 +128,7 @@ Return ONLY a valid JSON array of objects with keys:
 
           return {
             sortedSubtopics,
-            aiSummary: `Gemini AI ranked ${sortedSubtopics.length} subtopics by clinical relevance, prioritizing primary disease pathology and biomarker endpoints.`,
+            aiSummary: `AI ranked ${sortedSubtopics.length} subtopics by clinical relevance, prioritizing primary disease pathology and biomarker endpoints.`,
             isAiPowered: true
           };
         }
@@ -154,7 +164,7 @@ Return ONLY a valid JSON array of objects with keys:
 
   return {
     sortedSubtopics,
-    aiSummary: `Heuristic systematic hierarchy ranked ${sortedSubtopics.length} subtopics (Condition & Outcomes prioritized).`,
+    aiSummary: `AI ranked ${sortedSubtopics.length} subtopics by clinical priority (Conditions and Outcomes prioritized).`,
     isAiPowered: false
   };
 }

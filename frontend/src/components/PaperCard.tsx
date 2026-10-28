@@ -14,14 +14,13 @@ import {
   Bot,
   Star,
   Quote,
-  Key,
   RefreshCw,
   SlidersHorizontal,
   ArrowUpDown
 } from 'lucide-react';
 import { ResearchPaper, ReviewerDecision, AIBadge, PICOSpan, ExtractedSubtopic } from '../types';
 import { extractDetailedSubtopics } from '../services/fileParser';
-import { sortSubtopicsWithGemini, getGeminiApiKey, setGeminiApiKey } from '../services/geminiService';
+import { sortSubtopicsWithGemini } from '../services/geminiService';
 
 interface PaperCardProps {
   paper: ResearchPaper;
@@ -141,13 +140,10 @@ export const PaperCard: React.FC<PaperCardProps> = ({
     }
   }
 
-  // Subtopics and Gemini AI sorting state
+  // Subtopics and AI sorting state
   const [currentSubtopics, setCurrentSubtopics] = useState<ExtractedSubtopic[]>(subtopics);
   const [isSortingSubtopics, setIsSortingSubtopics] = useState(false);
   const [sortSummary, setSortSummary] = useState<string | null>(null);
-  const [geminiKeyInput, setGeminiKeyInput] = useState<string>(getGeminiApiKey());
-  const [showKeyConfig, setShowKeyConfig] = useState(false);
-  const [keySaveSuccess, setKeySaveSuccess] = useState(false);
 
   const handleToggleSubtopic = (idx: number, targetDecision: 'included' | 'excluded' | 'neutral') => {
     const updated = [...currentSubtopics];
@@ -170,25 +166,15 @@ export const PaperCard: React.FC<PaperCardProps> = ({
     setIsSortingSubtopics(true);
     setSortSummary(null);
     try {
-      const res = await sortSubtopicsWithGemini(displayTitle, paper.abstract, currentSubtopics, geminiKeyInput);
+      const res = await sortSubtopicsWithGemini(displayTitle, paper.abstract, currentSubtopics);
       setCurrentSubtopics(res.sortedSubtopics);
       setSortSummary(res.aiSummary);
       setTimeout(() => setSortSummary(null), 8000);
     } catch (err) {
-      console.error('Gemini sort error:', err);
+      console.error('AI sort error:', err);
     } finally {
       setIsSortingSubtopics(false);
     }
-  };
-
-  const handleSaveGeminiKey = (e: React.FormEvent) => {
-    e.preventDefault();
-    setGeminiApiKey(geminiKeyInput);
-    setKeySaveSuccess(true);
-    setTimeout(() => {
-      setKeySaveSuccess(false);
-      setShowKeyConfig(false);
-    }, 1500);
   };
 
   const getCategoryBadgeStyle = (cat: string) => {
@@ -350,12 +336,12 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
           {/* Action Toolbar: AI Sort Button, Bulk Actions, Key Config */}
           <div className="flex flex-wrap items-center gap-2">
-            {/* Gemini AI Sort Button */}
+            {/* AI Sort Subtopics Button */}
             <button
               onClick={handleSortWithGemini}
               disabled={isSortingSubtopics}
               className="px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white flex items-center space-x-1.5 shadow-md cursor-pointer transition-all disabled:opacity-50"
-              title="Use Google Gemini 3.5 Flash-Lite AI with your API key to sort subtopics by clinical and systematic review priority"
+              title="Use AI to sort subtopics by clinical and systematic review priority"
             >
               {isSortingSubtopics ? (
                 <>
@@ -365,19 +351,9 @@ export const PaperCard: React.FC<PaperCardProps> = ({
               ) : (
                 <>
                   <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                  <span>AI Sort Subtopics (Gemini)</span>
+                  <span>AI Sort Subtopics</span>
                 </>
               )}
-            </button>
-
-            {/* API Key Config Button */}
-            <button
-              onClick={() => setShowKeyConfig(!showKeyConfig)}
-              className="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-[#2E1C12] hover:bg-[#3E271A] text-[#E6E0F0] border border-[#E6E0F0]/25 flex items-center space-x-1 cursor-pointer transition-all"
-              title="Configure or view active Gemini API key"
-            >
-              <Key className="w-3 h-3 text-amber-300" />
-              <span className="hidden sm:inline">API Key</span>
             </button>
 
             {/* Quick Bulk Actions */}
@@ -397,43 +373,6 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             </button>
           </div>
         </div>
-
-        {/* Gemini API Key Configuration Drawer */}
-        {showKeyConfig && (
-          <div className="p-3.5 rounded-xl bg-[#1C110B] border border-amber-500/40 text-xs space-y-2 animate-fade-in shadow-xl">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-amber-200 flex items-center space-x-1.5">
-                <Key className="w-3.5 h-3.5 text-amber-300" />
-                <span>Google Gemini AI API Key Configuration</span>
-              </span>
-              <button
-                type="button"
-                onClick={() => setShowKeyConfig(false)}
-                className="text-[#E5E4E2]/70 hover:text-white cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-            <p className="text-[11px] text-[#E5E4E2]/80 leading-relaxed">
-              Active Gemini API key for clinical subtopic sorting: <code className="bg-[#2B1B12] px-1.5 py-0.5 rounded text-amber-300 font-mono text-[10px]">{geminiKeyInput ? `${geminiKeyInput.slice(0, 8)}...` : 'Using Project Key'}</code>
-            </p>
-            <form onSubmit={handleSaveGeminiKey} className="flex gap-2">
-              <input
-                type="password"
-                value={geminiKeyInput}
-                onChange={(e) => setGeminiKeyInput(e.target.value)}
-                placeholder="Enter Gemini API key"
-                className="flex-1 glass-input rounded-lg px-2.5 py-1.5 text-xs text-[#FAF9F8] font-mono"
-              />
-              <button
-                type="submit"
-                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-[#241710] hover:bg-amber-400 cursor-pointer shadow"
-              >
-                {keySaveSuccess ? 'Saved ✓' : 'Save Key'}
-              </button>
-            </form>
-          </div>
-        )}
 
         {/* AI Sort Feedback Banner */}
         {sortSummary && (
@@ -479,7 +418,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
                 {/* AI Score Badge if sorted */}
                 {sub.relevanceScore !== undefined && (
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-[#1B110B] text-amber-300 border border-amber-400/30" title="Gemini AI Clinical Relevance Score">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-[#1B110B] text-amber-300 border border-amber-400/30" title="AI Clinical Relevance Score">
                     Score: {sub.relevanceScore}%
                   </span>
                 )}
@@ -692,32 +631,9 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         )}
       </div>
 
-      {/* AI Badges Row & Recommender Button */}
-      <div className="mt-3 flex flex-wrap gap-2 items-center justify-between">
-        {paper.aiBadges && paper.aiBadges.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 items-center">
-            <span className="text-[10px] font-mono text-[#E5E4E2]/70 uppercase mr-1 flex items-center">
-              <Sparkles className="w-3 h-3 text-[#E6E0F0] mr-0.5" />
-              Badges:
-            </span>
-
-            {paper.aiBadges.map((badge) => (
-              <button
-                key={badge.id}
-                onClick={() => onInspectBadge(badge, paper)}
-                className="group/badge px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all flex items-center space-x-1.5 bg-[#4A3324] hover:bg-[#5C3F2D] border border-[#E6E0F0]/25 text-[#FAF9F8] shadow-sm cursor-pointer"
-                title="Click to inspect exact AI badge rationale & quote evidence"
-              >
-                <Award className="w-3 h-3 text-[#E6E0F0] group-hover/badge:scale-110 transition-transform" />
-                <span>{badge.label}</span>
-                <Info className="w-2.5 h-2.5 text-[#E5E4E2]/60 group-hover/badge:text-white" />
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Suggest Related Research Papers from Scopus, WoS, PubMed & IEEE */}
-        {onDiscoverSimilar && (
+      {/* Related Research Papers Recommender */}
+      {onDiscoverSimilar && (
+        <div className="mt-3 flex justify-end">
           <button
             onClick={() => onDiscoverSimilar(paper)}
             className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-[#4A3324] text-[#FAF9F8] border border-[#E6E0F0]/30 hover:bg-[#5C3F2D] hover:border-[#E6E0F0]/50 transition-all flex items-center space-x-1.5 cursor-pointer shadow-sm"
@@ -726,8 +642,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Suggest Related Papers (Scopus / WoS / PubMed / IEEE)</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Abstract with PICO Span Highlighting */}
       <div className="mt-3 text-xs text-[#E5E4E2]/90 leading-relaxed">

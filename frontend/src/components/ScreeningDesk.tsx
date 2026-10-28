@@ -36,7 +36,6 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'include' | 'exclude' | 'maybe' | 'unscreened'>('all');
-  const [badgeFilter, setBadgeFilter] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
 
@@ -50,12 +49,6 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
       const dec = decisions[paper.id]?.status || 'unscreened';
       if (statusFilter !== 'all' && dec !== statusFilter) return false;
 
-      // Badge filter
-      if (badgeFilter !== 'all') {
-        const hasBadge = paper.aiBadges?.some(b => b.type === badgeFilter);
-        if (!hasBadge) return false;
-      }
-
       // Search text query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -64,6 +57,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           paper.abstract.toLowerCase().includes(q) ||
           paper.authors.some(a => a.toLowerCase().includes(q)) ||
           paper.journal.toLowerCase().includes(q) ||
+          (paper.extractedTopics && paper.extractedTopics.some(t => t.toLowerCase().includes(q))) ||
           (paper.pmid && paper.pmid.includes(q)) ||
           (paper.doi && paper.doi.toLowerCase().includes(q));
         if (!textMatch) return false;
@@ -71,7 +65,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
 
       return true;
     });
-  }, [papers, decisions, statusFilter, badgeFilter, searchQuery]);
+  }, [papers, decisions, statusFilter, searchQuery]);
 
   // Pagination calculation
   const totalPages = Math.max(1, Math.ceil(filteredPapers.length / pageSize));
@@ -100,7 +94,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
               <span>Deduplication, Screening & PICO Tagging</span>
             </h2>
             <p className="text-xs text-[#7E7A72] mt-0.5">
-              Review records, inspect explainable AI badges, override automated decisions, and verify PICO spans.
+              Review records, inspect analyzed subtopics, override automated decisions, and verify PICO spans.
             </p>
           </div>
 
@@ -176,37 +170,18 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           </button>
         </div>
 
-        {/* Search & AI Badge Facet Filter */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
-          
-          {/* Free Text Search */}
-          <div className="md:col-span-2 relative">
+        {/* Search Bar */}
+        <div className="pt-2">
+          <div className="relative">
             <Search className="w-4 h-4 text-[#7E7A72] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              placeholder="Search across title, abstract, authors, DOI or PMID..."
-              className="w-full glass-input rounded-xl pl-10 pr-4 py-2 text-xs text-[#2D2521] placeholder-[#9B978F]"
+              placeholder="Search across title, abstract, authors, subtopics, DOI or PMID..."
+              className="w-full glass-input rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#2D2521] placeholder-[#9B978F]"
             />
           </div>
-
-          {/* AI Badge Filter Dropdown */}
-          <div className="relative">
-            <select
-              value={badgeFilter}
-              onChange={(e) => { setBadgeFilter(e.target.value); setCurrentPage(1); }}
-              className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#462E1E] font-medium"
-            >
-              <option value="all">All AI Badges</option>
-              <option value="rct_gold">🏆 Gold Standard RCT</option>
-              <option value="high_power">📊 High Sample Power (N ≥ 500)</option>
-              <option value="pico_concordance">🎯 Direct PICO Concordance</option>
-              <option value="contradiction">⚡ Divergent / Null Finding</option>
-              <option value="bias_risk">⚠️ Preclinical Animal / High Risk</option>
-            </select>
-          </div>
-
         </div>
 
       </div>
@@ -260,7 +235,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
             <p className="text-xs text-[#7E7A72] mt-1 max-w-md mx-auto">
               {papers.length === 0
                 ? 'Navigate to the "Search & Upload" tab to upload your research files (RIS, CSV, BibTeX) or run a live literature search.'
-                : 'Try resetting the status or badge facet filters above.'}
+                : 'Try resetting the status filters or search query above.'}
             </p>
           </div>
         )}

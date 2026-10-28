@@ -50,46 +50,46 @@ export function extractDetailedSubtopics(text: string): ExtractedSubtopic[] {
 
   const SUBTOPIC_RULES: Array<{ category: ExtractedSubtopic['category']; name: string; pattern: RegExp }> = [
     // Condition & Disease Subtopics
-    { category: 'Condition', name: 'Hyperhomocysteinemia & Amino Acid Metabolism', pattern: /\b(hyperhomocystein[a-z]*|homocysteine|thcy|amino acid metabolism)\b/i },
+    { category: 'Condition', name: 'Hyperhomocysteinemia', pattern: /\b(hyperhomocystein[a-z]*|homocysteine|thcy)\b/i },
     { category: 'Condition', name: 'Type 2 Diabetes Mellitus', pattern: /\b(type 2 diabetes|t2d|type 2 diabetic|diabetic population|glycemic control|insulin resistance)\b/i },
-    { category: 'Condition', name: 'Cardiovascular Disease & Atherosclerosis Risk', pattern: /\b(cardiovascular|coronary|atherosclerosis|atherogenic|ischemic|myocardial|stroke|vascular risk)\b/i },
-    { category: 'Condition', name: 'Diabetic Microangiopathy & Nephropathy', pattern: /\b(microangiopathy|nephropathy|retinopathy|neuropathy|diabetic kidney|glomerular)\b/i },
-    { category: 'Condition', name: 'Dyslipidemia & Metabolic Syndrome', pattern: /\b(dyslipidemia|hyperlipidemia|metabolic syndrome|hypertriglyceridemia|hypercholesterolemia)\b/i },
-    { category: 'Condition', name: 'Hypertension & Endothelial Dysfunction', pattern: /\b(hypertension|blood pressure|endothelial|vascular endothelium|arterial stiffness)\b/i },
-    { category: 'Condition', name: 'Oncology & Malignant Neoplasms', pattern: /\b(cancer|tumor|carcinoma|oncology|metastatic|chemotherapy|leukemia|sarcoma)\b/i },
-    { category: 'Condition', name: 'Neurodegenerative & Dementia Disorders', pattern: /\b(alzheimer|dementia|cognitive impairment|tau protein|amyloid|neurodegenerative)\b/i },
+    { category: 'Condition', name: 'Cardiovascular Disease Risk', pattern: /\b(cardiovascular|coronary|atherosclerosis|atherogenic|ischemic|myocardial|stroke|vascular risk)\b/i },
+    { category: 'Condition', name: 'Diabetic Microangiopathy', pattern: /\b(microangiopathy|nephropathy|retinopathy|neuropathy|diabetic kidney|glomerular)\b/i },
+    { category: 'Condition', name: 'Dyslipidemia', pattern: /\b(dyslipidemia|hyperlipidemia|metabolic syndrome|hypertriglyceridemia|hypercholesterolemia)\b/i },
+    { category: 'Condition', name: 'Hypertension', pattern: /\b(hypertension|blood pressure|arterial stiffness)\b/i },
+    { category: 'Condition', name: 'Oncology & Neoplasms', pattern: /\b(cancer|tumor|carcinoma|oncology|metastatic|chemotherapy|leukemia|sarcoma)\b/i },
+    { category: 'Condition', name: 'Neurodegenerative Disorders', pattern: /\b(alzheimer|dementia|cognitive impairment|tau protein|amyloid|neurodegenerative)\b/i },
     { category: 'Condition', name: 'Infectious & Inflammatory Pathology', pattern: /\b(infection|pathogen|covid-19|sepsis|autoimmune|cytokine storm|antimicrobial)\b/i },
 
     // Biomarkers & Laboratory Assays
-    { category: 'Biomarkers', name: 'Serum Total Homocysteine (tHcy) Assays', pattern: /\b(serum homocysteine|plasma homocysteine|total homocysteine|thcy concentration|homocysteine level)\b/i },
-    { category: 'Biomarkers', name: 'Glycated Hemoglobin (HbA1c) Monitoring', pattern: /\b(hba1c|glycated hemoglobin|hemoglobin a1c|glycated hb)\b/i },
-    { category: 'Biomarkers', name: 'Fasting Blood Glucose (FBG) & Glycemia', pattern: /\b(fasting blood glucose|fasting glycemia|blood glucose|fbg|fasting plasma)\b/i },
-    { category: 'Biomarkers', name: 'Lipid Profile (HDL, LDL & Triglycerides)', pattern: /\b(lipid profile|ldl-c|hdl-c|cholesterol|triglycerides|vldl|atherogenic index)\b/i },
-    { category: 'Biomarkers', name: 'Renal Biomarkers (Creatinine & Urea Clearance)', pattern: /\b(creatinine|egfr|urea|clearance|proteinuria|microalbuminuria)\b/i },
-    { category: 'Biomarkers', name: 'Vitamin Cofactors (B12, Folate & B6 Metabolism)', pattern: /\b(vitamin b12|cobalamin|folate|folic acid|vitamin b6|pyridoxine)\b/i },
-    { category: 'Biomarkers', name: 'Inflammatory Biomarkers (CRP / Interleukins)', pattern: /\b(c-reactive protein|crp|hs-crp|interleukin|il-6|tnf-alpha)\b/i },
+    { category: 'Biomarkers', name: 'Serum Total Homocysteine (tHcy)', pattern: /\b(serum homocysteine|plasma homocysteine|total homocysteine|thcy concentration|homocysteine level)\b/i },
+    { category: 'Biomarkers', name: 'Glycated Hemoglobin (HbA1c)', pattern: /\b(hba1c|glycated hemoglobin|hemoglobin a1c|glycated hb)\b/i },
+    { category: 'Biomarkers', name: 'Fasting Blood Glucose (FBG)', pattern: /\b(fasting blood glucose|fasting glycemia|blood glucose|fbg|fasting plasma)\b/i },
+    { category: 'Biomarkers', name: 'Lipid Profile (HDL, LDL, Triglycerides)', pattern: /\b(lipid profile|ldl-c|hdl-c|cholesterol|triglycerides|vldl|atherogenic index)\b/i },
+    { category: 'Biomarkers', name: 'Serum Creatinine & Renal Clearance', pattern: /\b(creatinine|egfr|urea|clearance|proteinuria|microalbuminuria)\b/i },
+    { category: 'Biomarkers', name: 'Vitamin B12 & Folate Metabolism', pattern: /\b(vitamin b12|cobalamin|folate|folic acid|vitamin b6|pyridoxine)\b/i },
+    { category: 'Biomarkers', name: 'C-Reactive Protein (CRP) & Cytokines', pattern: /\b(c-reactive protein|crp|hs-crp|interleukin|il-6|tnf-alpha)\b/i },
 
     // Population & Geographic Demographics
-    { category: 'Population', name: 'Senegalese Cohort (Sub-Saharan Africa)', pattern: /\b(senegal|senegalese|dakar|west africa|sub-saharan)\b/i },
-    { category: 'Population', name: 'Adult Type 2 Diabetic Patient Cohort', pattern: /\b(adult diabetic|diabetic population|diabetic patients|type 2 cohort|patients aged)\b/i },
-    { category: 'Population', name: 'Clinical Outpatient & Hospital Registry', pattern: /\b(outpatient|ambulatory|clinic patients|hospitalized|medical center cohort)\b/i },
-    { category: 'Population', name: 'Geriatric & Older Adult Demographics', pattern: /\b(elderly|geriatric|older adults|seniors|aged 65)\b/i },
-    { category: 'Population', name: 'Pediatric & Adolescent Population', pattern: /\b(pediatric|children|adolescent|juvenile)\b/i },
+    { category: 'Population', name: 'Senegalese Patient Cohort', pattern: /\b(senegal|senegalese|dakar|west africa|sub-saharan)\b/i },
+    { category: 'Population', name: 'Adult Type 2 Diabetic Cohort', pattern: /\b(adult diabetic|diabetic population|diabetic patients|type 2 cohort|patients aged)\b/i },
+    { category: 'Population', name: 'Clinical Outpatient Cohort', pattern: /\b(outpatient|ambulatory|clinic patients|hospitalized|medical center cohort)\b/i },
+    { category: 'Population', name: 'Geriatric Population', pattern: /\b(elderly|geriatric|older adults|seniors|aged 65)\b/i },
+    { category: 'Population', name: 'Pediatric Population', pattern: /\b(pediatric|children|adolescent|juvenile)\b/i },
 
     // Methodology & Research Design
-    { category: 'Methodology', name: 'Cross-Sectional Observational Study', pattern: /\b(cross-sectional|cross sectional|observational study|descriptive study|prevalence study)\b/i },
-    { category: 'Methodology', name: 'Comparative Case-Control Evaluation', pattern: /\b(case-control|case control|comparative study|control group|healthy controls)\b/i },
-    { category: 'Methodology', name: 'Prospective Longitudinal Cohort Tracking', pattern: /\b(prospective|longitudinal|follow-up|cohort study|follow up)\b/i },
-    { category: 'Methodology', name: 'Double-Blind Randomized Controlled Trial (RCT)', pattern: /\b(randomized|randomised|double-blind|placebo-controlled|clinical trial|rct)\b/i },
-    { category: 'Methodology', name: 'Biochemical Spectrophotometry & Enzymatic Assays', pattern: /\b(spectrophotometric|enzymatic assay|spectrophotometer|elisa|hplc|chemiluminescence|colorimetric)\b/i },
-    { category: 'Methodology', name: 'Statistical Confidence & Significance (p < 0.05)', pattern: /\b(p\s*<\s*0\.05|p\s*<\s*0\.01|statistically significant|confidence interval|odds ratio|linear regression)\b/i },
+    { category: 'Methodology', name: 'Cross-Sectional Study', pattern: /\b(cross-sectional|cross sectional|descriptive study|prevalence study)\b/i },
+    { category: 'Methodology', name: 'Case-Control Study Design', pattern: /\b(case-control|case control|comparative study|control group|healthy controls)\b/i },
+    { category: 'Methodology', name: 'Prospective Longitudinal Cohort', pattern: /\b(prospective|longitudinal|follow-up|cohort study|follow up)\b/i },
+    { category: 'Methodology', name: 'Double-Blind Randomized Controlled Trial', pattern: /\b(randomized|randomised|double-blind|placebo-controlled|clinical trial|rct)\b/i },
+    { category: 'Methodology', name: 'Biochemical Enzymatic Assays', pattern: /\b(spectrophotometric|enzymatic assay|spectrophotometer|elisa|hplc|chemiluminescence|colorimetric)\b/i },
+    { category: 'Methodology', name: 'Statistical Significance Testing (p < 0.05)', pattern: /\b(p\s*<\s*0\.05|p\s*<\s*0\.01|statistically significant|confidence interval|odds ratio|linear regression)\b/i },
 
     // Outcomes & Clinical Risk Factors
-    { category: 'Outcomes', name: 'Cardiovascular Complication Risk Factor', pattern: /\b(cardiovascular risk|vascular complication|coronary risk|atherogenic risk|risk factor for)\b/i },
+    { category: 'Outcomes', name: 'Cardiovascular Complication Risk', pattern: /\b(cardiovascular risk|vascular complication|coronary risk|atherogenic risk|risk factor for)\b/i },
     { category: 'Outcomes', name: 'Hyperhomocysteinemia Prevalence Rate', pattern: /\b(prevalence of hyperhomocysteinemia|prevalence rate|frequency of|proportion of patients)\b/i },
-    { category: 'Outcomes', name: 'Correlation with Glycemic Dysregulation', pattern: /\b(correlation with|associated with hba1c|glycemic balance|metabolic correlation|positive correlation)\b/i },
-    { category: 'Outcomes', name: 'Microvascular Endothelial Damage Endpoints', pattern: /\b(microvascular damage|endothelial damage|thrombosis|vascular lesions)\b/i },
-    { category: 'Outcomes', name: 'Therapeutic Lifestyle & Dietary Interventions', pattern: /\b(dietary|nutritional|lifestyle intervention|supplementation|vitamin therapy)\b/i }
+    { category: 'Outcomes', name: 'Correlation with Glycemic Control (HbA1c)', pattern: /\b(correlation with|associated with hba1c|glycemic balance|metabolic correlation|positive correlation)\b/i },
+    { category: 'Outcomes', name: 'Microvascular Endothelial Damage', pattern: /\b(microvascular damage|endothelial damage|thrombosis|vascular lesions)\b/i },
+    { category: 'Outcomes', name: 'Dietary & Therapeutic Interventions', pattern: /\b(dietary|nutritional|lifestyle intervention|supplementation|vitamin therapy)\b/i }
   ];
 
   for (const rule of SUBTOPIC_RULES) {
