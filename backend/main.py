@@ -1,6 +1,8 @@
 import os
 import json
-from fastapi import FastAPI, HTTPException, Body
+import io
+import re
+from fastapi import FastAPI, HTTPException, Body, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -86,6 +88,65 @@ class RAGQueryRequest(BaseModel):
 def synthesize_corpus(req: RAGQueryRequest):
     agent = AutonomousDeepAgent(req.papers)
     return agent.synthesize_query(req.query)
+
+@app.post("/api/parse-document")
+async def parse_document(file: UploadFile = File(...)):
+    content = await file.read()
+    filename = file.filename or "document.pdf"
+    
+    extracted_text = ""
+    title = ""
+    authors = ["Uploaded Author"]
+    year = 2024
+    
+    if filename.lower().endswith(".pdf") or content.startswith(b"%PDF"):
+        try:
+            import pypdf
+            reader = pypdf.PdfReader(io.BytesIO(content))
+            meta = reader.metadata or {}
+            title = meta.get("/Title") or ""
+            author_meta = meta.get("/Author") or ""
+            if author_meta:
+                authors = [str(author_meta).strip()]
+            
+            pages_text = []
+            for page in reader.pages[:10]:
+                t = page.extract_text()
+                if t:
+                    pages_text.append(t)
+            extracted_text = "\n\n".join(pages_text)
+        except Exception as e:
+            pass
+
+    if not extracted_text:
+        try:
+            extracted_text = content.decode("utf-8", errors="ignore")
+        except Exception:
+            extracted_text = ""
+
+    # Clean up text from binary tokens
+    cleaned = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F\uFFFD]", " ", extracted_text)
+    cleaned = re.sub(r"%\s*\d+\s+\d+\s+obj[\s\S]*?endobj", " ", cleaned)
+    cleaned = re.sub(r"\d+\s+\d+\s+obj\s*<<[\s\S]*?>>", " ", cleaned)
+    cleaned = re.sub(r"<<[\s\S]*?>>", " ", cleaned)
+    cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+
+    if not title:
+        candidate_lines = [l.strip() for l in cleaned.split("\n") if len(l.strip()) > 5 and not l.strip().startswith("%")]
+        if candidate_lines and len(candidate_lines[0]) < 220:
+            title = candidate_lines[0]
+        else:
+            title = filename.rsplit(".", 1)[0].replace("_", " ").replace("-", " ").title()
+
+    abstract = cleaned[:900] if len(cleaned) > 50 else f"Uploaded research publication {filename} ingested into systematic review workspace."
+
+    return {
+        "filename": filename,
+        "title": title,
+        "authors": authors,
+        "abstract": abstract,
+        "year": year
+    }
 
 # Serve built frontend in production (dist directory)
 dist_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")

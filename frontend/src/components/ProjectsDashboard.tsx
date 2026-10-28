@@ -709,7 +709,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                   <input
                     type="file"
                     multiple
-                    accept=".ris,.csv,.json,.bib,.txt"
+                    accept=".pdf,.ris,.csv,.json,.bib,.bibtex,.txt"
                     onChange={(e) => handleStep2FileUpload(e.target.files)}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     title="Drop or select research paper files"
@@ -722,7 +722,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                     <div>
                       <h4 className="text-sm font-bold text-[#FAF9F8]">Upload Research Articles</h4>
                       <p className="text-xs text-[#E5E4E2]/80 mt-1 max-w-md mx-auto">
-                        Drag and drop <strong>.RIS</strong>, <strong>.CSV</strong>, <strong>.BIB</strong>, or <strong>.JSON</strong> files. Any duplicates are automatically removed and AI ratings are computed with textual evidence!
+                        Drag and drop <strong>.PDF</strong>, <strong>.RIS</strong>, <strong>.CSV</strong>, <strong>.BIB</strong>, or <strong>.JSON</strong> files. Any duplicates are automatically removed and AI ratings are computed with textual evidence!
                       </p>
                     </div>
 

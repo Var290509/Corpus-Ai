@@ -135,7 +135,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
           <button
             onClick={() => exportData('ris')}
             className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-[#FAF9FD] text-[#5A3D29] border border-[#E6E0F0] transition-all"
-            title="Standard RIS format for EndNote, Zotero, Mendeley, and Rayyan"
+            title="Standard RIS format for EndNote, Zotero, and Mendeley"
           >
             <FileText className="w-3.5 h-3.5 text-[#6F4E37]" />
             <span>RIS Citations</span>

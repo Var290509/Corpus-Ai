@@ -119,7 +119,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
         <input
           type="file"
           multiple
-          accept=".ris,.csv,.json,.bib,.txt"
+          accept=".pdf,.ris,.csv,.json,.bib,.bibtex,.txt"
           onChange={(e) => handleFiles(e.target.files)}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
           title="Drop or select research paper files"
@@ -135,7 +135,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
               Drop your citation or paper files here
             </h3>
             <p className="text-xs text-[#E5E4E2]/80 mt-1 leading-relaxed">
-              Accepts <strong>.RIS</strong> (Rayyan/EndNote/Zotero), <strong>.CSV</strong>, <strong>.BIB</strong> (BibTeX), <strong>.JSON</strong>, or raw text.
+              Accepts <strong>.PDF</strong>, <strong>.RIS</strong> (EndNote/Zotero/Scopus), <strong>.CSV</strong>, <strong>.BIB</strong> (BibTeX), <strong>.JSON</strong>, or raw text.
             </p>
           </div>
 
