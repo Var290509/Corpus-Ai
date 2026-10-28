@@ -4,11 +4,23 @@ export interface User {
   email: string;
 }
 
+export interface ReviewMember {
+  id: string;
+  name: string;
+  email: string;
+  role: 'Owner' | 'Reviewer' | 'Collaborator' | 'Viewer';
+  avatar?: string;
+  joinedAt: string;
+}
+
 export interface Project {
   id: string;
   name: string;
   description: string;
-  reviewQuestion: ReviewQuestion;
+  reviewType?: string; // e.g., 'Systematic review', 'Scoping review', 'Meta-analysis', etc.
+  reviewDomain?: string; // e.g., 'Medicine & Health Sciences', 'Computer Science & AI', etc.
+  members?: ReviewMember[];
+  reviewQuestion?: ReviewQuestion;
   papers: ResearchPaper[];
   queryVersions: QueryVersion[];
   decisions: Record<string, ReviewerDecision>;
@@ -191,6 +203,21 @@ export interface AuditRunLog {
   action: string;
   actor: 'human' | 'system';
   details: string;
+}
+
+export interface SuggestedPaper {
+  id: string;
+  title: string;
+  authors: string[];
+  year: number;
+  journal: string;
+  abstract: string;
+  doi?: string;
+  databases: Array<'scopus' | 'web_of_science' | 'pubmed' | 'ieee_xplore' | 'library'>;
+  similarityScore: number; // e.g. 96
+  recommendationReason: string;
+  citationCount: number;
+  relevanceKeywords: string[];
 }
 
 export interface RAGSynthesisQuery {

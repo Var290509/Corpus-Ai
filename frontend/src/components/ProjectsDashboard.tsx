@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Plus, 
   Folder, 
@@ -10,15 +10,25 @@ import {
   LogOut,
   Upload,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Users,
+  X,
+  Edit3,
+  ChevronRight,
+  Shield,
+  Cloud,
+  UserPlus
 } from 'lucide-react';
-import { Project, User, ReviewQuestion } from '../types';
+import { Project, User, ReviewMember } from '../types';
+import { firestoreService } from '../services/firestoreService';
+import gsap from 'gsap';
 
 interface ProjectsDashboardProps {
   user: User;
   projects: Project[];
   onSelectProject: (projectId: string) => void;
   onCreateProject: (project: Project) => void;
+  onUpdateProject?: (project: Project) => void;
   onDeleteProject: (projectId: string) => void;
   onLogout: () => void;
 }
@@ -28,50 +38,96 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
   projects,
   onSelectProject,
   onCreateProject,
+  onUpdateProject,
   onDeleteProject,
   onLogout
 }) => {
+  // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createStep, setCreateStep] = useState<1 | 2 | 3>(1);
 
-  // Form states for creating a new project
-  const [projectName, setProjectName] = useState('');
-  const [projectDescription, setProjectDescription] = useState('');
-  const [question, setQuestion] = useState('');
-  const [population, setPopulation] = useState('');
-  const [intervention, setIntervention] = useState('');
-  const [comparator, setComparator] = useState('');
-  const [outcome, setOutcome] = useState('');
+  // Edit Project Modal state
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editType, setEditType] = useState('Systematic review');
+  const [editDomain, setEditDomain] = useState('Medicine & Health Sciences');
 
-  const handleCreateSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!projectName.trim()) return;
+  // Manage Members Modal state
+  const [managingMembersProject, setManagingMembersProject] = useState<Project | null>(null);
+  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [newMemberRole, setNewMemberRole] = useState<'Reviewer' | 'Collaborator' | 'Viewer'>('Reviewer');
 
-    const newQuestion: ReviewQuestion = {
-      id: `q-${Date.now()}`,
-      title: projectName,
-      question: question.trim() || 'Custom Systematic Review Question',
-      population: population.trim() || 'Adult study population',
-      intervention: intervention.trim() || 'Primary therapeutic intervention',
-      comparator: comparator.trim() || 'Active comparator or placebo control',
-      outcome: outcome.trim() || 'Primary clinical and statistical endpoints',
-      inclusionCriteria: [
-        { id: `inc-${Date.now()}-1`, code: 'INC-HUMAN', text: 'Human clinical trials and prospective cohorts', rationale: 'Direct clinical relevance', detectionType: 'metadata', active: true },
-        { id: `inc-${Date.now()}-2`, code: 'INC-END', text: 'Quantified primary outcomes and endpoints', rationale: 'Statistical evaluability', detectionType: 'algorithm', active: true }
-      ],
-      exclusionCriteria: [
-        { id: `exc-${Date.now()}-1`, code: 'EXC-ANIMAL', text: 'Preclinical animal and rodent models', rationale: 'Lacks clinical human translation', detectionType: 'algorithm', active: true },
-        { id: `exc-${Date.now()}-2`, code: 'EXC-NON-ENG', text: 'Non-English language publications', rationale: 'Auditability of primary clinical tables', detectionType: 'metadata', active: true },
-        { id: `exc-${Date.now()}-3`, code: 'EXC-SIM', text: 'Computational in silico simulations / docking', rationale: 'Lacks in vivo biological endpoints', detectionType: 'algorithm', active: true },
-        { id: `exc-${Date.now()}-4`, code: 'EXC-CASE', text: 'Single case reports (N=1)', rationale: 'Inability to infer average treatment effects', detectionType: 'metadata', active: true }
-      ]
+  // Create form states (Clean, no sample examples in the boxes)
+  const [reviewTitle, setReviewTitle] = useState('');
+  const [reviewType, setReviewType] = useState('');
+  const [reviewDomain, setReviewDomain] = useState('');
+  const [description, setDescription] = useState('');
+  const [membersList, setMembersList] = useState<ReviewMember[]>([
+    {
+      id: `mem-${Date.now()}`,
+      name: user.name || 'Current User',
+      email: user.email || 'user@corpus.ai',
+      role: 'Owner',
+      joinedAt: new Date().toLocaleDateString()
+    }
+  ]);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState<'Reviewer' | 'Collaborator' | 'Viewer'>('Reviewer');
+
+  const cardsContainerRef = useRef<HTMLDivElement>(null);
+  const createModalRef = useRef<HTMLDivElement>(null);
+  const editModalRef = useRef<HTMLDivElement>(null);
+
+  // GSAP animation on cards load
+  useEffect(() => {
+    if (cardsContainerRef.current) {
+      gsap.fromTo(
+        cardsContainerRef.current.children,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.08, ease: 'power2.out' }
+      );
+    }
+  }, [projects.length]);
+
+  // GSAP animation when opening create modal
+  useEffect(() => {
+    if (showCreateModal && createModalRef.current) {
+      gsap.fromTo(
+        createModalRef.current,
+        { opacity: 0, scale: 0.96, y: 20 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: 'power3.out' }
+      );
+    }
+  }, [showCreateModal]);
+
+  // Handle Add Member during creation
+  const handleAddInviteMember = () => {
+    if (!inviteEmail.trim()) return;
+    const newMember: ReviewMember = {
+      id: `mem-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      name: inviteEmail.split('@')[0],
+      email: inviteEmail.trim(),
+      role: inviteRole,
+      joinedAt: new Date().toLocaleDateString()
     };
+    setMembersList([...membersList, newMember]);
+    setInviteEmail('');
+  };
+
+  // Handle Final Create
+  const handleFinalCreate = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!reviewTitle.trim()) return;
 
     const newProject: Project = {
       id: `proj-${Date.now()}`,
-      name: projectName.trim(),
-      description: projectDescription.trim() || 'Systematic literature review workspace',
-      reviewQuestion: newQuestion,
-      papers: [], // Starts completely clean with ZERO pre-seeded papers
+      name: reviewTitle.trim(),
+      description: description.trim() || 'Systematic literature review workspace',
+      reviewType: reviewType || 'Systematic review',
+      reviewDomain: reviewDomain || 'Medicine & Health Sciences',
+      members: membersList,
+      papers: [],
       queryVersions: [
         {
           id: `qv-${Date.now()}`,
@@ -93,9 +149,9 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
           id: `log-${Date.now()}`,
           versionNumber: 1,
           step: 'Protocol',
-          action: 'Created New Project Workspace',
+          action: 'Created New Review Workspace',
           actor: 'human',
-          details: `Initialized project "${projectName}" with user-defined PICO parameters`,
+          details: `Initialized review "${reviewTitle}" (${reviewType || 'Systematic review'})`,
           timestamp: new Date().toLocaleTimeString()
         }
       ],
@@ -104,134 +160,294 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
     };
 
     onCreateProject(newProject);
-    setShowCreateModal(false);
-    
+    firestoreService.saveProject(newProject);
+
     // Reset form
-    setProjectName('');
-    setProjectDescription('');
-    setQuestion('');
-    setPopulation('');
-    setIntervention('');
-    setComparator('');
-    setOutcome('');
+    setShowCreateModal(false);
+    setCreateStep(1);
+    setReviewTitle('');
+    setReviewType('');
+    setReviewDomain('');
+    setDescription('');
+    setMembersList([
+      {
+        id: `mem-${Date.now()}`,
+        name: user.name || 'Current User',
+        email: user.email || 'user@corpus.ai',
+        role: 'Owner',
+        joinedAt: new Date().toLocaleDateString()
+      }
+    ]);
+  };
+
+  // Open Edit Modal
+  const openEditModal = (proj: Project, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingProject(proj);
+    setEditTitle(proj.name);
+    setEditDescription(proj.description || '');
+    setEditType(proj.reviewType || 'Systematic review');
+    setEditDomain(proj.reviewDomain || 'Medicine & Health Sciences');
+  };
+
+  // Save Edit Modal
+  const handleSaveEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingProject || !editTitle.trim()) return;
+
+    const updated: Project = {
+      ...editingProject,
+      name: editTitle.trim(),
+      description: editDescription.trim(),
+      reviewType: editType,
+      reviewDomain: editDomain,
+      updatedAt: new Date().toLocaleDateString()
+    };
+
+    if (onUpdateProject) {
+      onUpdateProject(updated);
+    }
+    firestoreService.saveProject(updated);
+    setEditingProject(null);
+  };
+
+  // Open Members Modal
+  const openMembersModal = (proj: Project, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setManagingMembersProject(proj);
+  };
+
+  // Add Member in Managing Modal
+  const handleAddMemberToProject = () => {
+    if (!managingMembersProject || !newMemberEmail.trim()) return;
+    const newMember: ReviewMember = {
+      id: `mem-${Date.now()}`,
+      name: newMemberEmail.split('@')[0],
+      email: newMemberEmail.trim(),
+      role: newMemberRole,
+      joinedAt: new Date().toLocaleDateString()
+    };
+
+    const updatedMembers = [...(managingMembersProject.members || []), newMember];
+    const updated: Project = {
+      ...managingMembersProject,
+      members: updatedMembers,
+      updatedAt: new Date().toLocaleDateString()
+    };
+
+    if (onUpdateProject) {
+      onUpdateProject(updated);
+    }
+    firestoreService.saveProject(updated);
+    setManagingMembersProject(updated);
+    setNewMemberEmail('');
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-gradient-to-br from-[#F5F4F2] via-[#EBE9E6] to-[#ECE7F4] text-[#2D2521]">
+    <div className="min-h-screen flex flex-col font-sans bg-radial from-[#24160E] via-[#160E09] to-[#0D0704] text-[#E5E4E2]">
       
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 w-full glass-panel border-b border-[#E6E0F0] backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            
-            {/* Logo */}
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#8A5F40] flex items-center justify-center shadow-md shadow-[#6F4E37]/20 border border-[#E6E0F0]">
-                <span className="text-[#E6E0F0] font-bold text-xl font-mono">C</span>
-              </div>
-              <div>
-                <span className="font-semibold text-lg tracking-tight text-[#462E1E]">Corpus AI</span>
-                <span className="text-xs text-[#7E7A72] block -mt-1">Projects Workspace</span>
-              </div>
+      <header className="border-b border-[#E6E0F0]/15 bg-[#1C110B]/85 backdrop-blur-md sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#9E88BE] flex items-center justify-center text-white shadow-md">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="font-bold text-sm tracking-tight text-[#FAF9F8]">
+                CORPUS <span className="text-[#E6E0F0] font-light">AI</span>
+              </span>
+              <span className="ml-2 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-[#3B2518] text-[#E6E0F0] border border-[#E6E0F0]/20">
+                Review Workspaces
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            {/* Cloud Firestore Status Badge */}
+            <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#2B1B12] border border-emerald-500/30 text-emerald-300 text-xs">
+              <Cloud className="w-3.5 h-3.5" />
+              <span>Google Cloud Firestore: Spark Free Tier (Active)</span>
             </div>
 
-            {/* User Profile & Logout */}
-            <div className="flex items-center space-x-4">
-              <div className="text-right hidden sm:block">
-                <span className="text-xs font-semibold text-[#462E1E] block">{user.name}</span>
-                <span className="text-[11px] text-[#7E7A72] block">{user.email}</span>
-              </div>
-
-              <button
-                onClick={onLogout}
-                className="p-2 rounded-xl text-[#7E7A72] hover:text-[#462E1E] hover:bg-white/60 transition-all"
-                title="Sign Out"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+            <div className="text-right">
+              <div className="text-xs font-semibold text-[#FAF9F8]">{user.name}</div>
+              <div className="text-[11px] text-[#A59E98]">{user.email}</div>
             </div>
 
+            <button
+              onClick={onLogout}
+              className="p-2 rounded-xl text-[#B8B3AC] hover:text-[#FAF9F8] hover:bg-[#3B2518] transition-colors"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 text-left">
+      {/* Main Content */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        {/* Banner with Create Project CTA */}
-        <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0] flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-glass">
-          <div>
-            <h1 className="text-xl font-bold text-[#462E1E]">My Systematic Review Projects</h1>
-            <p className="text-xs text-[#5F5C56] mt-1 max-w-xl">
-              Create a project, define your PICO research question, and upload your own research papers (RIS, CSV, BibTeX, PDF) or query live PubMed.
+        {/* Welcome Banner */}
+        <div className="glass-panel-elevated rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#E6E0F0]/20">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#3D2619] border border-[#E6E0F0]/20 text-[#E6E0F0] text-xs font-medium">
+              <Sparkles className="w-3.5 h-3.5 text-[#E5E4E2]" />
+              <span>Autonomous Systematic Literature Review Workspace</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#FAF9F8] tracking-tight">
+              Welcome back, {user.name.split(' ')[0]}
+            </h1>
+            <p className="text-xs sm:text-sm text-[#C5BFB8] leading-relaxed">
+              Create and manage your systematic reviews. Upload literature, run multi-hop Agentic RAG synthesis, and collaborate with review team members.
             </p>
           </div>
 
           <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-md shadow-[#6F4E37]/20 transition-all flex items-center space-x-2 shrink-0"
+            onClick={() => {
+              setCreateStep(1);
+              setShowCreateModal(true);
+            }}
+            className="px-5 py-3 rounded-xl font-semibold text-xs bg-gradient-to-r from-[#E5E4E2] to-[#E6E0F0] text-[#1A1009] hover:brightness-105 shadow-lg flex items-center justify-center space-x-2 transition-all cursor-pointer shrink-0"
           >
-            <Plus className="w-4 h-4 text-[#E6E0F0]" />
-            <span>Create New Project</span>
+            <Plus className="w-4 h-4" />
+            <span>Create New Review</span>
           </button>
         </div>
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {/* Reviews Grid Header */}
+        <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center space-x-2">
+            <Folder className="w-4 h-4 text-[#E6E0F0]" />
+            <h2 className="text-sm font-bold text-[#FAF9F8]">Active Systematic Reviews</h2>
+            <span className="text-xs px-2 py-0.5 rounded-full bg-[#3B2518] text-[#E6E0F0] font-semibold">
+              {projects.length}
+            </span>
+          </div>
+        </div>
+
+        {/* Projects Cards Grid */}
+        <div ref={cardsContainerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {projects.map((proj) => {
-            const paperCount = proj.papers?.length || 0;
-            const includedCount = proj.papers?.filter(p => proj.decisions?.[p.id]?.status === 'include').length || 0;
+            const includedCount = Object.values(proj.decisions || {}).filter(d => d.status === 'include').length;
+            const members = proj.members || [
+              { id: '1', name: user.name, email: user.email, role: 'Owner', joinedAt: proj.createdAt }
+            ];
 
             return (
               <div
                 key={proj.id}
-                className="glass-card rounded-2xl p-5 border border-[#E6E0F0] hover:border-[#6F4E37]/40 flex flex-col justify-between transition-all group"
+                className="glass-card rounded-2xl p-5 border border-[#E6E0F0]/15 flex flex-col justify-between hover:border-[#E6E0F0]/40 transition-all group"
               >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="p-2 rounded-xl bg-[#E6E0F0] text-[#5A3D29]">
-                      <Folder className="w-4 h-4 text-[#6F4E37]" />
+                <div className="space-y-3">
+                  {/* Top Bar: Review Type & Action Buttons */}
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-[#3B2518] text-[#E6E0F0] border border-[#E6E0F0]/20">
+                      {proj.reviewType || 'Systematic Review'}
                     </span>
 
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteProject(proj.id);
-                      }}
-                      className="text-[#B8B5AE] hover:text-rose-600 p-1 rounded transition-colors"
-                      title="Delete Project"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center space-x-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      {/* Edit Details Button */}
+                      <button
+                        onClick={(e) => openEditModal(proj, e)}
+                        className="p-1.5 rounded-lg text-[#B8B3AC] hover:text-[#FAF9F8] hover:bg-[#3B2518] transition-colors"
+                        title="Edit Review Details"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Manage Members Button */}
+                      <button
+                        onClick={(e) => openMembersModal(proj, e)}
+                        className="p-1.5 rounded-lg text-[#B8B3AC] hover:text-[#FAF9F8] hover:bg-[#3B2518] transition-colors"
+                        title="Review Team Members"
+                      >
+                        <Users className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Delete Project */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm(`Are you sure you want to delete "${proj.name}"?`)) {
+                            onDeleteProject(proj.id);
+                            firestoreService.deleteProject(proj.id);
+                          }
+                        }}
+                        className="p-1.5 rounded-lg text-rose-400 hover:text-rose-200 hover:bg-rose-950/40 transition-colors"
+                        title="Delete Review"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
 
-                  <h3 className="font-semibold text-sm text-[#462E1E] group-hover:text-[#6F4E37] transition-colors line-clamp-1">
-                    {proj.name}
-                  </h3>
+                  {/* Title & Description */}
+                  <div>
+                    <h3 className="text-sm font-bold text-[#FAF9F8] group-hover:text-white transition-colors line-clamp-1">
+                      {proj.name}
+                    </h3>
+                    <p className="text-xs text-[#B8B3AC] mt-1 line-clamp-2">
+                      {proj.description || 'Systematic literature review workspace.'}
+                    </p>
+                  </div>
 
-                  <p className="text-xs text-[#7E7A72] mt-1 line-clamp-2 leading-relaxed">
-                    {proj.reviewQuestion?.question || proj.description}
-                  </p>
-
-                  <div className="mt-4 pt-3 border-t border-[#E6E0F0] grid grid-cols-2 gap-2 text-[11px] text-[#5F5C56]">
-                    <div>
-                      <span className="text-[#9B978F] block text-[10px]">Total Papers</span>
-                      <strong className="font-mono text-[#462E1E]">{paperCount.toLocaleString()}</strong>
+                  {/* Domain Tag */}
+                  {proj.reviewDomain && (
+                    <div className="text-[11px] text-[#A59E98] flex items-center space-x-1">
+                      <span className="font-medium text-[#C5BFB8]">Domain:</span>
+                      <span className="text-[#E6E0F0]">{proj.reviewDomain}</span>
                     </div>
-                    <div>
-                      <span className="text-[#9B978F] block text-[10px]">Included</span>
-                      <strong className="font-mono text-emerald-700">{includedCount}</strong>
+                  )}
+
+                  {/* Metrics Row */}
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#E6E0F0]/10 text-xs">
+                    <div className="p-2 rounded-xl bg-[#1A1009]/80 border border-[#E6E0F0]/10">
+                      <span className="text-[10px] text-[#A59E98] block">Papers Uploaded</span>
+                      <span className="font-bold text-[#FAF9F8]">{proj.papers?.length || 0}</span>
+                    </div>
+                    <div className="p-2 rounded-xl bg-[#1A1009]/80 border border-[#E6E0F0]/10">
+                      <span className="text-[10px] text-[#A59E98] block">Included Studies</span>
+                      <span className="font-bold text-emerald-400">{includedCount}</span>
+                    </div>
+                  </div>
+
+                  {/* Review Team Members Display */}
+                  <div className="pt-2">
+                    <span className="text-[10px] font-semibold text-[#A59E98] block mb-1">
+                      Review Members ({members.length})
+                    </span>
+                    <div className="flex items-center space-x-1.5">
+                      {members.slice(0, 3).map((m, i) => (
+                        <div
+                          key={m.id || i}
+                          className="w-6 h-6 rounded-full bg-[#3B2518] border border-[#E6E0F0]/30 flex items-center justify-center text-[10px] font-bold text-[#FAF9F8]"
+                          title={`${m.name} (${m.role})`}
+                        >
+                          {m.name.charAt(0).toUpperCase()}
+                        </div>
+                      ))}
+                      {members.length > 3 && (
+                        <span className="text-[10px] text-[#B8B3AC]">
+                          +{members.length - 3} more
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-[#E6E0F0] flex items-center justify-between">
-                  <span className="text-[10px] text-[#9B978F]">Created: {proj.createdAt}</span>
+                {/* Footer Action */}
+                <div className="pt-4 mt-3 border-t border-[#E6E0F0]/10 flex items-center justify-between">
+                  <span className="text-[10px] text-[#8E8680]">
+                    Updated {proj.updatedAt}
+                  </span>
+
                   <button
                     onClick={() => onSelectProject(proj.id)}
-                    className="flex items-center space-x-1.5 text-xs font-semibold text-[#6F4E37] hover:text-[#5A3D29] group-hover:translate-x-1 transition-transform"
+                    className="flex items-center space-x-1.5 text-xs font-semibold text-[#E6E0F0] hover:text-white group-hover:translate-x-1 transition-all cursor-pointer"
                   >
-                    <span>Open Workspace</span>
+                    <span>Open Review Desk</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -240,166 +456,533 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
           })}
 
           {projects.length === 0 && (
-            <div className="col-span-full glass-panel rounded-2xl p-12 text-center border border-dashed border-[#d4c8e4]">
-              <Folder className="w-12 h-12 text-[#6F4E37]/40 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-[#462E1E]">No Systematic Review Projects Yet</h3>
-              <p className="text-xs text-[#7E7A72] mt-1 max-w-sm mx-auto">
-                Click "Create New Project" to define your review question and upload research papers.
+            <div className="col-span-full glass-panel rounded-2xl p-12 text-center border border-dashed border-[#E6E0F0]/25">
+              <Folder className="w-12 h-12 text-[#E6E0F0]/40 mx-auto mb-3" />
+              <h3 className="text-sm font-semibold text-[#FAF9F8]">No Systematic Reviews Yet</h3>
+              <p className="text-xs text-[#A59E98] mt-1 max-w-sm mx-auto">
+                Click "Create New Review" to set up your review title, domain, and invite team members.
               </p>
               <button
-                onClick={() => setShowCreateModal(true)}
-                className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold bg-[#6F4E37] text-white hover:bg-[#5A3D29] shadow-sm inline-flex items-center space-x-1.5"
+                onClick={() => {
+                  setCreateStep(1);
+                  setShowCreateModal(true);
+                }}
+                className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#1A1009] hover:bg-white shadow-md inline-flex items-center space-x-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Create First Project</span>
+                <span>Create First Review</span>
               </button>
             </div>
           )}
         </div>
-
       </main>
 
-      {/* Create Project Modal */}
+      {/* CREATE NEW REVIEW MODAL (Exact match to Image 2 with stepper & clean inputs) */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
           <div 
-            className="w-full max-w-2xl glass-panel-elevated rounded-2xl border border-[#E6E0F0] shadow-2xl p-6 space-y-5 max-h-[85vh] overflow-y-auto"
+            ref={createModalRef}
+            className="w-full max-w-2xl bg-[#1E130B] border border-[#E6E0F0]/25 rounded-2xl shadow-2xl p-6 space-y-6 max-h-[85vh] overflow-y-auto text-left"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-[#E6E0F0]">
+            {/* Modal Header matching Image 2 */}
+            <div className="flex items-center justify-between pb-3 border-b border-[#E6E0F0]/15">
               <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#6F4E37] flex items-center justify-center text-white">
-                  <Plus className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-lg bg-[#3B2518] border border-[#E6E0F0]/20 flex items-center justify-center text-[#E6E0F0]">
+                  <Folder className="w-4 h-4" />
                 </div>
-                <div>
-                  <h3 className="text-sm font-bold text-[#462E1E]">Create New Systematic Review Project</h3>
-                  <p className="text-[11px] text-[#7E7A72]">
-                    Formulate your PICO research question and set up your research workspace.
-                  </p>
-                </div>
+                <h3 className="text-base font-bold text-[#FAF9F8]">Create new review</h3>
               </div>
 
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="text-[#7E7A72] hover:text-[#462E1E] text-xs font-medium"
+                className="text-[#A59E98] hover:text-[#FAF9F8] transition-colors p-1"
               >
-                Cancel
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateSubmit} className="space-y-4">
-              
-              {/* Project Title & Description */}
-              <div className="grid grid-cols-1 gap-3">
+            {/* Stepper matching Image 2 */}
+            <div className="flex items-center justify-between border-b border-[#E6E0F0]/15 pb-4">
+              <button 
+                onClick={() => setCreateStep(1)}
+                className={`flex items-center space-x-2 pb-1 transition-all ${
+                  createStep === 1 
+                    ? 'border-b-2 border-indigo-400 text-indigo-300 font-bold' 
+                    : 'text-[#8E8680] hover:text-[#C5BFB8]'
+                }`}
+              >
+                <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-bold ${
+                  createStep === 1 ? 'bg-indigo-600 text-white' : 'bg-[#2B1B12] text-[#8E8680]'
+                }`}>
+                  1
+                </span>
+                <span className="text-xs">Add review info</span>
+              </button>
+
+              <ChevronRight className="w-4 h-4 text-[#8E8680]" />
+
+              <button 
+                onClick={() => setCreateStep(2)}
+                className={`flex items-center space-x-2 pb-1 transition-all ${
+                  createStep === 2 
+                    ? 'border-b-2 border-indigo-400 text-indigo-300 font-bold' 
+                    : 'text-[#8E8680] hover:text-[#C5BFB8]'
+                }`}
+              >
+                <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-bold ${
+                  createStep === 2 ? 'bg-indigo-600 text-white' : 'bg-[#2B1B12] text-[#8E8680]'
+                }`}>
+                  2
+                </span>
+                <span className="text-xs">Upload articles</span>
+              </button>
+
+              <ChevronRight className="w-4 h-4 text-[#8E8680]" />
+
+              <button 
+                onClick={() => setCreateStep(3)}
+                className={`flex items-center space-x-2 pb-1 transition-all ${
+                  createStep === 3 
+                    ? 'border-b-2 border-indigo-400 text-indigo-300 font-bold' 
+                    : 'text-[#8E8680] hover:text-[#C5BFB8]'
+                }`}
+              >
+                <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-bold ${
+                  createStep === 3 ? 'bg-indigo-600 text-white' : 'bg-[#2B1B12] text-[#8E8680]'
+                }`}>
+                  3
+                </span>
+                <span className="text-xs">Invite members</span>
+              </button>
+            </div>
+
+            {/* STEP 1: Add review info */}
+            {createStep === 1 && (
+              <div className="space-y-4">
+                {/* Review title * */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#462E1E] mb-1">
-                    Project Name *
+                  <label className="block text-xs font-semibold text-[#FAF9F8] mb-1.5">
+                    Review title <span className="text-rose-400">*</span>
                   </label>
                   <input
                     type="text"
-                    value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
-                    placeholder="e.g. CRISPR-Cas9 Therapeutics in Hemoglobinopathies"
-                    className="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-[#2D2521]"
+                    value={reviewTitle}
+                    onChange={(e) => setReviewTitle(e.target.value)}
+                    placeholder="Review title has to be unique"
+                    className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#FAF9F8] placeholder-[#7A726C]"
                     required
                   />
                 </div>
 
+                {/* Review type * and Review domain * */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#FAF9F8] mb-1.5">
+                      Review type <span className="text-rose-400">*</span>
+                    </label>
+                    <select
+                      value={reviewType}
+                      onChange={(e) => setReviewType(e.target.value)}
+                      className="w-full bg-[#160E08] border border-[#E6E0F0]/25 text-[#FAF9F8] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#E6E0F0]"
+                    >
+                      <option value="">Choose review type</option>
+                      <option value="Systematic review">Systematic review</option>
+                      <option value="Scoping review">Scoping review</option>
+                      <option value="Meta-analysis">Meta-analysis</option>
+                      <option value="Narrative literature review">Narrative literature review</option>
+                      <option value="Rapid review">Rapid review</option>
+                      <option value="Umbrella review">Umbrella review</option>
+                      <option value="Clinical practice guideline">Clinical practice guideline</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-[#FAF9F8] mb-1.5">
+                      Review domain <span className="text-rose-400">*</span>
+                    </label>
+                    <select
+                      value={reviewDomain}
+                      onChange={(e) => setReviewDomain(e.target.value)}
+                      className="w-full bg-[#160E08] border border-[#E6E0F0]/25 text-[#FAF9F8] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#E6E0F0]"
+                    >
+                      <option value="">Choose review domain</option>
+                      <option value="Medicine & Health Sciences">Medicine & Health Sciences</option>
+                      <option value="Computer Science & Artificial Intelligence">Computer Science & Artificial Intelligence</option>
+                      <option value="Biochemistry & Genetics">Biochemistry & Genetics</option>
+                      <option value="Engineering & Technology">Engineering & Technology</option>
+                      <option value="Social & Behavioral Sciences">Social & Behavioral Sciences</option>
+                      <option value="Environmental & Agricultural Sciences">Environmental & Agricultural Sciences</option>
+                      <option value="Pharmacology & Toxicology">Pharmacology & Toxicology</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Description */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#462E1E] mb-1">
-                    Review Question
+                  <label className="block text-xs font-semibold text-[#FAF9F8] mb-1.5">
+                    Description
                   </label>
                   <textarea
-                    value={question}
-                    onChange={(e) => setQuestion(e.target.value)}
-                    placeholder="e.g. In patients with sickle cell disease, does exa-cel gene editing therapy, compared with standard chronic transfusion, reduce vaso-occlusive events?"
-                    rows={2}
-                    className="w-full glass-input rounded-xl px-3.5 py-2 text-xs text-[#2D2521] resize-none"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe your review!"
+                    rows={4}
+                    className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#FAF9F8] placeholder-[#7A726C] resize-none"
                   />
                 </div>
+
+                {/* Navigation */}
+                <div className="pt-4 flex items-center justify-between border-t border-[#E6E0F0]/15">
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateModal(false)}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#B8B3AC] hover:text-[#FAF9F8]"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!reviewTitle.trim()) {
+                        alert('Please enter a review title.');
+                        return;
+                      }
+                      setCreateStep(2);
+                    }}
+                    className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#1A1009] hover:bg-white flex items-center space-x-1.5 cursor-pointer shadow-md"
+                  >
+                    <span>Next: Upload articles</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 2: Upload articles */}
+            {createStep === 2 && (
+              <div className="space-y-4">
+                <div className="border border-dashed border-[#E6E0F0]/25 rounded-2xl p-8 text-center bg-[#150D07]/60">
+                  <Upload className="w-10 h-10 text-[#E6E0F0]/50 mx-auto mb-3" />
+                  <h4 className="text-sm font-bold text-[#FAF9F8]">Upload Initial Research Articles</h4>
+                  <p className="text-xs text-[#A59E98] mt-1 max-w-sm mx-auto">
+                    You can upload RIS, CSV, JSON, BibTeX, or PDF/TXT files inside your review workspace, or proceed to invite members.
+                  </p>
+                </div>
+
+                {/* Navigation */}
+                <div className="pt-4 flex items-center justify-between border-t border-[#E6E0F0]/15">
+                  <button
+                    type="button"
+                    onClick={() => setCreateStep(1)}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#B8B3AC] hover:text-[#FAF9F8]"
+                  >
+                    Back
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCreateStep(3)}
+                    className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#1A1009] hover:bg-white flex items-center space-x-1.5 cursor-pointer shadow-md"
+                  >
+                    <span>Next: Invite members</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* STEP 3: Invite members */}
+            {createStep === 3 && (
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <label className="block text-xs font-semibold text-[#FAF9F8]">
+                    Invite Team Members to this Review:
+                  </label>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      placeholder="Enter collaborator email..."
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      className="flex-1 glass-input rounded-xl px-3 py-2 text-xs text-[#FAF9F8]"
+                    />
+                    <select
+                      value={inviteRole}
+                      onChange={(e) => setInviteRole(e.target.value as any)}
+                      className="bg-[#160E08] border border-[#E6E0F0]/25 text-[#FAF9F8] rounded-xl px-3 py-2 text-xs"
+                    >
+                      <option value="Reviewer">Reviewer</option>
+                      <option value="Collaborator">Collaborator</option>
+                      <option value="Viewer">Viewer</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={handleAddInviteMember}
+                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#3B2518] text-[#E6E0F0] border border-[#E6E0F0]/30 hover:bg-[#4E3120]"
+                    >
+                      Add
+                    </button>
+                  </div>
+
+                  {/* List of members */}
+                  <div className="space-y-2 pt-2">
+                    {membersList.map((m) => (
+                      <div 
+                        key={m.id}
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-[#160E08] border border-[#E6E0F0]/15 text-xs"
+                      >
+                        <div className="flex items-center space-x-2.5">
+                          <div className="w-7 h-7 rounded-full bg-[#3B2518] text-[#FAF9F8] font-bold text-xs flex items-center justify-center">
+                            {m.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <span className="font-semibold text-[#FAF9F8]">{m.name}</span>
+                            <span className="text-[11px] text-[#A59E98] ml-2">({m.email})</span>
+                          </div>
+                        </div>
+
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#2B1B12] text-[#E6E0F0] border border-[#E6E0F0]/20">
+                          {m.role}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Navigation */}
+                <div className="pt-4 flex items-center justify-between border-t border-[#E6E0F0]/15">
+                  <button
+                    type="button"
+                    onClick={() => setCreateStep(2)}
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#B8B3AC] hover:text-[#FAF9F8]"
+                  >
+                    Back
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleFinalCreate()}
+                    className="px-6 py-2.5 rounded-xl text-xs font-semibold bg-gradient-to-r from-[#E5E4E2] to-[#E6E0F0] text-[#1A1009] hover:brightness-105 flex items-center space-x-1.5 cursor-pointer shadow-lg"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Create Review & Open Workspace</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* EDIT REVIEW MODAL */}
+      {editingProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+          <div 
+            ref={editModalRef}
+            className="w-full max-w-xl bg-[#1E130B] border border-[#E6E0F0]/25 rounded-2xl shadow-2xl p-6 space-y-5 text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-[#E6E0F0]/15">
+              <div className="flex items-center space-x-2">
+                <Edit3 className="w-4 h-4 text-[#E6E0F0]" />
+                <h3 className="text-base font-bold text-[#FAF9F8]">Edit Review Details</h3>
+              </div>
+              <button 
+                onClick={() => setEditingProject(null)}
+                className="text-[#A59E98] hover:text-[#FAF9F8]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-[#FAF9F8] mb-1.5">
+                  Review Title <span className="text-rose-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#FAF9F8]"
+                  required
+                />
               </div>
 
-              {/* PICO Breakdown */}
-              <div className="space-y-2 pt-2 border-t border-[#E6E0F0]">
-                <span className="text-xs font-semibold text-[#462E1E] block">
-                  PICO Framework Parameters:
-                </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#FAF9F8] mb-1.5">
+                    Review Type
+                  </label>
+                  <select
+                    value={editType}
+                    onChange={(e) => setEditType(e.target.value)}
+                    className="w-full bg-[#160E08] border border-[#E6E0F0]/25 text-[#FAF9F8] rounded-xl px-3 py-2 text-xs"
+                  >
+                    <option value="Systematic review">Systematic review</option>
+                    <option value="Scoping review">Scoping review</option>
+                    <option value="Meta-analysis">Meta-analysis</option>
+                    <option value="Narrative literature review">Narrative literature review</option>
+                    <option value="Rapid review">Rapid review</option>
+                    <option value="Umbrella review">Umbrella review</option>
+                    <option value="Clinical practice guideline">Clinical practice guideline</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[11px] font-medium text-[#6F4E37] mb-1">
-                      Population (P)
-                    </label>
-                    <input
-                      type="text"
-                      value={population}
-                      onChange={(e) => setPopulation(e.target.value)}
-                      placeholder="e.g. Patients with severe sickle cell disease"
-                      className="w-full glass-input rounded-xl px-3 py-1.5 text-xs text-[#2D2521]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-medium text-[#8169A3] mb-1">
-                      Intervention (I)
-                    </label>
-                    <input
-                      type="text"
-                      value={intervention}
-                      onChange={(e) => setIntervention(e.target.value)}
-                      placeholder="e.g. CRISPR-Cas9 exa-cel autologous infusion"
-                      className="w-full glass-input rounded-xl px-3 py-1.5 text-xs text-[#2D2521]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-medium text-[#7E7A72] mb-1">
-                      Comparator (C)
-                    </label>
-                    <input
-                      type="text"
-                      value={comparator}
-                      onChange={(e) => setComparator(e.target.value)}
-                      placeholder="e.g. Chronic blood transfusion or hydroxyurea"
-                      className="w-full glass-input rounded-xl px-3 py-1.5 text-xs text-[#2D2521]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-medium text-[#5A3D29] mb-1">
-                      Outcome (O)
-                    </label>
-                    <input
-                      type="text"
-                      value={outcome}
-                      onChange={(e) => setOutcome(e.target.value)}
-                      placeholder="e.g. Elimination of vaso-occlusive crises & HbF levels"
-                      className="w-full glass-input rounded-xl px-3 py-1.5 text-xs text-[#2D2521]"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#FAF9F8] mb-1.5">
+                    Review Domain
+                  </label>
+                  <select
+                    value={editDomain}
+                    onChange={(e) => setEditDomain(e.target.value)}
+                    className="w-full bg-[#160E08] border border-[#E6E0F0]/25 text-[#FAF9F8] rounded-xl px-3 py-2 text-xs"
+                  >
+                    <option value="Medicine & Health Sciences">Medicine & Health Sciences</option>
+                    <option value="Computer Science & Artificial Intelligence">Computer Science & Artificial Intelligence</option>
+                    <option value="Biochemistry & Genetics">Biochemistry & Genetics</option>
+                    <option value="Engineering & Technology">Engineering & Technology</option>
+                    <option value="Social & Behavioral Sciences">Social & Behavioral Sciences</option>
+                    <option value="Environmental & Agricultural Sciences">Environmental & Agricultural Sciences</option>
+                    <option value="Pharmacology & Toxicology">Pharmacology & Toxicology</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <div className="pt-3 border-t border-[#E6E0F0] flex items-center justify-end space-x-2">
+              <div>
+                <label className="block text-xs font-semibold text-[#FAF9F8] mb-1.5">
+                  Description
+                </label>
+                <textarea
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  rows={3}
+                  className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#FAF9F8] resize-none"
+                />
+              </div>
+
+              <div className="pt-3 flex items-center justify-end space-x-2 border-t border-[#E6E0F0]/15">
                 <button
                   type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-[#5A3D29] hover:bg-black/5"
+                  onClick={() => setEditingProject(null)}
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-[#B8B3AC] hover:text-[#FAF9F8]"
                 >
                   Cancel
                 </button>
-
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl text-xs font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-md shadow-[#6F4E37]/20 transition-all flex items-center space-x-1.5"
+                  className="px-5 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#1A1009] hover:bg-white shadow-md cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Create Project & Enter</span>
+                  Save Changes
                 </button>
               </div>
-
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MANAGE MEMBERS MODAL */}
+      {managingMembersProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+          <div 
+            className="w-full max-w-lg bg-[#1E130B] border border-[#E6E0F0]/25 rounded-2xl shadow-2xl p-6 space-y-5 text-left"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-[#E6E0F0]/15">
+              <div className="flex items-center space-x-2">
+                <Users className="w-4 h-4 text-[#E6E0F0]" />
+                <h3 className="text-base font-bold text-[#FAF9F8]">
+                  Review Members • {managingMembersProject.name}
+                </h3>
+              </div>
+              <button 
+                onClick={() => setManagingMembersProject(null)}
+                className="text-[#A59E98] hover:text-[#FAF9F8]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Invite New Member */}
+            <div className="space-y-2">
+              <label className="block text-xs font-semibold text-[#FAF9F8]">
+                Add Reviewer / Collaborator:
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="name@institution.edu"
+                  value={newMemberEmail}
+                  onChange={(e) => setNewMemberEmail(e.target.value)}
+                  className="flex-1 glass-input rounded-xl px-3 py-2 text-xs text-[#FAF9F8]"
+                />
+                <select
+                  value={newMemberRole}
+                  onChange={(e) => setNewMemberRole(e.target.value as any)}
+                  className="bg-[#160E08] border border-[#E6E0F0]/25 text-[#FAF9F8] rounded-xl px-2.5 py-2 text-xs"
+                >
+                  <option value="Reviewer">Reviewer</option>
+                  <option value="Collaborator">Collaborator</option>
+                  <option value="Viewer">Viewer</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={handleAddMemberToProject}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#1A1009] hover:bg-white flex items-center space-x-1 cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Invite</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Existing Members */}
+            <div className="space-y-2 pt-2">
+              <span className="text-[11px] font-semibold text-[#A59E98] block">
+                Current Members ({managingMembersProject.members?.length || 1}):
+              </span>
+              <div className="space-y-2 max-h-52 overflow-y-auto">
+                {(managingMembersProject.members || [
+                  { id: '1', name: user.name, email: user.email, role: 'Owner', joinedAt: managingMembersProject.createdAt }
+                ]).map((m) => (
+                  <div
+                    key={m.id}
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#160E08] border border-[#E6E0F0]/15 text-xs"
+                  >
+                    <div className="flex items-center space-x-2.5">
+                      <div className="w-7 h-7 rounded-full bg-[#3B2518] text-[#FAF9F8] font-bold text-xs flex items-center justify-center">
+                        {m.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <span className="font-semibold text-[#FAF9F8]">{m.name}</span>
+                        <span className="text-[11px] text-[#A59E98] ml-2">({m.email})</span>
+                      </div>
+                    </div>
+
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#2B1B12] text-[#E6E0F0] border border-[#E6E0F0]/20">
+                      {m.role}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-3 flex justify-end border-t border-[#E6E0F0]/15">
+              <button
+                type="button"
+                onClick={() => setManagingMembersProject(null)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#1A1009] hover:bg-white"
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
       )}

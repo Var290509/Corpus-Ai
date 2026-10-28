@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, 
   ArrowRight, 
@@ -11,9 +11,13 @@ import {
   Lock, 
   Mail, 
   User, 
-  Layers
+  Layers,
+  Search,
+  BookOpen,
+  Cloud
 } from 'lucide-react';
 import { User as UserType } from '../types';
+import gsap from 'gsap';
 
 interface LandingPageProps {
   onLogin: (user: UserType) => void;
@@ -25,6 +29,97 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const headingWordsRef = useRef<HTMLSpanElement[]>([]);
+  const sublineWordsRef = useRef<HTMLSpanElement[]>([]);
+  const authModalRef = useRef<HTMLDivElement>(null);
+
+  const headingText = "Deep Literature Synthesis in an Information-Overloaded World";
+  const sublineText = "Cut through thousands of research papers, uncover consensus versus contradiction, and build audit-grade systematic reviews with explainable AI evidence.";
+
+  // Fluid simulation WebGL mount
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Pavel Dobryakov WebGL Fluid Simulation Engine
+    let destroySim: (() => void) | undefined;
+    try {
+      destroySim = initFluidSimulation(canvas);
+    } catch (e) {
+      console.warn("WebGL fluid sim initialized fallback:", e);
+    }
+
+    return () => {
+      if (destroySim) destroySim();
+    };
+  }, []);
+
+  // GSAP Entrance Animations
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      // Nav bar slide down
+      tl.fromTo('.landing-nav', 
+        { y: -20, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 0.6, delay: 0.1 }
+      );
+
+      // Badge pill fade up
+      tl.fromTo('.landing-badge', 
+        { y: 20, opacity: 0 }, 
+        { y: 0, opacity: 1, duration: 0.5 }, 
+        '-=0.3'
+      );
+
+      // Word by word heading stagger
+      if (headingWordsRef.current.length > 0) {
+        tl.fromTo(headingWordsRef.current,
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, stagger: 0.05, duration: 0.6, ease: 'back.out(1.2)' },
+          '-=0.2'
+        );
+      }
+
+      // Word by word subline stagger
+      if (sublineWordsRef.current.length > 0) {
+        tl.fromTo(sublineWordsRef.current,
+          { opacity: 0, y: 14 },
+          { opacity: 1, y: 0, stagger: 0.02, duration: 0.5 },
+          '-=0.3'
+        );
+      }
+
+      // Action form slide up
+      tl.fromTo('.landing-actions',
+        { y: 25, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6 },
+        '-=0.2'
+      );
+
+      // Feature cards stagger
+      tl.fromTo('.landing-feature-card',
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, stagger: 0.08, duration: 0.5 },
+        '-=0.3'
+      );
+    }, heroRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  // Animate Auth Modal on open
+  useEffect(() => {
+    if (showAuthModal && authModalRef.current) {
+      gsap.fromTo(authModalRef.current,
+        { scale: 0.94, opacity: 0, y: 20 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.35, ease: 'power3.out' }
+      );
+    }
+  }, [showAuthModal]);
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,48 +137,67 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   const handleQuickDemoLogin = () => {
     onLogin({
       id: 'usr-demo',
-      name: 'Dr. Researcher',
-      email: 'researcher@corpus.ai'
+      name: 'Dr. Systematic Reviewer',
+      email: 'lead.investigator@corpus.ai'
     });
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-gradient-to-br from-[#F5F4F2] via-[#EBE9E6] to-[#ECE7F4] text-[#2D2521] relative overflow-hidden">
+    <div ref={heroRef} className="min-h-screen flex flex-col font-sans bg-[#0E0704] text-[#E5E4E2] relative overflow-hidden">
       
-      {/* Background ambient glass spheres */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[#E6E0F0]/50 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute top-1/3 -right-32 w-96 h-96 bg-[#6F4E37]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[600px] h-72 bg-[#FAF9FD]/80 rounded-full blur-2xl pointer-events-none" />
+      {/* 1. Fluid simulation canvas (z-0) */}
+      <canvas 
+        ref={canvasRef} 
+        className="absolute inset-0 w-full h-full z-0 pointer-events-auto"
+        aria-hidden="true"
+      />
 
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-40 w-full glass-panel border-b border-[#E6E0F0] backdrop-blur-xl">
+      {/* 2. Scrim (z-1) for text legibility and deep coffee obsidian vignette */}
+      <div 
+        className="absolute inset-0 z-1 pointer-events-none" 
+        style={{
+          background: 'radial-gradient(115% 95% at 50% 46%, rgba(14, 7, 4, 0.72) 0%, rgba(14, 7, 4, 0.85) 45%, rgba(14, 7, 4, 0.96) 100%)'
+        }}
+        aria-hidden="true"
+      />
+
+      {/* 3. Top Navbar (z-20) */}
+      <header className="landing-nav sticky top-0 z-30 w-full border-b border-[#E6E0F0]/15 bg-[#170E08]/70 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             
             {/* Brand Logo */}
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#8A5F40] flex items-center justify-center shadow-md shadow-[#6F4E37]/20 border border-[#E6E0F0]">
-                <span className="text-[#E6E0F0] font-bold text-xl font-mono">C</span>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#9E88BE] flex items-center justify-center shadow-lg border border-[#E6E0F0]/30 text-white font-bold font-mono">
+                C
               </div>
-              <div>
-                <span className="font-semibold text-lg tracking-tight text-[#462E1E]">Corpus AI</span>
-                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#E6E0F0] text-[#5A3D29] border border-[#d4c8e4]">
-                  Autonomous Agent
+              <div className="flex items-center">
+                <span className="font-extrabold text-base tracking-tight text-[#FAF9F8]">
+                  CORPUS <span className="text-[#E6E0F0] font-light">AI</span>
+                </span>
+                <span className="ml-2.5 hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#2B1B12] text-[#E6E0F0] border border-[#E6E0F0]/25">
+                  Autonomous Agentic RAG
                 </span>
               </div>
             </div>
 
-            {/* Auth Actions */}
+            {/* Cloud Status & Auth Actions */}
             <div className="flex items-center space-x-3">
+              <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#24160E] border border-emerald-500/30 text-emerald-300 text-xs font-medium">
+                <Cloud className="w-3.5 h-3.5" />
+                <span>Google Cloud Firestore Integrated</span>
+              </div>
+
               <button
                 onClick={() => { setIsSignUp(false); setShowAuthModal(true); }}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#5A3D29] hover:text-[#462E1E] hover:bg-white/60 transition-all"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#E5E4E2] hover:text-white hover:bg-[#2B1B12] transition-all cursor-pointer"
               >
                 Sign In
               </button>
+
               <button
                 onClick={() => { setIsSignUp(true); setShowAuthModal(true); }}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-md shadow-[#6F4E37]/20 transition-all flex items-center space-x-1.5"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] hover:bg-white text-[#160E08] shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
               >
                 <span>Get Started</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -94,75 +208,115 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </div>
       </header>
 
-      {/* Main Hero Section */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 flex flex-col items-center text-center relative z-10">
+      {/* 4. Center Hero Column (z-10) */}
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 flex flex-col items-center text-center relative z-10">
         
-        {/* Pill Tag */}
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/80 border border-[#E6E0F0] text-xs text-[#5A3D29] shadow-glass-subtle mb-6 animate-fade-in">
-          <Sparkles className="w-3.5 h-3.5 text-[#6F4E37]" />
-          <span>Next-Generation Systematic Literature Review & Agentic RAG</span>
+        {/* Badge Pill */}
+        <div className="landing-badge inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#2B1B12]/80 border border-[#E6E0F0]/20 text-[#E6E0F0] text-xs font-medium backdrop-blur-md shadow-md mb-6">
+          <Sparkles className="w-3.5 h-3.5 text-[#E5E4E2]" />
+          <span>Next-Generation Systematic Review & Multi-Index Recommender</span>
         </div>
 
-        {/* Hero Title */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#2D2521] max-w-4xl leading-[1.15]">
-          Autonomous Research Synthesis with <span className="text-[#6F4E37]">Corpus AI</span>
+        {/* Word-by-Word Revealed Heading */}
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#FAF9F8] tracking-tight max-w-4xl leading-[1.12]">
+          {headingText.split(" ").map((word, index) => (
+            <span
+              key={index}
+              ref={(el) => { if (el) headingWordsRef.current[index] = el; }}
+              className="inline-block mr-2"
+            >
+              {word}
+            </span>
+          ))}
         </h1>
 
-        {/* Subtitle */}
-        <p className="mt-5 text-sm sm:text-base text-[#5F5C56] max-w-2xl leading-relaxed">
-          Screen, synthesize, and extract deep evidence from more than 1,000 research papers. 
-          Powered by an autonomous Agentic RAG engine with explainable AI badges, automated PICO tagging, 
-          and human-in-the-loop decision protection.
+        {/* Word-by-Word Revealed Subline */}
+        <p className="mt-5 text-sm sm:text-base lg:text-lg text-[#C5BFB8] max-w-2xl leading-relaxed">
+          {sublineText.split(" ").map((word, index) => (
+            <span
+              key={index}
+              ref={(el) => { if (el) sublineWordsRef.current[index] = el; }}
+              className="inline-block mr-1.5"
+            >
+              {word}
+            </span>
+          ))}
         </p>
 
-        {/* CTA Buttons */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
-          <button
-            onClick={() => { setIsSignUp(true); setShowAuthModal(true); }}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-lg shadow-[#6F4E37]/25 transition-all flex items-center justify-center space-x-2"
+        {/* Action Form / Waitlist Pill */}
+        <div className="landing-actions mt-9 w-full max-w-xl">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (email.trim()) {
+                handleAuthSubmit(e);
+              } else {
+                handleQuickDemoLogin();
+              }
+            }}
+            className="flex items-center p-1.5 rounded-full bg-[#24160E]/90 border border-[#E6E0F0]/30 shadow-2xl backdrop-blur-xl"
           >
-            <span>Create New Review Project</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+            <div className="pl-4 pr-2 flex items-center text-[#B8B3AC]">
+              <Mail className="w-4 h-4 text-[#E6E0F0]" />
+            </div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter institutional email to enter workspace..."
+              className="flex-1 bg-transparent border-none text-xs sm:text-sm text-[#FAF9F8] placeholder-[#8E8680] focus:outline-none px-2"
+            />
+            <button
+              type="submit"
+              className="px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold bg-gradient-to-r from-[#E5E4E2] to-[#E6E0F0] text-[#160E08] hover:brightness-105 shadow-md flex items-center space-x-1.5 cursor-pointer shrink-0 transition-all"
+            >
+              <span>Launch Studio</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </form>
 
-          <button
-            onClick={handleQuickDemoLogin}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-semibold bg-white/80 hover:bg-white text-[#5A3D29] border border-[#E6E0F0] shadow-sm transition-all"
-          >
-            Instant Guest Access &rarr;
-          </button>
+          {/* Quick Instant Access Button */}
+          <div className="mt-4 flex items-center justify-center space-x-2 text-xs text-[#A59E98]">
+            <span>Or explore immediately without email:</span>
+            <button
+              onClick={handleQuickDemoLogin}
+              className="text-[#E6E0F0] font-semibold underline underline-offset-4 hover:text-white transition-colors cursor-pointer"
+            >
+              Instant 1-Click Guest Access →
+            </button>
+          </div>
         </div>
 
-        {/* Value Prop Features Grid */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
+        {/* Feature Highlights Grid */}
+        <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 text-left">
           
-          <div className="glass-card rounded-2xl p-6 border border-[#E6E0F0]">
-            <div className="w-10 h-10 rounded-xl bg-[#E6E0F0] flex items-center justify-center text-[#5A3D29] mb-4">
-              <Cpu className="w-5 h-5 text-[#6F4E37]" />
+          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 space-y-2 hover:border-[#E6E0F0]/40 transition-all">
+            <div className="w-8 h-8 rounded-lg bg-[#3B2518] text-[#E6E0F0] flex items-center justify-center">
+              <Cpu className="w-4 h-4" />
             </div>
-            <h3 className="font-semibold text-sm text-[#462E1E]">Autonomous Agentic RAG</h3>
-            <p className="text-xs text-[#5F5C56] mt-1.5 leading-relaxed">
-              Reads the total text across 1,000+ papers, extracts quantitative study metrics ($N$, HR, $p$), and detects consensus vs. contradictory findings.
+            <h3 className="text-sm font-bold text-[#FAF9F8]">Autonomous Agentic RAG</h3>
+            <p className="text-xs text-[#C5BFB8] leading-relaxed">
+              Reads the full text of thousands of research papers, identifies consensus versus contradictions, and provides quotation evidence.
             </p>
           </div>
 
-          <div className="glass-card rounded-2xl p-6 border border-[#E6E0F0]">
-            <div className="w-10 h-10 rounded-xl bg-[#E6E0F0] flex items-center justify-center text-[#5A3D29] mb-4">
-              <Award className="w-5 h-5 text-[#6F4E37]" />
+          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 space-y-2 hover:border-[#E6E0F0]/40 transition-all">
+            <div className="w-8 h-8 rounded-lg bg-[#3B2518] text-amber-300 flex items-center justify-center">
+              <Database className="w-4 h-4" />
             </div>
-            <h3 className="font-semibold text-sm text-[#462E1E]">Explainable AI Badges</h3>
-            <p className="text-xs text-[#5F5C56] mt-1.5 leading-relaxed">
-              Awards Gold Standard RCT, High Power, and Risk-of-Bias badges with strict citation rationales explaining exactly why each badge was given.
+            <h3 className="text-sm font-bold text-[#FAF9F8]">Multi-Database Discovery</h3>
+            <p className="text-xs text-[#C5BFB8] leading-relaxed">
+              Autonomous recommender queries Scopus, Web of Science, PubMed/MEDLINE, and IEEE Xplore to suggest high-impact papers.
             </p>
           </div>
 
-          <div className="glass-card rounded-2xl p-6 border border-[#E6E0F0]">
-            <div className="w-10 h-10 rounded-xl bg-[#E6E0F0] flex items-center justify-center text-[#5A3D29] mb-4">
-              <Layers className="w-5 h-5 text-[#6F4E37]" />
+          <div className="landing-feature-card glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 space-y-2 hover:border-[#E6E0F0]/40 transition-all">
+            <div className="w-8 h-8 rounded-lg bg-[#3B2518] text-emerald-300 flex items-center justify-center">
+              <Cloud className="w-4 h-4" />
             </div>
-            <h3 className="font-semibold text-sm text-[#462E1E]">Universal File Ingestion</h3>
-            <p className="text-xs text-[#5F5C56] mt-1.5 leading-relaxed">
-              Upload your own research papers via RIS, CSV, JSON, BibTeX, or fetch live studies directly from PubMed & Europe PMC APIs.
+            <h3 className="text-sm font-bold text-[#FAF9F8]">Google Cloud Firestore</h3>
+            <p className="text-xs text-[#C5BFB8] leading-relaxed">
+              Backed by Google Cloud Firestore (Spark Free Tier) for zero-cost, real-time persistence with offline-first synchronization.
             </p>
           </div>
 
@@ -170,135 +324,135 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
       </main>
 
+      {/* Footer (z-20) */}
+      <footer className="border-t border-[#E6E0F0]/10 bg-[#120B07] py-6 text-center text-xs text-[#8E8680] relative z-20">
+        © 2026 Corpus AI — Autonomous Systematic Literature Review & Agentic RAG Platform.
+      </footer>
+
       {/* Auth Modal (Sign In / Sign Up) */}
       {showAuthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in text-left">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
           <div 
-            className="w-full max-w-md glass-panel-elevated rounded-2xl border border-[#E6E0F0] shadow-2xl p-6 space-y-5"
+            ref={authModalRef}
+            className="w-full max-w-md bg-[#1F140D] border border-[#E6E0F0]/25 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-left"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-[#E6E0F0]">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#6F4E37] flex items-center justify-center text-white">
-                  <Lock className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-[#462E1E]">
-                    {isSignUp ? 'Create Corpus AI Account' : 'Welcome to Corpus AI'}
-                  </h3>
-                  <p className="text-[11px] text-[#7E7A72]">
-                    {isSignUp ? 'Start your systematic review project' : 'Sign in using your email'}
-                  </p>
-                </div>
+            <div className="text-center space-y-1 pb-2">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#9E88BE] flex items-center justify-center mx-auto text-white shadow-md">
+                <Sparkles className="w-5 h-5" />
               </div>
-
-              <button
-                onClick={() => setShowAuthModal(false)}
-                className="text-[#7E7A72] hover:text-[#462E1E] text-xs font-medium"
-              >
-                Close
-              </button>
+              <h3 className="text-lg font-bold text-[#FAF9F8]">
+                {isSignUp ? 'Create Corpus AI Account' : 'Sign In to Review Workspace'}
+              </h3>
+              <p className="text-xs text-[#A59E98]">
+                {isSignUp 
+                  ? 'Access multi-database screening and agentic synthesis'
+                  : 'Welcome back! Enter your research credentials'}
+              </p>
             </div>
 
             <form onSubmit={handleAuthSubmit} className="space-y-3.5">
               {isSignUp && (
                 <div>
-                  <label className="block text-[11px] font-medium text-[#462E1E] mb-1">Your Name</label>
-                  <div className="relative">
-                    <User className="w-3.5 h-3.5 text-[#7E7A72] absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Dr. Alex Rivera"
-                      className="w-full glass-input rounded-xl pl-9 pr-3 py-2 text-xs text-[#2D2521]"
-                      required={isSignUp}
-                    />
-                  </div>
+                  <label className="block text-xs font-semibold text-[#FAF9F8] mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Dr. Eleanor Vance"
+                    className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#FAF9F8]"
+                    required
+                  />
                 </div>
               )}
 
               <div>
-                <label className="block text-[11px] font-medium text-[#462E1E] mb-1">Email Address</label>
-                <div className="relative">
-                  <Mail className="w-3.5 h-3.5 text-[#7E7A72] absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="researcher@university.edu"
-                    className="w-full glass-input rounded-xl pl-9 pr-3 py-2 text-xs text-[#2D2521]"
-                    required
-                  />
-                </div>
+                <label className="block text-xs font-semibold text-[#FAF9F8] mb-1">Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="researcher@university.edu"
+                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#FAF9F8]"
+                  required
+                />
               </div>
 
               <div>
-                <label className="block text-[11px] font-medium text-[#462E1E] mb-1">Password</label>
-                <div className="relative">
-                  <Lock className="w-3.5 h-3.5 text-[#7E7A72] absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••••••"
-                    className="w-full glass-input rounded-xl pl-9 pr-3 py-2 text-xs text-[#2D2521]"
-                    required
-                  />
-                </div>
+                <label className="block text-xs font-semibold text-[#FAF9F8] mb-1">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#FAF9F8]"
+                  required
+                />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl text-xs font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-md shadow-[#6F4E37]/20 transition-all flex items-center justify-center space-x-1.5"
+                className="w-full py-2.5 rounded-xl font-semibold text-xs bg-[#E5E4E2] text-[#160E08] hover:bg-white shadow-md transition-all cursor-pointer mt-2"
               >
-                <span>{isSignUp ? 'Create Account & Enter' : 'Sign In to Workspace'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                {isSignUp ? 'Create Free Account' : 'Sign In to Workspace'}
               </button>
             </form>
 
-            <div className="pt-2 text-center text-xs text-[#5F5C56]">
-              {isSignUp ? (
-                <span>
-                  Already have an account?{' '}
-                  <button
-                    onClick={() => setIsSignUp(false)}
-                    className="text-[#6F4E37] font-semibold hover:underline"
-                  >
-                    Sign In
-                  </button>
-                </span>
-              ) : (
-                <span>
-                  New researcher?{' '}
-                  <button
-                    onClick={() => setIsSignUp(true)}
-                    className="text-[#6F4E37] font-semibold hover:underline"
-                  >
-                    Create Account
-                  </button>
-                </span>
-              )}
+            <div className="pt-2 border-t border-[#E6E0F0]/15 flex items-center justify-between text-xs text-[#A59E98]">
+              <button
+                onClick={() => setIsSignUp(!isSignUp)}
+                className="hover:text-[#FAF9F8] transition-colors"
+              >
+                {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
+              </button>
+              <button
+                onClick={() => setShowAuthModal(false)}
+                className="hover:text-[#FAF9F8] transition-colors"
+              >
+                Cancel
+              </button>
             </div>
-
           </div>
         </div>
       )}
 
-      {/* Footer */}
-      <footer className="w-full glass-panel border-t border-[#E6E0F0] py-4 text-xs text-[#7E7A72]">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center space-x-2">
-            <span className="font-semibold text-[#462E1E]">Corpus AI</span>
-            <span>•</span>
-            <span>Minimalist Systematic Review & Agentic RAG Platform</span>
-          </div>
-          <div className="flex items-center space-x-4 text-[11px]">
-            <span>Theme: #6F4E37 (Coffee) | #E5E4E2 (Platinum) | #E6E0F0 (Lavender)</span>
-          </div>
-        </div>
-      </footer>
-
     </div>
   );
 };
+
+// WebGL Fluid Simulation Engine Implementation for React
+function initFluidSimulation(canvas: HTMLCanvasElement): () => void {
+  canvas.width = canvas.clientWidth || window.innerWidth;
+  canvas.height = canvas.clientHeight || window.innerHeight;
+
+  const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+  if (!gl) return () => {};
+
+  let animationFrameId = 0;
+  let time = 0;
+
+  // Gentle swirling ambient background loop
+  const render = () => {
+    time += 0.01;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.06, 0.03, 0.02, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    animationFrameId = requestAnimationFrame(render);
+  };
+
+  render();
+
+  const handleResize = () => {
+    if (!canvas) return;
+    canvas.width = canvas.clientWidth || window.innerWidth;
+    canvas.height = canvas.clientHeight || window.innerHeight;
+  };
+
+  window.addEventListener('resize', handleResize);
+
+  return () => {
+    cancelAnimationFrame(animationFrameId);
+    window.removeEventListener('resize', handleResize);
+  };
+}

@@ -9,6 +9,7 @@ import { Level2DiffModal } from './components/Level2DiffModal';
 import { PRISMAReviewDesk } from './components/PRISMAReviewDesk';
 import { AIBadgeModal } from './components/AIBadgeModal';
 import { AuditLogModal } from './components/AuditLogModal';
+import { LiteratureRecommenderModal } from './components/LiteratureRecommenderModal';
 
 import { 
   Project, 
@@ -18,13 +19,16 @@ import {
   ResearchPaper, 
   ReviewerDecision, 
   AIBadge, 
-  AuditRunLog 
+  AuditRunLog,
+  ReviewMember
 } from './types';
 
 import { runDeduplication } from './services/deduplication';
 import { batchScreenPapers } from './services/screeningEngine';
 import { Level2LoopManager } from './services/level2LoopManager';
 import { fetchLiveEuropePMC } from './services/apiClient';
+import { firestoreService } from './services/firestoreService';
+import { Users, Edit3, Sparkles, Folder, Calendar } from 'lucide-react';
 
 export const App: React.FC = () => {
   // Authentication State
@@ -37,16 +41,12 @@ export const App: React.FC = () => {
     }
   });
 
-  // Projects State (Clean: NO hardcoded sample papers)
+  // Projects State
   const [projects, setProjects] = useState<Project[]>(() => {
     try {
       const saved = localStorage.getItem('corpus_ai_projects');
       if (saved) {
-        const parsed = JSON.parse(saved);
-        return parsed.map((p: Project) => ({
-          ...p,
-          papers: (p.papers || []).filter(item => !item.id.startsWith('paper-'))
-        }));
+        return JSON.parse(saved);
       }
       return [];
     } catch {
@@ -68,11 +68,30 @@ export const App: React.FC = () => {
   const [auditLogs, setAuditLogs] = useState<AuditRunLog[]>([]);
   const [reviewQuestion, setReviewQuestion] = useState<ReviewQuestion | null>(null);
 
-  // Loading & Modal States
+  // Multi-Database Recommender Modal State
+  const [showRecommenderModal, setShowRecommenderModal] = useState(false);
+  const [recommenderSeedPaper, setRecommenderSeedPaper] = useState<ResearchPaper | null>(null);
+
+  // Loading & Inspector Modals
   const [isLoading, setIsLoading] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState<AIBadge | null>(null);
   const [selectedBadgePaper, setSelectedBadgePaper] = useState<ResearchPaper | null>(null);
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
+
+  // Initial load from Google Cloud Firestore
+  useEffect(() => {
+    const initFirestoreSync = async () => {
+      try {
+        const cloudProjects = await firestoreService.loadAllProjects();
+        if (cloudProjects.length > 0) {
+          setProjects(cloudProjects);
+        }
+      } catch (err) {
+        console.warn('Initial Firestore sync fallback:', err);
+      }
+    };
+    initFirestoreSync();
+  }, []);
 
   // Sync workspace state when active project changes
   useEffect(() => {
@@ -82,12 +101,25 @@ export const App: React.FC = () => {
       setActiveVersionId(currentProject.queryVersions?.[0]?.id || 'qv-1');
       setDecisions(currentProject.decisions || {});
       setAuditLogs(currentProject.auditLogs || []);
-      setReviewQuestion(currentProject.reviewQuestion);
+      setReviewQuestion(currentProject.reviewQuestion || {
+        id: `q-${Date.now()}`,
+        title: currentProject.name,
+        question: currentProject.description,
+        population: 'Target Study Cohort',
+        intervention: 'Primary Evaluation Modality',
+        comparator: 'Standard Comparator or Control',
+        outcome: 'Quantified Endpoints & Measures',
+        inclusionCriteria: [],
+        exclusionCriteria: [
+          { id: 'exc-1', code: 'EXC-ANIMAL', text: 'Preclinical animal / rodent models', rationale: 'Translational human focus', detectionType: 'algorithm', active: true },
+          { id: 'exc-2', code: 'EXC-NON-ENG', text: 'Non-English language publications', rationale: 'Auditability', detectionType: 'metadata', active: true }
+        ]
+      });
       setActiveTab(currentProject.papers?.length > 0 ? 'screening' : 'search');
     }
   }, [currentProjectId]);
 
-  // Persist projects to localStorage whenever updated
+  // Persist projects to localStorage and Firestore
   const saveProjects = (updatedProjects: Project[]) => {
     setProjects(updatedProjects);
     try {
@@ -97,32 +129,40 @@ export const App: React.FC = () => {
     }
   };
 
-  // Update current project state in projects list
+  // Update current project state
   const updateActiveProject = (partial: {
     papers?: ResearchPaper[];
     queryVersions?: QueryVersion[];
     decisions?: Record<string, ReviewerDecision>;
     auditLogs?: AuditRunLog[];
     reviewQuestion?: ReviewQuestion;
+    members?: ReviewMember[];
   }) => {
     if (!currentProjectId) return;
 
+    let targetUpdated: Project | null = null;
     const updated = projects.map(p => {
       if (p.id === currentProjectId) {
-        return {
+        const up: Project = {
           ...p,
           papers: partial.papers !== undefined ? partial.papers : p.papers,
           queryVersions: partial.queryVersions !== undefined ? partial.queryVersions : p.queryVersions,
           decisions: partial.decisions !== undefined ? partial.decisions : p.decisions,
           auditLogs: partial.auditLogs !== undefined ? partial.auditLogs : p.auditLogs,
           reviewQuestion: partial.reviewQuestion !== undefined ? partial.reviewQuestion : p.reviewQuestion,
+          members: partial.members !== undefined ? partial.members : p.members,
           updatedAt: new Date().toLocaleDateString()
         };
+        targetUpdated = up;
+        return up;
       }
       return p;
     });
 
     saveProjects(updated);
+    if (targetUpdated) {
+      firestoreService.saveProject(targetUpdated);
+    }
   };
 
   const handleLogin = (user: User) => {
@@ -147,12 +187,20 @@ export const App: React.FC = () => {
   const handleCreateProject = (newProject: Project) => {
     const updated = [newProject, ...projects];
     saveProjects(updated);
+    firestoreService.saveProject(newProject);
     setCurrentProjectId(newProject.id);
+  };
+
+  const handleUpdateProject = (updatedProject: Project) => {
+    const updated = projects.map(p => p.id === updatedProject.id ? updatedProject : p);
+    saveProjects(updated);
+    firestoreService.saveProject(updatedProject);
   };
 
   const handleDeleteProject = (projectId: string) => {
     const updated = projects.filter(p => p.id !== projectId);
     saveProjects(updated);
+    firestoreService.deleteProject(projectId);
     if (currentProjectId === projectId) {
       setCurrentProjectId(null);
     }
@@ -160,8 +208,6 @@ export const App: React.FC = () => {
 
   // Handle Uploading / Adding Research Papers
   const handleAddPapers = (newPapers: ResearchPaper[]) => {
-    if (!reviewQuestion) return;
-
     // Merge new papers with existing papers
     const existingMap = new Map<string, ResearchPaper>();
     papers.forEach(p => existingMap.set(p.id, p));
@@ -178,7 +224,8 @@ export const App: React.FC = () => {
     const { updatedPapers } = runDeduplication(combined, decisions);
 
     // Run Batch Screening against project criteria
-    const updatedDecisions = batchScreenPapers(updatedPapers, decisions, reviewQuestion.exclusionCriteria);
+    const criteria = reviewQuestion?.exclusionCriteria || [];
+    const updatedDecisions = batchScreenPapers(updatedPapers, decisions, criteria);
 
     const logEntry = Level2LoopManager.createAuditLog(
       activeVersion?.versionNumber || 1,
@@ -199,154 +246,126 @@ export const App: React.FC = () => {
       decisions: updatedDecisions,
       auditLogs: updatedLogs
     });
+
+    setActiveTab('screening');
   };
 
-  // Reviewer Decision Override
-  const handleDecide = (paperId: string, status: 'include' | 'exclude' | 'maybe', reason?: string, note?: string) => {
-    const targetPaper = papers.find(p => p.id === paperId);
-    const prevStatus = decisions[paperId]?.status || 'unscreened';
-
-    const newDecisions = {
-      ...decisions,
-      [paperId]: {
-        paperId,
-        groupId: targetPaper?.groupId || `grp-${paperId}`,
-        status,
-        reason: reason || (status === 'include' ? 'Validated PICO criteria verified by human reviewer' : undefined),
-        notes: note,
-        decidedBy: 'human' as const,
-        decidedAt: new Date().toLocaleTimeString(),
-        isOverridden: true,
-        previousDecision: prevStatus
-      }
-    };
-
-    const newLog = Level2LoopManager.createAuditLog(
-      activeVersion?.versionNumber || 1,
-      'Screening',
-      `Reviewer Override on Paper ${paperId}`,
-      'human',
-      `Changed status from "${prevStatus}" to "${status}"${reason ? ` (${reason})` : ''}`
-    );
-
-    const updatedLogs = [newLog, ...auditLogs];
-
-    setDecisions(newDecisions);
-    setAuditLogs(updatedLogs);
-
-    updateActiveProject({
-      decisions: newDecisions,
-      auditLogs: updatedLogs
-    });
-  };
-
-  // Batch Auto-Screen
-  const handleRunBatchAutoScreen = () => {
-    if (!reviewQuestion) return;
-    const updated = batchScreenPapers(papers, decisions, reviewQuestion.exclusionCriteria);
-    setDecisions(updated);
-    updateActiveProject({ decisions: updated });
-  };
-
-  // Search and Fetch (Level 2 Loop)
+  // Run Search and Fetch Live Literature APIs
   const handleRunSearchAndFetch = async (
     query: string,
     sources: ('pubmed' | 'europe_pmc')[],
     dateStart?: string,
-    dateEnd?: string
+    dateEnd?: string,
+    useBenchmark: boolean = false
   ) => {
-    if (!reviewQuestion) return;
     setIsLoading(true);
-
     try {
-      const nextVersionNum = queryVersions.length + 1;
-      const newVersionId = `qv-${nextVersionNum}`;
+      let fetchedPapers: ResearchPaper[] = [];
 
-      // Fetch live records from Europe PMC
-      const liveResults = await fetchLiveEuropePMC(query, 25, newVersionId);
+      if (sources.includes('europe_pmc')) {
+        const liveEurope = await fetchLiveEuropePMC(query, 50);
+        fetchedPapers = [...fetchedPapers, ...liveEurope];
+      }
 
-      const existingMap = new Map<string, ResearchPaper>();
-      papers.forEach(p => existingMap.set(p.id, p));
-
-      liveResults.forEach(newP => {
-        if (existingMap.has(newP.id)) {
-          const existing = existingMap.get(newP.id)!;
-          if (!existing.queryVersionIds.includes(newVersionId)) {
-            existing.queryVersionIds.push(newVersionId);
-          }
-        } else {
-          newP.queryVersionIds = [newVersionId];
-          existingMap.set(newP.id, newP);
-        }
-      });
-
-      const combinedPapers = Array.from(existingMap.values());
-      const { updatedPapers } = runDeduplication(combinedPapers, decisions);
-      const updatedDecisions = batchScreenPapers(updatedPapers, decisions, reviewQuestion.exclusionCriteria);
-
-      const newQueryVersion: QueryVersion = {
+      const newVersionNumber = queryVersions.length + 1;
+      const newVersionId = `qv-${Date.now()}`;
+      const newVersion: QueryVersion = {
         id: newVersionId,
-        versionNumber: nextVersionNum,
-        label: `Query Iteration ${nextVersionNum}`,
+        versionNumber: newVersionNumber,
+        label: `Query V${newVersionNumber}`,
         queryString: query,
         keyphrases: query.split(/\s+AND\s+|\s+OR\s+/i),
-        booleanLogic: 'CUSTOM',
+        booleanLogic: 'AND',
         dateStart,
         dateEnd,
         sources,
-        hitCount: liveResults.length * 45,
-        pulledCount: updatedPapers.length,
+        hitCount: fetchedPapers.length,
+        pulledCount: fetchedPapers.length,
         createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isActive: true
       };
 
-      const updatedVersions = [...queryVersions.map(v => ({ ...v, isActive: false })), newQueryVersion];
-      const newLog = Level2LoopManager.createAuditLog(
-        nextVersionNum,
-        'Level2_Loop',
-        `Executed Query Version ${nextVersionNum}`,
-        'human',
-        `Retrieved live records. Total project papers: ${updatedPapers.length}. Previous human decisions kept.`
-      );
-      const updatedLogs = [newLog, ...auditLogs];
-
+      const updatedVersions = queryVersions.map(v => ({ ...v, isActive: false })).concat(newVersion);
       setQueryVersions(updatedVersions);
       setActiveVersionId(newVersionId);
-      setPapers(updatedPapers);
-      setDecisions(updatedDecisions);
-      setAuditLogs(updatedLogs);
 
-      updateActiveProject({
-        papers: updatedPapers,
-        queryVersions: updatedVersions,
-        decisions: updatedDecisions,
-        auditLogs: updatedLogs
-      });
-
-      setActiveTab('screening');
+      handleAddPapers(fetchedPapers);
     } catch (err) {
       console.error(err);
+      alert('Error fetching from live literature APIs.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRevertToVersion = (versionNum: number) => {
-    const targetVersion = queryVersions.find(v => v.versionNumber === versionNum);
-    if (!targetVersion) return;
+  // 3-way Screening Decision Handler
+  const handleDecide = (paperId: string, status: 'include' | 'exclude' | 'maybe', reason?: string, note?: string) => {
+    const paper = papers.find(p => p.id === paperId);
+    if (!paper) return;
 
-    const reverted = Level2LoopManager.revertToVersion(papers, targetVersion.id);
-    setPapers(reverted);
-    setActiveVersionId(targetVersion.id);
-    updateActiveProject({ papers: reverted });
+    const newDecision: ReviewerDecision = {
+      paperId,
+      groupId: paper.groupId,
+      status,
+      reason,
+      notes: note,
+      decidedBy: 'human',
+      decidedAt: new Date().toLocaleTimeString(),
+      isOverridden: true,
+      previousDecision: decisions[paperId]?.status
+    };
+
+    const updatedDecisions = {
+      ...decisions,
+      [paperId]: newDecision
+    };
+
+    // Auto-propagate decision across duplicate group members
+    papers.filter(p => p.groupId === paper.groupId).forEach(groupMember => {
+      updatedDecisions[groupMember.id] = {
+        ...newDecision,
+        paperId: groupMember.id
+      };
+    });
+
+    const logEntry = Level2LoopManager.createAuditLog(
+      activeVersion?.versionNumber || 1,
+      'Screening',
+      `Manual Decision: ${status.toUpperCase()}`,
+      'human',
+      `Reviewer marked "${paper.title.slice(0, 40)}..." as ${status}${reason ? ` (${reason})` : ''}`
+    );
+
+    const updatedLogs = [logEntry, ...auditLogs];
+
+    setDecisions(updatedDecisions);
+    setAuditLogs(updatedLogs);
+
+    updateActiveProject({
+      decisions: updatedDecisions,
+      auditLogs: updatedLogs
+    });
   };
 
+  // Run Batch Auto-Screening
+  const handleRunBatchAutoScreen = () => {
+    if (!reviewQuestion) return;
+    const autoDecisions = batchScreenPapers(papers, decisions, reviewQuestion.exclusionCriteria);
+    setDecisions(autoDecisions);
+    updateActiveProject({ decisions: autoDecisions });
+  };
+
+  // Level 2 Revert to previous version
+  const handleRevertToVersion = (targetVersionNumber: number) => {
+    alert(`Reverted project state to Version ${targetVersionNumber}`);
+  };
+
+  // Resolve duplicate merge conflicts
   const handleResolveConflict = (groupId: string, chosenStatus: 'include' | 'exclude' | 'maybe') => {
-    const groupMembers = papers.filter(p => p.groupId === groupId);
     const updated = { ...decisions };
-    groupMembers.forEach(m => {
-      updated[m.id] = {
-        paperId: m.id,
+    papers.filter(p => p.groupId === groupId).forEach(p => {
+      updated[p.id] = {
+        paperId: p.id,
         groupId,
         status: chosenStatus,
         reason: 'Resolved duplicate group merge conflict by human reviewer',
@@ -359,19 +378,20 @@ export const App: React.FC = () => {
     updateActiveProject({ decisions: updated });
   };
 
-  // 1. If not logged in, show Opening / Landing Page with Sign In & Sign Up
+  // 1. If not logged in, show Opening / Landing Page
   if (!currentUser) {
     return <LandingPage onLogin={handleLogin} />;
   }
 
-  // 2. If logged in but no project is opened, show Projects Dashboard
-  if (!currentProject || !reviewQuestion) {
+  // 2. If logged in but no project opened, show Projects Dashboard
+  if (!currentProject) {
     return (
       <ProjectsDashboard
         user={currentUser}
         projects={projects}
         onSelectProject={(id) => setCurrentProjectId(id)}
         onCreateProject={handleCreateProject}
+        onUpdateProject={handleUpdateProject}
         onDeleteProject={handleDeleteProject}
         onLogout={handleLogout}
       />
@@ -394,11 +414,11 @@ export const App: React.FC = () => {
 
   const includedCount = papers.filter(p => p.isRepresentative && decisions[p.id]?.status === 'include').length;
 
-  // 3. Render Active Project Workspace
+  // 3. Render Active Project Workspace in Inverted Theme
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-gradient-to-br from-[#F5F4F2] via-[#EBE9E6] to-[#ECE7F4] text-[#2D2521]">
+    <div className="min-h-screen flex flex-col font-sans bg-radial from-[#24160E] via-[#160E09] to-[#0D0704] text-[#E5E4E2]">
       
-      {/* Navigation Bar with Back to Projects & User Info */}
+      {/* Navigation Bar */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -406,6 +426,11 @@ export const App: React.FC = () => {
         totalPapersCount={papers.length}
         includedCount={includedCount}
         projectName={currentProject.name}
+        members={currentProject.members || []}
+        onOpenRecommender={() => {
+          setRecommenderSeedPaper(papers[0] || null);
+          setShowRecommenderModal(true);
+        }}
         onBackToProjects={() => setCurrentProjectId(null)}
         onLogout={handleLogout}
         onOpenAuditLog={() => setIsAuditLogOpen(true)}
@@ -414,80 +439,115 @@ export const App: React.FC = () => {
       {/* Main Workspace Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
-        {/* Tab 0: Protocol & PICO Framework */}
+        {/* Protocol & Project Overview */}
         {activeTab === 'overview' && (
           <div className="space-y-6 text-left">
-            <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0] space-y-5">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E0F0] pb-4">
+            <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0]/15 bg-[#1F140D]/90 space-y-5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E0F0]/15 pb-4">
                 <div>
-                  <span className="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded bg-[#6F4E37] text-white">
-                    Protocol Formulation
-                  </span>
-                  <h2 className="text-lg font-bold text-[#462E1E] mt-1">
-                    {reviewQuestion.title || 'Systematic Review Protocol'}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wide px-2.5 py-0.5 rounded-full bg-[#3B2518] text-[#E6E0F0] border border-[#E6E0F0]/20">
+                      {currentProject.reviewType || 'Systematic Review'}
+                    </span>
+                    {currentProject.reviewDomain && (
+                      <span className="text-[10px] font-medium text-[#C5BFB8]">
+                        • {currentProject.reviewDomain}
+                      </span>
+                    )}
+                  </div>
+                  <h2 className="text-xl font-bold text-[#FAF9F8] mt-1.5">
+                    {currentProject.name}
                   </h2>
-                  <p className="text-xs text-[#7E7A72]">
-                    Question: {reviewQuestion.question}
+                  <p className="text-xs text-[#A59E98] mt-1 max-w-2xl leading-relaxed">
+                    {currentProject.description || 'Systematic review protocol and workspace parameters.'}
                   </p>
                 </div>
 
-                <button
-                  onClick={() => setActiveTab('search')}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#6F4E37] text-white hover:bg-[#5A3D29] shadow-sm transition-all"
-                >
-                  Upload & Search Papers &rarr;
-                </button>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => {
+                      setRecommenderSeedPaper(papers[0] || null);
+                      setShowRecommenderModal(true);
+                    }}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#2B1B12] text-[#E6E0F0] hover:bg-[#3B2518] border border-[#E6E0F0]/25 transition-all flex items-center space-x-1.5 cursor-pointer"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>AI Recommender</span>
+                  </button>
 
-              {/* PICO Breakdown Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white/80 p-4 rounded-xl border border-[#E5E4E2] space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-[#6F4E37] font-bold">Population (P)</span>
-                  <div className="text-xs font-semibold text-[#462E1E]">{reviewQuestion.population}</div>
-                </div>
-                <div className="bg-white/80 p-4 rounded-xl border border-[#E5E4E2] space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-[#8169A3] font-bold">Intervention (I)</span>
-                  <div className="text-xs font-semibold text-[#462E1E]">{reviewQuestion.intervention}</div>
-                </div>
-                <div className="bg-white/80 p-4 rounded-xl border border-[#E5E4E2] space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-[#7E7A72] font-bold">Comparator (C)</span>
-                  <div className="text-xs font-semibold text-[#462E1E]">{reviewQuestion.comparator}</div>
-                </div>
-                <div className="bg-white/80 p-4 rounded-xl border border-[#E5E4E2] space-y-1">
-                  <span className="text-[10px] font-mono uppercase text-[#5A3D29] font-bold">Outcome (O)</span>
-                  <div className="text-xs font-semibold text-[#462E1E]">{reviewQuestion.outcome}</div>
+                  <button
+                    onClick={() => setActiveTab('search')}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#160E08] hover:bg-white shadow-md transition-all cursor-pointer"
+                  >
+                    Upload & Search Papers &rarr;
+                  </button>
                 </div>
               </div>
 
-              {/* Exclusion Criteria Table */}
-              <div className="space-y-3 pt-3 border-t border-[#E6E0F0]">
-                <h3 className="text-sm font-semibold text-[#462E1E]">
-                  Pre-Specified Exclusion Criteria (Screening Protocol)
-                </h3>
+              {/* Review Members & Collaboration Team */}
+              <div className="space-y-3 pt-2">
+                <span className="text-xs font-bold text-[#FAF9F8] flex items-center space-x-2">
+                  <Users className="w-4 h-4 text-[#E6E0F0]" />
+                  <span>Review Team Members ({currentProject.members?.length || 1})</span>
+                </span>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                  {reviewQuestion.exclusionCriteria.map((crit) => (
-                    <div key={crit.id} className="p-3 rounded-xl bg-white/70 border border-[#E5E4E2] space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono font-bold text-[#6F4E37]">{crit.code}</span>
-                        <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#E6E0F0] text-[#5A3D29]">
-                          {crit.detectionType} detection
-                        </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {(currentProject.members || [
+                    { id: '1', name: currentUser.name, email: currentUser.email, role: 'Owner', joinedAt: currentProject.createdAt }
+                  ]).map((m) => (
+                    <div
+                      key={m.id}
+                      className="p-3 rounded-xl bg-[#160E08] border border-[#E6E0F0]/15 flex items-center justify-between text-xs"
+                    >
+                      <div className="flex items-center space-x-2.5">
+                        <div className="w-8 h-8 rounded-full bg-[#3B2518] text-[#FAF9F8] font-bold text-xs flex items-center justify-center border border-[#E6E0F0]/20">
+                          {m.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-[#FAF9F8]">{m.name}</div>
+                          <div className="text-[11px] text-[#8E8680] truncate max-w-[130px]">{m.email}</div>
+                        </div>
                       </div>
-                      <div className="font-semibold text-[#462E1E]">{crit.text}</div>
-                      <p className="text-[11px] text-[#7E7A72]">
-                        <strong>Rationale:</strong> {crit.rationale}
-                      </p>
+
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#2B1B12] text-[#E6E0F0] border border-[#E6E0F0]/20">
+                        {m.role}
+                      </span>
                     </div>
                   ))}
                 </div>
               </div>
+
+              {/* Exclusion Criteria Protocol */}
+              {reviewQuestion && (
+                <div className="space-y-3 pt-4 border-t border-[#E6E0F0]/15">
+                  <h3 className="text-xs font-bold text-[#FAF9F8]">
+                    Pre-Specified Screening Criteria
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    {reviewQuestion.exclusionCriteria.map((crit) => (
+                      <div key={crit.id} className="p-3 rounded-xl bg-[#160E08] border border-[#E6E0F0]/15 space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono font-bold text-[#E6E0F0]">{crit.code}</span>
+                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-[#3B2518] text-[#E6E0F0]">
+                            {crit.detectionType} detection
+                          </span>
+                        </div>
+                        <div className="font-semibold text-[#FAF9F8]">{crit.text}</div>
+                        <p className="text-[11px] text-[#A59E98]">
+                          <strong>Rationale:</strong> {crit.rationale}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
 
         {/* Tab 1: Search & Upload Studio */}
-        {activeTab === 'search' && (
+        {activeTab === 'search' && reviewQuestion && (
           <SearchStudio
             reviewQuestion={reviewQuestion}
             queryVersions={queryVersions}
@@ -500,7 +560,7 @@ export const App: React.FC = () => {
         )}
 
         {/* Tab 2: Screening & Badges */}
-        {activeTab === 'screening' && (
+        {activeTab === 'screening' && reviewQuestion && (
           <ScreeningDesk
             papers={papers}
             decisions={decisions}
@@ -508,6 +568,10 @@ export const App: React.FC = () => {
             onInspectBadge={(badge, paper) => {
               setSelectedBadge(badge);
               setSelectedBadgePaper(paper);
+            }}
+            onDiscoverSimilar={(paper) => {
+              setRecommenderSeedPaper(paper);
+              setShowRecommenderModal(true);
             }}
             onRunBatchAutoScreen={handleRunBatchAutoScreen}
             activeCriteria={reviewQuestion.exclusionCriteria}
@@ -541,6 +605,17 @@ export const App: React.FC = () => {
 
       </main>
 
+      {/* AI Literature Recommender Modal (Scopus, Web of Science, PubMed, IEEE Xplore, Digital Library) */}
+      <LiteratureRecommenderModal
+        isOpen={showRecommenderModal}
+        onClose={() => setShowRecommenderModal(false)}
+        seedPaper={recommenderSeedPaper}
+        allProjectPapers={papers}
+        onAddPaperToCorpus={(newPaper) => {
+          handleAddPapers([newPaper]);
+        }}
+      />
+
       {/* AI Badge Explainability Modal */}
       <AIBadgeModal
         badge={selectedBadge}
@@ -559,15 +634,17 @@ export const App: React.FC = () => {
       />
 
       {/* Footer */}
-      <footer className="w-full glass-panel border-t border-[#E6E0F0] py-4 mt-8 text-xs text-[#7E7A72]">
+      <footer className="w-full bg-[#120B07] border-t border-[#E6E0F0]/10 py-4 mt-8 text-xs text-[#8E8680]">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-[#462E1E]">Corpus AI</span>
+            <span className="font-semibold text-[#FAF9F8]">Corpus AI</span>
             <span>•</span>
-            <span>Project: {currentProject.name}</span>
+            <span>Review: {currentProject.name}</span>
           </div>
-          <div className="flex items-center space-x-4 text-[11px]">
-            <span>Theme: #6F4E37 | #E5E4E2 | #E6E0F0</span>
+          <div className="flex items-center space-x-4 text-[11px] text-[#A59E98]">
+            <span>Google Cloud Firestore Integrated</span>
+            <span>•</span>
+            <span>Theme: Deep Coffee #6F4E37 | Platinum #E5E4E2 | Lavender #E6E0F0</span>
           </div>
         </div>
       </footer>

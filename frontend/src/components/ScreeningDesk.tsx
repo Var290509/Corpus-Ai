@@ -20,6 +20,7 @@ interface ScreeningDeskProps {
   decisions: Record<string, ReviewerDecision>;
   onDecide: (paperId: string, status: 'include' | 'exclude' | 'maybe', reason?: string, note?: string) => void;
   onInspectBadge: (badge: AIBadge, paper: ResearchPaper) => void;
+  onDiscoverSimilar?: (paper: ResearchPaper) => void;
   onRunBatchAutoScreen: () => void;
   activeCriteria: Criterion[];
 }
@@ -29,6 +30,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
   decisions,
   onDecide,
   onInspectBadge,
+  onDiscoverSimilar,
   onRunBatchAutoScreen,
   activeCriteria
 }) => {
@@ -245,6 +247,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
             decision={decisions[paper.id]}
             onDecide={onDecide}
             onInspectBadge={onInspectBadge}
+            onDiscoverSimilar={onDiscoverSimilar}
           />
         ))}
 

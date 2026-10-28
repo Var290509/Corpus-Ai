@@ -44,23 +44,17 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
   isLoading
 }) => {
   const [activeMode, setActiveMode] = useState<'upload' | 'search'>('upload');
-  const [keyphraseInput, setKeyphraseInput] = useState(
-    reviewQuestion.intervention 
-      ? `"${reviewQuestion.population}" AND "${reviewQuestion.intervention}"`
-      : ''
-  );
+  const [keyphraseInput, setKeyphraseInput] = useState('');
   const [dateStart, setDateStart] = useState('2018');
   const [dateEnd, setDateEnd] = useState('2026');
   const [usePubMed, setUsePubMed] = useState(true);
   const [useEuropePMC, setUseEuropePMC] = useState(true);
   
   const [isCheckingHits, setIsCheckingHits] = useState(false);
-  const [estimatedHits, setEstimatedHits] = useState<{ pubmed: number; europePMC: number } | null>({
-    pubmed: 1420,
-    europePMC: 890
-  });
+  const [estimatedHits, setEstimatedHits] = useState<{ pubmed: number; europePMC: number } | null>(null);
 
   const handleCheckHits = async () => {
+    if (!keyphraseInput.trim()) return;
     setIsCheckingHits(true);
     try {
       const pmHits = usePubMed ? await searchPubMedHitCount(keyphraseInput) : 0;
@@ -82,48 +76,46 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 text-left">
       
-      {/* Top Banner: Review Question Summary */}
-      <div className="glass-panel rounded-2xl p-5 border border-[#E6E0F0]">
+      {/* Search Studio Header */}
+      <div className="glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 bg-[#1F140D]/85">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold bg-[#6F4E37] text-white">
-                Protocol
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#3B2518] text-[#E6E0F0] border border-[#E6E0F0]/20">
+                Article Acquisition & Query Studio
               </span>
-              <h2 className="text-sm font-semibold text-[#462E1E]">Active Systematic Review Protocol</h2>
             </div>
-            <p className="text-xs text-[#5F5C56] mt-1 max-w-3xl leading-relaxed">
-              <strong>Question:</strong> {reviewQuestion.question}
+            <h2 className="text-base font-bold text-[#FAF9F8] mt-1">
+              Add Research Articles to Review Corpus
+            </h2>
+            <p className="text-xs text-[#A59E98] mt-0.5">
+              Upload local citation files (RIS, CSV, BibTeX, PDF) or pull live peer-reviewed records from PubMed and Europe PMC.
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-[11px]">
-            <span className="px-2.5 py-1 rounded-lg bg-white/70 border border-[#E6E0F0] text-[#462E1E]">
-              <strong>P:</strong> {reviewQuestion.population}
-            </span>
-            <span className="px-2.5 py-1 rounded-lg bg-white/70 border border-[#E6E0F0] text-[#6F4E37]">
-              <strong>I:</strong> {reviewQuestion.intervention}
-            </span>
-            <span className="px-2.5 py-1 rounded-lg bg-white/70 border border-[#E6E0F0] text-[#7E7A72]">
-              <strong>C:</strong> {reviewQuestion.comparator}
-            </span>
-            <span className="px-2.5 py-1 rounded-lg bg-white/70 border border-[#E6E0F0] text-[#5A3D29]">
-              <strong>O:</strong> {reviewQuestion.outcome}
-            </span>
+          <div className="flex items-center space-x-3 text-xs">
+            <div className="px-3 py-1.5 rounded-xl bg-[#160E08] border border-[#E6E0F0]/15">
+              <span className="text-[#8E8680] block text-[10px]">Active Query Version</span>
+              <span className="font-bold text-[#FAF9F8]">Version {activeVersion.versionNumber}</span>
+            </div>
+            <div className="px-3 py-1.5 rounded-xl bg-[#160E08] border border-[#E6E0F0]/15">
+              <span className="text-[#8E8680] block text-[10px]">Total Articles in Version</span>
+              <span className="font-bold text-[#E6E0F0]">{activeVersion.pulledCount} Papers</span>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Ingestion Mode Selector (Upload Files vs Live Search) */}
-      <div className="flex items-center space-x-2 border-b border-[#E6E0F0] pb-2">
+      {/* Mode Switcher Tabs */}
+      <div className="flex items-center space-x-2 border-b border-[#E6E0F0]/15 pb-2">
         <button
           onClick={() => setActiveMode('upload')}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+          className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
             activeMode === 'upload'
-              ? 'bg-[#6F4E37] text-white shadow-sm'
-              : 'bg-white/70 text-[#5F5C56] hover:bg-white border border-[#E5E4E2]'
+              ? 'bg-[#E5E4E2] text-[#160E08] shadow-md font-bold'
+              : 'bg-[#24160E] text-[#B8B3AC] hover:bg-[#341F14] hover:text-[#FAF9F8] border border-[#E6E0F0]/15'
           }`}
         >
           <Upload className="w-3.5 h-3.5" />
@@ -132,10 +124,10 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
 
         <button
           onClick={() => setActiveMode('search')}
-          className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+          className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
             activeMode === 'search'
-              ? 'bg-[#6F4E37] text-white shadow-sm'
-              : 'bg-white/70 text-[#5F5C56] hover:bg-white border border-[#E5E4E2]'
+              ? 'bg-[#E5E4E2] text-[#160E08] shadow-md font-bold'
+              : 'bg-[#24160E] text-[#B8B3AC] hover:bg-[#341F14] hover:text-[#FAF9F8] border border-[#E6E0F0]/15'
           }`}
         >
           <Search className="w-3.5 h-3.5" />
@@ -149,172 +141,165 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
         /* Main Search Builder Grid */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Left Column: Query Builder & Fetcher */}
-        <div className="lg:col-span-2 glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0] space-y-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-semibold text-[#462E1E] flex items-center space-x-2">
-                <Search className="w-4 h-4 text-[#6F4E37]" />
-                <span>Multi-Database Search Query</span>
-              </h3>
-              <p className="text-xs text-[#7E7A72] mt-0.5">
-                Construct Boolean queries, inspect live hits across PubMed and Europe PMC, and create query versions.
-              </p>
-            </div>
-
-            <span className="px-2.5 py-1 rounded-lg bg-[#E6E0F0] text-[#5A3D29] text-xs font-mono font-medium border border-[#d4c8e4]">
-              Target: Version {queryVersions.length + 1}
-            </span>
-          </div>
-
-          {/* Query String Input */}
-          <div>
-            <label className="block text-xs font-medium text-[#462E1E] mb-1.5">
-              Boolean Query Expression (AND, OR, NOT, Quotes)
-            </label>
-            <textarea
-              value={keyphraseInput}
-              onChange={(e) => setKeyphraseInput(e.target.value)}
-              rows={3}
-              className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs font-mono text-[#2D2521] leading-relaxed resize-none focus:ring-1 focus:ring-[#6F4E37]"
-              placeholder='e.g., ("targeted therapy" OR "intervention") AND ("condition" OR "disease") AND placebo'
-            />
-          </div>
-
-          {/* Search Parameters Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {/* Date Range */}
-            <div>
-              <label className="block text-[11px] font-medium text-[#5F5C56] mb-1">Publication Years</label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={dateStart}
-                  onChange={(e) => setDateStart(e.target.value)}
-                  className="w-full glass-input rounded-xl px-2.5 py-1.5 text-xs text-center"
-                  placeholder="2018"
-                />
-                <span className="text-[#B8B5AE] text-xs">to</span>
-                <input
-                  type="text"
-                  value={dateEnd}
-                  onChange={(e) => setDateEnd(e.target.value)}
-                  className="w-full glass-input rounded-xl px-2.5 py-1.5 text-xs text-center"
-                  placeholder="2026"
-                />
+          {/* Left Column: Query Builder & Fetcher */}
+          <div className="lg:col-span-2 glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0]/15 bg-[#1F140D]/90 space-y-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-semibold text-[#FAF9F8] flex items-center space-x-2">
+                  <Search className="w-4 h-4 text-[#E6E0F0]" />
+                  <span>Multi-Database Search Query</span>
+                </h3>
+                <p className="text-xs text-[#A59E98] mt-0.5">
+                  Construct Boolean queries, inspect live hits across PubMed and Europe PMC, and create query versions.
+                </p>
               </div>
-            </div>
 
-            {/* Sources Toggle */}
-            <div className="sm:col-span-2">
-              <label className="block text-[11px] font-medium text-[#5F5C56] mb-1">Target Live Literature APIs</label>
-              <div className="flex items-center space-x-3 pt-1">
-                <label className="flex items-center space-x-1.5 text-xs text-[#462E1E] cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={usePubMed}
-                    onChange={(e) => setUsePubMed(e.target.checked)}
-                    className="rounded text-[#6F4E37] focus:ring-[#6F4E37]"
-                  />
-                  <span>PubMed (NCBI E-utilities)</span>
-                </label>
-                <label className="flex items-center space-x-1.5 text-xs text-[#462E1E] cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={useEuropePMC}
-                    onChange={(e) => setUseEuropePMC(e.target.checked)}
-                    className="rounded text-[#6F4E37] focus:ring-[#6F4E37]"
-                  />
-                  <span>Europe PMC REST</span>
-                </label>
-              </div>
-            </div>
-          </div>
-
-          {/* Hit Counts Box */}
-          <div className="bg-[#FAF9FD] rounded-xl p-3.5 border border-[#E6E0F0] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div>
-              <div className="text-xs font-medium text-[#462E1E] flex items-center space-x-1.5">
-                <Database className="w-3.5 h-3.5 text-[#6F4E37]" />
-                <span>Live Pre-Search Hit Count</span>
-              </div>
-              <div className="flex items-center space-x-4 mt-1 text-xs text-[#5F5C56]">
-                <span>PubMed hits: <strong className="text-[#6F4E37]">{estimatedHits ? estimatedHits.pubmed.toLocaleString() : '...'}</strong></span>
-                <span>Europe PMC hits: <strong className="text-[#6F4E37]">{estimatedHits ? estimatedHits.europePMC.toLocaleString() : '...'}</strong></span>
-              </div>
-            </div>
-
-            <button
-              onClick={handleCheckHits}
-              disabled={isCheckingHits}
-              className="px-3 py-1.5 rounded-xl text-xs font-medium bg-white text-[#6F4E37] border border-[#E6E0F0] hover:bg-[#FAF9FD] shadow-sm transition-all"
-            >
-              {isCheckingHits ? 'Checking APIs...' : 'Refresh Hit Counts'}
-            </button>
-          </div>
-
-          {/* Action Button: Live Ingest */}
-          <div className="pt-2 flex items-center">
-            <button
-              onClick={() => handleExecutePull(false)}
-              disabled={isLoading}
-              className="w-full flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-md shadow-[#6F4E37]/20 transition-all"
-            >
-              <DownloadCloud className="w-4 h-4 text-[#E6E0F0]" />
-              <span>{isLoading ? 'Executing Fetch & Deduplication...' : 'Pull Live Search Results & Ingest'}</span>
-            </button>
-          </div>
-
-          <div className="text-[11px] text-[#7E7A72] flex items-center space-x-1.5">
-            <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Meets NCBI EFetch requirements (email attribution & respectful batch querying).</span>
-          </div>
-        </div>
-
-        {/* Right Column: Query Version History (Database Provenance & Immutability) */}
-        <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0] flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-[#462E1E] flex items-center space-x-2">
-                <Layers className="w-4 h-4 text-[#6F4E37]" />
-                <span>Query Versions (Level 2)</span>
-              </h3>
-              <span className="text-[11px] text-[#7E7A72]">
-                {queryVersions.length} versions
+              <span className="px-2.5 py-1 rounded-lg bg-[#3B2518] text-[#E6E0F0] text-xs font-mono font-medium border border-[#E6E0F0]/20">
+                Target: Version {queryVersions.length + 1}
               </span>
             </div>
 
-            <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+            {/* Query String Input */}
+            <div>
+              <label className="block text-xs font-medium text-[#FAF9F8] mb-1.5">
+                Boolean Query Expression (AND, OR, NOT, Quotes)
+              </label>
+              <textarea
+                value={keyphraseInput}
+                onChange={(e) => setKeyphraseInput(e.target.value)}
+                rows={3}
+                className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs font-mono text-[#FAF9F8] leading-relaxed resize-none focus:ring-1 focus:ring-[#E6E0F0]"
+                placeholder='("targeted intervention" OR "clinical therapy") AND ("target cohort" OR "demographic") AND randomized'
+              />
+            </div>
+
+            {/* Search Parameters Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Date Range */}
+              <div>
+                <label className="block text-[11px] font-medium text-[#A59E98] mb-1">Publication Years</label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={dateStart}
+                    onChange={(e) => setDateStart(e.target.value)}
+                    className="w-full glass-input rounded-xl px-2.5 py-1.5 text-xs text-center text-[#FAF9F8]"
+                    placeholder="2018"
+                  />
+                  <span className="text-[#8E8680] text-xs">to</span>
+                  <input
+                    type="text"
+                    value={dateEnd}
+                    onChange={(e) => setDateEnd(e.target.value)}
+                    className="w-full glass-input rounded-xl px-2.5 py-1.5 text-xs text-center text-[#FAF9F8]"
+                    placeholder="2026"
+                  />
+                </div>
+              </div>
+
+              {/* Sources Toggle */}
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] font-medium text-[#A59E98] mb-1">Target Live Literature APIs</label>
+                <div className="flex items-center space-x-3 pt-1">
+                  <label className="flex items-center space-x-1.5 text-xs text-[#FAF9F8] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={usePubMed}
+                      onChange={(e) => setUsePubMed(e.target.checked)}
+                      className="rounded text-[#E6E0F0] focus:ring-[#E6E0F0]"
+                    />
+                    <span>PubMed (NCBI E-utilities)</span>
+                  </label>
+
+                  <label className="flex items-center space-x-1.5 text-xs text-[#FAF9F8] cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={useEuropePMC}
+                      onChange={(e) => setUseEuropePMC(e.target.checked)}
+                      className="rounded text-[#E6E0F0] focus:ring-[#E6E0F0]"
+                    />
+                    <span>Europe PMC REST API</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions: Dry-Run Estimation vs Pull */}
+            <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[#E6E0F0]/15">
+              <button
+                onClick={handleCheckHits}
+                disabled={isCheckingHits || !keyphraseInput.trim()}
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#2B1B12] hover:bg-[#3B2518] text-[#FAF9F8] border border-[#E6E0F0]/25 transition-all flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
+              >
+                <Filter className="w-3.5 h-3.5 text-[#E6E0F0]" />
+                <span>{isCheckingHits ? 'Querying Indexes...' : 'Inspect Live Hits'}</span>
+              </button>
+
+              <button
+                onClick={() => handleExecutePull(false)}
+                disabled={isLoading || !keyphraseInput.trim()}
+                className="px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#E5E4E2] hover:bg-white text-[#160E08] shadow-md transition-all flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
+              >
+                <DownloadCloud className="w-4 h-4" />
+                <span>{isLoading ? 'Executing Search Pipeline...' : 'Fetch Live Articles'}</span>
+              </button>
+            </div>
+
+            {/* Hits Result Pill */}
+            {estimatedHits && (
+              <div className="p-3.5 rounded-xl bg-[#160E08] border border-[#E6E0F0]/15 flex items-center justify-between text-xs">
+                <span className="text-[#C5BFB8]">Found indexed candidate articles:</span>
+                <div className="flex items-center space-x-3 font-semibold">
+                  <span className="text-sky-300">PubMed: {estimatedHits.pubmed.toLocaleString()}</span>
+                  <span className="text-amber-300">Europe PMC: {estimatedHits.europePMC.toLocaleString()}</span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Query Version History */}
+          <div className="glass-panel rounded-2xl p-5 border border-[#E6E0F0]/15 bg-[#1F140D]/80 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#E6E0F0]/15 pb-2">
+              <span className="text-xs font-bold text-[#FAF9F8] flex items-center space-x-1.5">
+                <Layers className="w-3.5 h-3.5 text-[#E6E0F0]" />
+                <span>Query Version Timeline</span>
+              </span>
+              <span className="text-[10px] font-mono text-[#8E8680]">
+                {queryVersions.length} Recorded
+              </span>
+            </div>
+
+            <div className="space-y-2.5 max-h-[380px] overflow-y-auto">
               {queryVersions.map((qv) => {
                 const isSelected = qv.id === activeVersion.id;
                 return (
                   <div
                     key={qv.id}
                     onClick={() => onSelectVersion(qv.id)}
-                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                    className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-white border-[#6F4E37] shadow-sm'
-                        : 'bg-white/60 hover:bg-white border-[#E5E4E2]'
+                        ? 'bg-[#2D1B12] border-[#E6E0F0]/40 shadow-sm'
+                        : 'bg-[#180E08] border-[#E6E0F0]/10 hover:border-[#E6E0F0]/25'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold text-[#462E1E]">
-                        Version {qv.versionNumber}
+                      <span className="font-bold text-[#FAF9F8]">
+                        Version {qv.versionNumber}: {qv.label}
                       </span>
-                      <span className="text-[10px] text-[#7E7A72] font-mono">
-                        {qv.createdAt}
-                      </span>
+                      {isSelected && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                          Active
+                        </span>
+                      )}
                     </div>
 
-                    <p className="text-[11px] text-[#5F5C56] line-clamp-2 font-mono bg-[#FAF9FD] p-1.5 rounded border border-[#E6E0F0]">
-                      {qv.queryString}
-                    </p>
+                    <div className="font-mono text-[11px] text-[#A59E98] truncate">
+                      {qv.queryString || 'Uploaded Citation Corpus'}
+                    </div>
 
-                    <div className="mt-2 flex items-center justify-between text-[11px] text-[#7E7A72]">
-                      <span>Pulled: <strong className="text-[#6F4E37]">{qv.pulledCount.toLocaleString()}</strong></span>
-                      <span className="text-[10px] bg-[#E6E0F0] text-[#5A3D29] px-2 py-0.5 rounded-full font-medium">
-                        {isSelected ? 'Active' : 'Reopen'}
-                      </span>
+                    <div className="flex items-center justify-between text-[10px] text-[#8E8680] mt-2 pt-1.5 border-t border-[#E6E0F0]/10">
+                      <span>{qv.pulledCount} articles stored</span>
+                      <span>{qv.createdAt}</span>
                     </div>
                   </div>
                 );
@@ -322,17 +307,9 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-[#E6E0F0] text-[11px] text-[#7E7A72] flex items-start space-x-2">
-            <AlertCircle className="w-3.5 h-3.5 text-[#6F4E37] shrink-0 mt-0.5" />
-            <span>
-              <strong>Database Immutability Rule:</strong> Nothing is ever deleted. Old versions remain preserved and can be inspected anytime.
-            </span>
-          </div>
-
         </div>
-      </div>
-    )}
+      )}
 
-  </div>
-);
+    </div>
+  );
 };
