@@ -7,20 +7,21 @@ import {
   Layers, 
   ArrowRight, 
   Trash2, 
-  LogOut,
-  Upload,
-  CheckCircle2,
-  Sparkles,
-  Users,
-  X,
-  Edit3,
-  ChevronRight,
-  Shield,
-  Cloud,
-  UserPlus,
-  Star,
-  Award,
-  Check
+  LogOut, 
+  Upload, 
+  CheckCircle2, 
+  Sparkles, 
+  Users, 
+  X, 
+  Edit3, 
+  ChevronRight, 
+  Shield, 
+  Cloud, 
+  UserPlus, 
+  Star, 
+  Award, 
+  Check,
+  Search
 } from 'lucide-react';
 import { Project, User, ReviewMember, ResearchPaper } from '../types';
 import { firestoreService } from '../services/firestoreService';
@@ -101,19 +102,36 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<'Reviewer' | 'Collaborator' | 'Viewer'>('Reviewer');
 
+  // Search state for filtering review tasks
+  const [searchQuery, setSearchQuery] = useState('');
+
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const createModalRef = useRef<HTMLDivElement>(null);
 
-  // GSAP animation on cards load
+  // Filtered projects based on search query
+  const filteredProjects = projects.filter((proj) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    const matchesName = proj.name.toLowerCase().includes(q);
+    const matchesDesc = (proj.description || '').toLowerCase().includes(q);
+    const matchesDomain = (proj.reviewDomain || '').toLowerCase().includes(q);
+    const matchesType = (proj.reviewType || '').toLowerCase().includes(q);
+    const matchesMember = (proj.members || []).some(m => 
+      m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)
+    );
+    return matchesName || matchesDesc || matchesDomain || matchesType || matchesMember;
+  });
+
+  // GSAP animation on cards load / filter
   useEffect(() => {
     if (cardsContainerRef.current) {
       gsap.fromTo(
         cardsContainerRef.current.children,
         { opacity: 0, y: 15 },
-        { opacity: 1, y: 0, duration: 0.45, stagger: 0.08, ease: 'power2.out' }
+        { opacity: 1, y: 0, duration: 0.35, stagger: 0.05, ease: 'power2.out' }
       );
     }
-  }, [projects.length]);
+  }, [filteredProjects.length, searchQuery]);
 
   // GSAP animation when opening create modal
   useEffect(() => {
@@ -367,20 +385,42 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
           </button>
         </div>
 
-        {/* Reviews Grid Header */}
-        <div className="flex items-center justify-between pt-2">
+        {/* Reviews Grid Header & Search Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
           <div className="flex items-center space-x-2">
             <Folder className="w-4 h-4 text-[#E6E0F0]" />
             <h2 className="text-sm font-bold text-[#FAF9F8]">Active Systematic Reviews</h2>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[#4A3324] text-[#E6E0F0] font-semibold border border-[#E6E0F0]/20">
-              {projects.length}
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#4A3324] text-[#E6E0F0] font-semibold border border-[#E6E0F0]/20">
+              {searchQuery.trim() ? `${filteredProjects.length} of ${projects.length}` : projects.length}
             </span>
+          </div>
+
+          {/* Search Input for Reviews / Tasks */}
+          <div className="relative w-full sm:w-80">
+            <Search className="w-3.5 h-3.5 text-[#E6E0F0]/70 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search reviews by name, domain, member..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-8 py-2 rounded-xl text-xs bg-[#241710]/90 border border-[#FAF9F8]/15 text-[#FAF9F8] placeholder-[#FAF9F8]/40 focus:outline-none focus:border-[#E6E0F0]/60 focus:ring-1 focus:ring-[#E6E0F0]/40 transition-all shadow-inner"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#FAF9F8]/50 hover:text-white transition-colors cursor-pointer"
+                title="Clear search filter"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
         {/* Projects Cards Grid */}
         <div ref={cardsContainerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {projects.map((proj) => {
+          {filteredProjects.map((proj) => {
             const includedCount = Object.values(proj.decisions || {}).filter(d => d.status === 'include').length;
             const members = proj.members || [
               { id: '1', name: user.name, email: user.email, role: 'Owner', joinedAt: proj.createdAt }
@@ -506,6 +546,25 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
             );
           })}
 
+          {/* No Search Results State */}
+          {projects.length > 0 && filteredProjects.length === 0 && (
+            <div className="col-span-full rounded-2xl p-10 text-center bg-[#241710]/70 border border-[#FAF9F8]/10 space-y-3">
+              <Search className="w-8 h-8 text-[#E6E0F0]/40 mx-auto" />
+              <h3 className="text-sm font-bold text-[#FAF9F8]">No reviews matching "{searchQuery}"</h3>
+              <p className="text-xs text-[#E5E4E2]/70 max-w-sm mx-auto">
+                No systematic review tasks matched your search query. Try searching by review title, domain, or team member.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#4A3324] text-[#FAF9F8] border border-[#FAF9F8]/15 hover:bg-[#5C3F2D] transition-all cursor-pointer shadow-sm"
+              >
+                Clear Search Filter
+              </button>
+            </div>
+          )}
+
+          {/* Zero Projects Total Empty State */}
           {projects.length === 0 && (
             <div className="col-span-full glass-panel rounded-2xl p-12 text-center border border-dashed border-[#E6E0F0]/30">
               <Folder className="w-12 h-12 text-[#E6E0F0]/50 mx-auto mb-3" />
