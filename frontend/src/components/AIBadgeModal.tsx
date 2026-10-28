@@ -59,24 +59,24 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
       <div 
         ref={modalRef}
-        className="w-full max-w-xl bg-[#2D2836] border border-[#E6E0F0]/30 rounded-2xl shadow-2xl overflow-hidden text-left"
+        className="w-full max-w-xl bg-[#0B1630] border border-[#E0E5E7]/30 rounded-2xl shadow-2xl overflow-hidden text-left"
         onClick={(e) => e.stopPropagation()}
       >
         
         {/* Header */}
-        <div className="p-5 border-b border-[#E6E0F0]/20 flex items-center justify-between bg-[#442E20]/90">
+        <div className="p-5 border-b border-[#E0E5E7]/20 flex items-center justify-between bg-[#442E20]/90">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#9E88BE] flex items-center justify-center text-white shadow-md">
               <Icon className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="font-bold text-base text-[#E2DDE7]">{badge.label}</h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#383242] text-[#E6E0F0] border border-[#E6E0F0]/25">
+                <h3 className="font-bold text-base text-[#F9F8FD]">{badge.label}</h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#192440] text-[#E0E5E7] border border-[#E0E5E7]/25">
                   {badge.category} Category
                 </span>
               </div>
-              <p className="text-xs text-[#E2DDE7]/80">
+              <p className="text-xs text-[#F9F8FD]/80">
                 Autonomous Evidence Verification & Quality Audit
               </p>
             </div>
@@ -84,7 +84,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#E2DDE7] hover:text-white hover:bg-[#383242] transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#F9F8FD] hover:text-white hover:bg-[#192440] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -94,39 +94,39 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
         <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
           
           {/* Target Paper Info */}
-          <div className="bg-[#1E1B24] p-3.5 rounded-xl border border-[#E6E0F0]/20 text-xs">
-            <span className="text-[10px] uppercase font-mono font-bold text-[#E6E0F0] tracking-wider block mb-1">
+          <div className="bg-[#060D1E] p-3.5 rounded-xl border border-[#E0E5E7]/20 text-xs">
+            <span className="text-[10px] uppercase font-mono font-bold text-[#E0E5E7] tracking-wider block mb-1">
               Associated Research Study
             </span>
-            <div className="font-bold text-[#E2DDE7] line-clamp-2">
+            <div className="font-bold text-[#F9F8FD] line-clamp-2">
               {paper.title}
             </div>
-            <div className="text-[11px] text-[#E2DDE7]/70 mt-1 flex items-center space-x-2">
+            <div className="text-[11px] text-[#F9F8FD]/70 mt-1 flex items-center space-x-2">
               <span>{paper.authors[0] || 'Unknown'} et al.</span>
               <span>•</span>
               <span>{paper.journal} ({paper.year})</span>
               {paper.doi && (
                 <>
                   <span>•</span>
-                  <span className="font-mono text-[#E6E0F0]">{paper.doi}</span>
+                  <span className="font-mono text-[#E0E5E7]">{paper.doi}</span>
                 </>
               )}
             </div>
           </div>
 
           {/* AI Quality Rating Score & Stars */}
-          <div className="p-4 rounded-xl bg-[#383242] border border-amber-400/40 text-xs space-y-2">
+          <div className="p-4 rounded-xl bg-[#192440] border border-amber-400/40 text-xs space-y-2">
             <div className="flex items-center justify-between">
               <span className="font-bold text-amber-300 flex items-center space-x-1.5">
                 <Star className="w-4 h-4 fill-amber-300 text-amber-300" />
                 <span>Overall AI Rating: {ratingStars} / 5 Stars ({ratingScore} / 100 Rigor Score)</span>
               </span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#1E1B24] text-amber-200 border border-amber-400/30">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#060D1E] text-amber-200 border border-amber-400/30">
                 {paper.ratingBadgeLabel || 'Empirical Assessment'}
               </span>
             </div>
 
-            <p className="text-[#E2DDE7] leading-relaxed">
+            <p className="text-[#F9F8FD] leading-relaxed">
               <strong>Why This Rating Was Assigned:</strong> {paper.ratingRationale || badge.whySnippet}
             </p>
           </div>
@@ -134,56 +134,56 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
           {/* Strict Rationale: Why the AI Gave This Badge */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#E2DDE7] flex items-center space-x-1.5">
+              <span className="text-xs font-bold text-[#F9F8FD] flex items-center space-x-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>Explicit Badge Rationale</span>
               </span>
-              <span className="text-[11px] font-mono text-[#E2DDE7]/80">
+              <span className="text-[11px] font-mono text-[#F9F8FD]/80">
                 Confidence: <strong className="text-emerald-300">{Math.round(badge.confidence * 100)}%</strong>
               </span>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#1E1B24] border border-[#E6E0F0]/20 text-xs text-[#E2DDE7] leading-relaxed">
+            <div className="p-4 rounded-xl bg-[#060D1E] border border-[#E0E5E7]/20 text-xs text-[#F9F8FD] leading-relaxed">
               {badge.whySnippet}
             </div>
           </div>
 
           {/* Text Evidence Snippet */}
           <div className="space-y-2">
-            <span className="text-xs font-bold text-[#E2DDE7] flex items-center space-x-1.5">
-              <Quote className="w-3.5 h-3.5 text-[#E6E0F0]" />
+            <span className="text-xs font-bold text-[#F9F8FD] flex items-center space-x-1.5">
+              <Quote className="w-3.5 h-3.5 text-[#E0E5E7]" />
               <span>Verbatim Abstract Text Evidence Quote</span>
             </span>
 
-            <blockquote className="p-4 rounded-xl bg-[#20140D] border-l-4 border-amber-400 border-y border-r border-[#E6E0F0]/15 text-xs text-[#E2DDE7] italic leading-relaxed">
+            <blockquote className="p-4 rounded-xl bg-[#20140D] border-l-4 border-amber-400 border-y border-r border-[#E0E5E7]/15 text-xs text-[#F9F8FD] italic leading-relaxed">
               "{badge.textEvidence}"
             </blockquote>
           </div>
 
           {/* Deep Quantitative Metrics Extracted from this paper */}
           {paper.deepAnalysis && (
-            <div className="space-y-2 pt-2 border-t border-[#E6E0F0]/20">
-              <span className="text-xs font-bold text-[#E2DDE7]">
+            <div className="space-y-2 pt-2 border-t border-[#E0E5E7]/20">
+              <span className="text-xs font-bold text-[#F9F8FD]">
                 Extracted Study Parameters
               </span>
 
               <div className="grid grid-cols-2 gap-2.5 text-xs">
-                <div className="p-2.5 rounded-lg bg-[#1E1B24] border border-[#E6E0F0]/20">
-                  <span className="text-[10px] text-[#E2DDE7]/70 block">Extracted Study Design</span>
-                  <span className="font-bold text-[#E2DDE7]">{paper.deepAnalysis.studyDesign}</span>
+                <div className="p-2.5 rounded-lg bg-[#060D1E] border border-[#E0E5E7]/20">
+                  <span className="text-[10px] text-[#F9F8FD]/70 block">Extracted Study Design</span>
+                  <span className="font-bold text-[#F9F8FD]">{paper.deepAnalysis.studyDesign}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#1E1B24] border border-[#E6E0F0]/20">
-                  <span className="text-[10px] text-[#E2DDE7]/70 block">Verified Sample Power</span>
-                  <span className="font-bold text-[#E2DDE7]">
+                <div className="p-2.5 rounded-lg bg-[#060D1E] border border-[#E0E5E7]/20">
+                  <span className="text-[10px] text-[#F9F8FD]/70 block">Verified Sample Power</span>
+                  <span className="font-bold text-[#F9F8FD]">
                     {paper.deepAnalysis.sampleSize ? `N = ${paper.deepAnalysis.sampleSize.toLocaleString()}` : 'Not Specified'}
                   </span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#1E1B24] border border-[#E6E0F0]/20">
-                  <span className="text-[10px] text-[#E2DDE7]/70 block">Primary Effect Metric</span>
-                  <span className="font-bold text-[#E6E0F0]">{paper.deepAnalysis.primaryEffectMetric || 'N/A'}</span>
+                <div className="p-2.5 rounded-lg bg-[#060D1E] border border-[#E0E5E7]/20">
+                  <span className="text-[10px] text-[#F9F8FD]/70 block">Primary Effect Metric</span>
+                  <span className="font-bold text-[#E0E5E7]">{paper.deepAnalysis.primaryEffectMetric || 'N/A'}</span>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#1E1B24] border border-[#E6E0F0]/20">
-                  <span className="text-[10px] text-[#E2DDE7]/70 block">Risk of Bias Level</span>
+                <div className="p-2.5 rounded-lg bg-[#060D1E] border border-[#E0E5E7]/20">
+                  <span className="text-[10px] text-[#F9F8FD]/70 block">Risk of Bias Level</span>
                   <span className={`font-bold ${
                     paper.deepAnalysis.biasAssessment.riskLevel === 'Low' ? 'text-emerald-300' : 'text-amber-300'
                   }`}>
@@ -196,12 +196,12 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
 
           {/* Extracted Topics & AI Screening Recommendation */}
           {(paper.extractedTopics || paper.aiScreeningRecommendation) && (
-            <div className="space-y-3 pt-3 border-t border-[#E6E0F0]/20">
+            <div className="space-y-3 pt-3 border-t border-[#E0E5E7]/20">
               {/* Screening Recommendation */}
               {paper.aiScreeningRecommendation && (
-                <div className="p-3.5 rounded-xl bg-[#1E1B24] border border-[#E6E0F0]/20 text-xs space-y-1.5">
+                <div className="p-3.5 rounded-xl bg-[#060D1E] border border-[#E0E5E7]/20 text-xs space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono uppercase text-[#E2DDE7]/70">
+                    <span className="text-[10px] font-mono uppercase text-[#F9F8FD]/70">
                       Autonomous Screening Recommendation:
                     </span>
                     <span className={`px-2.5 py-0.5 rounded-lg font-bold border ${
@@ -214,15 +214,15 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
                       {paper.aiScreeningRecommendation}
                     </span>
                   </div>
-                  <p className="text-[#E2DDE7] text-[11px] leading-relaxed">
+                  <p className="text-[#F9F8FD] text-[11px] leading-relaxed">
                     <strong>Criteria Analysis:</strong> {paper.aiScreeningReason || 'Evaluated against systematic review population, intervention, and design criteria.'}
                   </p>
                 </div>
               )}
 
               {/* Analyzed Subtopics from Full PDF */}
-              <div className="space-y-2 pt-2 border-t border-[#E6E0F0]/15">
-                <span className="text-xs font-bold text-[#E2DDE7] block">
+              <div className="space-y-2 pt-2 border-t border-[#E0E5E7]/15">
+                <span className="text-xs font-bold text-[#F9F8FD] block">
                   Analyzed Subtopics in this Paper ({paper.extractedSubtopics?.length || paper.extractedTopics?.length || 0}):
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -252,7 +252,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
                     paper.extractedTopics && paper.extractedTopics.map((top, idx) => (
                       <span 
                         key={idx} 
-                        className="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-[#383242] border border-[#E6E0F0]/25 text-[#E2DDE7]"
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-[#192440] border border-[#E0E5E7]/25 text-[#F9F8FD]"
                       >
                         #{top}
                       </span>
@@ -278,10 +278,10 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
         </div>
 
         {/* Footer with Screening Decision Action Buttons */}
-        <div className="p-4 bg-[#1E1B24] border-t border-[#E6E0F0]/20 flex flex-wrap items-center justify-between gap-3">
+        <div className="p-4 bg-[#060D1E] border-t border-[#E0E5E7]/20 flex flex-wrap items-center justify-between gap-3">
           {onDecide && paper ? (
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-[#E2DDE7] hidden sm:inline">Screening Action:</span>
+              <span className="text-xs font-bold text-[#F9F8FD] hidden sm:inline">Screening Action:</span>
               <button
                 onClick={() => {
                   onDecide(paper.id, 'include', 'Matches review criteria & target subtopics');
@@ -305,7 +305,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
                   onDecide(paper.id, 'maybe', 'Hold for secondary consensus review');
                   onClose();
                 }}
-                className="px-3 py-2 rounded-xl text-xs font-bold bg-[#383242] hover:bg-[#463E53] text-[#E6E0F0] border border-[#E6E0F0]/30 transition-all cursor-pointer"
+                className="px-3 py-2 rounded-xl text-xs font-bold bg-[#192440] hover:bg-[#223154] text-[#E0E5E7] border border-[#E0E5E7]/30 transition-all cursor-pointer"
               >
                 ? Maybe
               </button>
@@ -314,7 +314,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
 
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-bold bg-[#E2DDE7] text-[#25212C] hover:bg-white transition-all cursor-pointer shadow-md"
+            className="px-4 py-2 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] hover:bg-white transition-all cursor-pointer shadow-md"
           >
             Close Inspector
           </button>

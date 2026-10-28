@@ -67,7 +67,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
     <div className="space-y-6 text-left">
       
       {/* Header Banner */}
-      <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0]">
+      <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E0E5E7]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2">
@@ -91,7 +91,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
           {/* Quick Revert to V1 Button */}
           <button
             onClick={() => onRevertToVersion(1)}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#6F4E37] border border-[#E6E0F0] hover:bg-[#FAF9FD] shadow-sm transition-all"
+            className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white text-[#6F4E37] border border-[#E0E5E7] hover:bg-[#FAF9FD] shadow-sm transition-all"
             title="Rollback state deterministically to Version 1"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -100,7 +100,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
         </div>
 
         {/* Version Comparator Controls */}
-        <div className="mt-5 pt-4 border-t border-[#E6E0F0] flex flex-wrap items-center gap-4 text-xs">
+        <div className="mt-5 pt-4 border-t border-[#E0E5E7] flex flex-wrap items-center gap-4 text-xs">
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-[#462E1E]">Compare Base:</span>
             <select
@@ -171,7 +171,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
         </div>
 
         {/* Merged Groups */}
-        <div className="glass-panel rounded-2xl p-4 border border-[#E6E0F0] bg-white/60">
+        <div className="glass-panel rounded-2xl p-4 border border-[#E0E5E7] bg-white/60">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-[#462E1E] flex items-center space-x-1.5">
               <Layers className="w-4 h-4 text-[#6F4E37]" />
@@ -189,7 +189,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
       </div>
 
       {/* Crucial Hackathon Requirement: Merge Conflict Resolution Desk */}
-      <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0] space-y-4">
+      <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E0E5E7] space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <AlertOctagon className="w-5 h-5 text-amber-600" />
@@ -218,7 +218,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             {/* Record A */}
-            <div className="bg-white p-3 rounded-xl border border-[#E2DDE7] space-y-1">
+            <div className="bg-white p-3 rounded-xl border border-[#F9F8FD] space-y-1">
               <span className="text-[10px] font-mono uppercase text-[#7E7A72]">Record A (V1)</span>
               <div className="font-semibold text-[#462E1E]">{simulatedConflicts[0].paperA.title}</div>
               <div className="text-[11px] text-emerald-700 font-medium">Status: Included</div>
@@ -226,7 +226,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
             </div>
 
             {/* Record B */}
-            <div className="bg-white p-3 rounded-xl border border-[#E2DDE7] space-y-1">
+            <div className="bg-white p-3 rounded-xl border border-[#F9F8FD] space-y-1">
               <span className="text-[10px] font-mono uppercase text-[#7E7A72]">Record B (V2 duplicate match)</span>
               <div className="font-semibold text-[#462E1E]">{simulatedConflicts[0].paperB.title}</div>
               <div className="text-[11px] text-rose-700 font-medium">Status: Excluded</div>

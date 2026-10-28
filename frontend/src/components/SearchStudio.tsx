@@ -79,43 +79,43 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
     <div className="space-y-6 text-left">
       
       {/* Search Studio Header */}
-      <div className="glass-panel rounded-2xl p-5 border border-[#E6E0F0]/20 bg-[#2D2836]/90">
+      <div className="glass-panel rounded-2xl p-5 border border-[#E0E5E7]/20 bg-[#0B1630]/90">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#383242] text-[#E6E0F0] border border-[#E6E0F0]/25">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#192440] text-[#E0E5E7] border border-[#E0E5E7]/25">
                 Article Acquisition & Query Studio
               </span>
             </div>
-            <h2 className="text-base font-bold text-[#E2DDE7] mt-1">
+            <h2 className="text-base font-bold text-[#F9F8FD] mt-1">
               Upload Citation Files & Expand Corpus
             </h2>
-            <p className="text-xs text-[#E2DDE7]/80 mt-0.5">
+            <p className="text-xs text-[#F9F8FD]/80 mt-0.5">
               Upload local research files (.ris, .csv, .bib, .json, .txt). Records are automatically deduplicated and enriched with explainable AI ratings.
             </p>
           </div>
 
           <div className="flex items-center space-x-3 text-xs">
-            <div className="px-3 py-1.5 rounded-xl bg-[#1E1B24] border border-[#E6E0F0]/20">
-              <span className="text-[#E2DDE7]/70 block text-[10px]">Active Query Version</span>
-              <span className="font-bold text-[#E2DDE7]">Version {activeVersion.versionNumber}</span>
+            <div className="px-3 py-1.5 rounded-xl bg-[#060D1E] border border-[#E0E5E7]/20">
+              <span className="text-[#F9F8FD]/70 block text-[10px]">Active Query Version</span>
+              <span className="font-bold text-[#F9F8FD]">Version {activeVersion.versionNumber}</span>
             </div>
-            <div className="px-3 py-1.5 rounded-xl bg-[#1E1B24] border border-[#E6E0F0]/20">
-              <span className="text-[#E2DDE7]/70 block text-[10px]">Articles Ingested</span>
-              <span className="font-bold text-[#E6E0F0]">{activeVersion.pulledCount} Papers</span>
+            <div className="px-3 py-1.5 rounded-xl bg-[#060D1E] border border-[#E0E5E7]/20">
+              <span className="text-[#F9F8FD]/70 block text-[10px]">Articles Ingested</span>
+              <span className="font-bold text-[#E0E5E7]">{activeVersion.pulledCount} Papers</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Mode Switcher Tabs */}
-      <div className="flex items-center space-x-2 border-b border-[#E6E0F0]/20 pb-2">
+      <div className="flex items-center space-x-2 border-b border-[#E0E5E7]/20 pb-2">
         <button
           onClick={() => setActiveMode('upload')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeMode === 'upload'
-              ? 'bg-[#E2DDE7] text-[#25212C] shadow-md'
-              : 'bg-[#2D2836] text-[#E2DDE7] hover:bg-[#383242] hover:text-white border border-[#E6E0F0]/20'
+              ? 'bg-[#F9F8FD] text-[#0A1225] shadow-md'
+              : 'bg-[#0B1630] text-[#F9F8FD] hover:bg-[#192440] hover:text-white border border-[#E0E5E7]/20'
           }`}
         >
           <Upload className="w-3.5 h-3.5" />
@@ -126,8 +126,8 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
           onClick={() => setActiveMode('search')}
           className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeMode === 'search'
-              ? 'bg-[#E2DDE7] text-[#25212C] shadow-md'
-              : 'bg-[#2D2836] text-[#E2DDE7] hover:bg-[#383242] hover:text-white border border-[#E6E0F0]/20'
+              ? 'bg-[#F9F8FD] text-[#0A1225] shadow-md'
+              : 'bg-[#0B1630] text-[#F9F8FD] hover:bg-[#192440] hover:text-white border border-[#E0E5E7]/20'
           }`}
         >
           <Search className="w-3.5 h-3.5" />
@@ -142,33 +142,33 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
           {/* Left Column: Query Builder & Fetcher */}
-          <div className="lg:col-span-2 glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0]/20 bg-[#2D2836]/95 space-y-5">
+          <div className="lg:col-span-2 glass-panel-elevated rounded-2xl p-6 border border-[#E0E5E7]/20 bg-[#0B1630]/95 space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-[#E2DDE7] flex items-center space-x-2">
-                  <Search className="w-4 h-4 text-[#E6E0F0]" />
+                <h3 className="text-base font-bold text-[#F9F8FD] flex items-center space-x-2">
+                  <Search className="w-4 h-4 text-[#E0E5E7]" />
                   <span>Multi-Database Search Query</span>
                 </h3>
-                <p className="text-xs text-[#E2DDE7]/80 mt-0.5">
+                <p className="text-xs text-[#F9F8FD]/80 mt-0.5">
                   Construct Boolean queries, inspect live hits across PubMed and Europe PMC, and create query versions.
                 </p>
               </div>
 
-              <span className="px-2.5 py-1 rounded-lg bg-[#383242] text-[#E6E0F0] text-xs font-mono font-medium border border-[#E6E0F0]/25">
+              <span className="px-2.5 py-1 rounded-lg bg-[#192440] text-[#E0E5E7] text-xs font-mono font-medium border border-[#E0E5E7]/25">
                 Target: Version {queryVersions.length + 1}
               </span>
             </div>
 
             {/* Query String Input */}
             <div>
-              <label className="block text-xs font-semibold text-[#E2DDE7] mb-1.5">
+              <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
                 Boolean Query Expression (AND, OR, NOT, Quotes)
               </label>
               <textarea
                 value={keyphraseInput}
                 onChange={(e) => setKeyphraseInput(e.target.value)}
                 rows={3}
-                className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs font-mono text-[#E2DDE7] leading-relaxed resize-none focus:ring-1 focus:ring-[#E6E0F0]"
+                className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs font-mono text-[#F9F8FD] leading-relaxed resize-none focus:ring-1 focus:ring-[#E0E5E7]"
                 placeholder='("targeted intervention" OR "clinical therapy") AND ("target cohort" OR "demographic") AND randomized'
               />
             </div>
@@ -177,21 +177,21 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {/* Date Range */}
               <div>
-                <label className="block text-[11px] font-medium text-[#E2DDE7]/80 mb-1">Publication Years</label>
+                <label className="block text-[11px] font-medium text-[#F9F8FD]/80 mb-1">Publication Years</label>
                 <div className="flex items-center space-x-2">
                   <input
                     type="text"
                     value={dateStart}
                     onChange={(e) => setDateStart(e.target.value)}
-                    className="w-full glass-input rounded-xl px-2.5 py-1.5 text-xs text-center text-[#E2DDE7]"
+                    className="w-full glass-input rounded-xl px-2.5 py-1.5 text-xs text-center text-[#F9F8FD]"
                     placeholder="2018"
                   />
-                  <span className="text-[#E2DDE7]/60 text-xs">to</span>
+                  <span className="text-[#F9F8FD]/60 text-xs">to</span>
                   <input
                     type="text"
                     value={dateEnd}
                     onChange={(e) => setDateEnd(e.target.value)}
-                    className="w-full glass-input rounded-xl px-2.5 py-1.5 text-xs text-center text-[#E2DDE7]"
+                    className="w-full glass-input rounded-xl px-2.5 py-1.5 text-xs text-center text-[#F9F8FD]"
                     placeholder="2026"
                   />
                 </div>
@@ -199,24 +199,24 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
 
               {/* Sources Toggle */}
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-medium text-[#E2DDE7]/80 mb-1">Target Live Literature APIs</label>
+                <label className="block text-[11px] font-medium text-[#F9F8FD]/80 mb-1">Target Live Literature APIs</label>
                 <div className="flex items-center space-x-3 pt-1">
-                  <label className="flex items-center space-x-1.5 text-xs text-[#E2DDE7] cursor-pointer">
+                  <label className="flex items-center space-x-1.5 text-xs text-[#F9F8FD] cursor-pointer">
                     <input
                       type="checkbox"
                       checked={usePubMed}
                       onChange={(e) => setUsePubMed(e.target.checked)}
-                      className="rounded text-[#E6E0F0] focus:ring-[#E6E0F0]"
+                      className="rounded text-[#E0E5E7] focus:ring-[#E0E5E7]"
                     />
                     <span>PubMed (NCBI E-utilities)</span>
                   </label>
 
-                  <label className="flex items-center space-x-1.5 text-xs text-[#E2DDE7] cursor-pointer">
+                  <label className="flex items-center space-x-1.5 text-xs text-[#F9F8FD] cursor-pointer">
                     <input
                       type="checkbox"
                       checked={useEuropePMC}
                       onChange={(e) => setUseEuropePMC(e.target.checked)}
-                      className="rounded text-[#E6E0F0] focus:ring-[#E6E0F0]"
+                      className="rounded text-[#E0E5E7] focus:ring-[#E0E5E7]"
                     />
                     <span>Europe PMC REST API</span>
                   </label>
@@ -225,20 +225,20 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
             </div>
 
             {/* Actions: Dry-Run Estimation vs Pull */}
-            <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[#E6E0F0]/20">
+            <div className="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-[#E0E5E7]/20">
               <button
                 onClick={handleCheckHits}
                 disabled={isCheckingHits || !keyphraseInput.trim()}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#383242] hover:bg-[#463E53] text-[#E2DDE7] border border-[#E6E0F0]/30 transition-all flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#192440] hover:bg-[#223154] text-[#F9F8FD] border border-[#E0E5E7]/30 transition-all flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
               >
-                <Filter className="w-3.5 h-3.5 text-[#E6E0F0]" />
+                <Filter className="w-3.5 h-3.5 text-[#E0E5E7]" />
                 <span>{isCheckingHits ? 'Querying Indexes...' : 'Inspect Live Hits'}</span>
               </button>
 
               <button
                 onClick={() => handleExecutePull(false)}
                 disabled={isLoading || !keyphraseInput.trim()}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#E2DDE7] hover:bg-white text-[#25212C] shadow-md transition-all flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#F9F8FD] hover:bg-white text-[#0A1225] shadow-md transition-all flex items-center space-x-1.5 disabled:opacity-50 cursor-pointer"
               >
                 <DownloadCloud className="w-4 h-4" />
                 <span>{isLoading ? 'Executing Search Pipeline...' : 'Fetch Live Articles'}</span>
@@ -247,8 +247,8 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
 
             {/* Hits Result Pill */}
             {estimatedHits && (
-              <div className="p-3.5 rounded-xl bg-[#1E1B24] border border-[#E6E0F0]/20 flex items-center justify-between text-xs">
-                <span className="text-[#E2DDE7]/90">Found indexed candidate articles:</span>
+              <div className="p-3.5 rounded-xl bg-[#060D1E] border border-[#E0E5E7]/20 flex items-center justify-between text-xs">
+                <span className="text-[#F9F8FD]/90">Found indexed candidate articles:</span>
                 <div className="flex items-center space-x-3 font-bold">
                   <span className="text-sky-300">PubMed: {estimatedHits.pubmed.toLocaleString()}</span>
                   <span className="text-amber-300">Europe PMC: {estimatedHits.europePMC.toLocaleString()}</span>
@@ -258,13 +258,13 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
           </div>
 
           {/* Right Column: Query Version History */}
-          <div className="glass-panel rounded-2xl p-5 border border-[#E6E0F0]/20 bg-[#2D2836]/90 space-y-4">
-            <div className="flex items-center justify-between border-b border-[#E6E0F0]/20 pb-2">
-              <span className="text-xs font-bold text-[#E2DDE7] flex items-center space-x-1.5">
-                <Layers className="w-3.5 h-3.5 text-[#E6E0F0]" />
+          <div className="glass-panel rounded-2xl p-5 border border-[#E0E5E7]/20 bg-[#0B1630]/90 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#E0E5E7]/20 pb-2">
+              <span className="text-xs font-bold text-[#F9F8FD] flex items-center space-x-1.5">
+                <Layers className="w-3.5 h-3.5 text-[#E0E5E7]" />
                 <span>Query Version Timeline</span>
               </span>
-              <span className="text-[10px] font-mono text-[#E2DDE7]/70">
+              <span className="text-[10px] font-mono text-[#F9F8FD]/70">
                 {queryVersions.length} Recorded
               </span>
             </div>
@@ -278,12 +278,12 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
                     onClick={() => onSelectVersion(qv.id)}
                     className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-[#383242] border-[#E6E0F0]/50 shadow-sm'
-                        : 'bg-[#1E1B24] border-[#E6E0F0]/15 hover:border-[#E6E0F0]/35'
+                        ? 'bg-[#192440] border-[#E0E5E7]/50 shadow-sm'
+                        : 'bg-[#060D1E] border-[#E0E5E7]/15 hover:border-[#E0E5E7]/35'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-[#E2DDE7]">
+                      <span className="font-bold text-[#F9F8FD]">
                         Version {qv.versionNumber}: {qv.label}
                       </span>
                       {isSelected && (
@@ -293,11 +293,11 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
                       )}
                     </div>
 
-                    <div className="font-mono text-[11px] text-[#E2DDE7]/80 truncate">
+                    <div className="font-mono text-[11px] text-[#F9F8FD]/80 truncate">
                       {qv.queryString || 'Uploaded Citation Corpus'}
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-[#E2DDE7]/60 mt-2 pt-1.5 border-t border-[#E6E0F0]/15">
+                    <div className="flex items-center justify-between text-[10px] text-[#F9F8FD]/60 mt-2 pt-1.5 border-t border-[#E0E5E7]/15">
                       <span>{qv.pulledCount} articles stored</span>
                       <span>{qv.createdAt}</span>
                     </div>

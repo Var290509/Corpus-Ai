@@ -85,7 +85,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
     <div className="space-y-6 text-left">
       
       {/* Top Controls & Metrics Bar */}
-      <div className="glass-panel-elevated rounded-2xl p-5 border border-[#E6E0F0] space-y-4">
+      <div className="glass-panel-elevated rounded-2xl p-5 border border-[#E0E5E7] space-y-4">
         
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
@@ -103,19 +103,19 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
             onClick={onRunBatchAutoScreen}
             className="flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#6F4E37] text-white hover:bg-[#5A3D29] shadow-md shadow-[#6F4E37]/20 transition-all shrink-0"
           >
-            <Bot className="w-4 h-4 text-[#E6E0F0]" />
+            <Bot className="w-4 h-4 text-[#E0E5E7]" />
             <span>Auto-Screen All via Protocol Rules</span>
           </button>
         </div>
 
         {/* Status Count Tally Tabs */}
-        <div className="flex flex-wrap gap-2 pt-2 border-t border-[#E6E0F0]">
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-[#E0E5E7]">
           <button
             onClick={() => { setStatusFilter('all'); setCurrentPage(1); }}
             className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
               statusFilter === 'all'
                 ? 'bg-[#6F4E37] text-white shadow-xs'
-                : 'bg-white/80 text-[#5F5C56] hover:bg-white border border-[#E2DDE7]'
+                : 'bg-white/80 text-[#5F5C56] hover:bg-white border border-[#F9F8FD]'
             }`}
           >
             All Screenable ({totalRepresentative})
@@ -162,7 +162,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
             className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center space-x-1.5 transition-all ${
               statusFilter === 'unscreened'
                 ? 'bg-[#5F5C56] text-white shadow-xs'
-                : 'bg-white/80 text-[#7E7A72] hover:bg-white border border-[#E2DDE7]'
+                : 'bg-white/80 text-[#7E7A72] hover:bg-white border border-[#F9F8FD]'
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-[#B8B5AE]" />
@@ -196,7 +196,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="p-1.5 rounded-lg bg-white border border-[#E2DDE7] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
+            className="p-1.5 rounded-lg bg-white border border-[#F9F8FD] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -206,7 +206,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="p-1.5 rounded-lg bg-white border border-[#E2DDE7] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
+            className="p-1.5 rounded-lg bg-white border border-[#F9F8FD] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -227,7 +227,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
         ))}
 
         {paginatedPapers.length === 0 && (
-          <div className="glass-panel rounded-2xl p-12 text-center border border-[#E6E0F0]">
+          <div className="glass-panel rounded-2xl p-12 text-center border border-[#E0E5E7]">
             <Layers className="w-10 h-10 text-[#6F4E37]/40 mx-auto mb-3" />
             <p className="text-sm font-semibold text-[#462E1E]">
               {papers.length === 0 ? 'No Research Papers Ingested Yet' : 'No research papers match the current filters'}
@@ -247,7 +247,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1.5 rounded-xl bg-white border border-[#E2DDE7] text-xs text-[#462E1E] disabled:opacity-40"
+            className="px-3 py-1.5 rounded-xl bg-white border border-[#F9F8FD] text-xs text-[#462E1E] disabled:opacity-40"
           >
             Previous
           </button>
@@ -257,7 +257,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1.5 rounded-xl bg-white border border-[#E2DDE7] text-xs text-[#462E1E] disabled:opacity-40"
+            className="px-3 py-1.5 rounded-xl bg-white border border-[#F9F8FD] text-xs text-[#462E1E] disabled:opacity-40"
           >
             Next
           </button>
