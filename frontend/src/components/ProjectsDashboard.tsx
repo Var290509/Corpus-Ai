@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { Project, User, ReviewMember, ResearchPaper } from '../types';
 import { firestoreService } from '../services/firestoreService';
-import { parseUploadedFile } from '../services/fileParser';
+import { parseUploadedFile, parseUploadedFilesBatch } from '../services/fileParser';
 import gsap from 'gsap';
 
 interface ProjectsDashboardProps {
@@ -133,20 +133,25 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
     setUploadStatusMsg(null);
 
     try {
-      const allParsed: ResearchPaper[] = [];
-      let totalDupes = 0;
-      let lastFileName = '';
+      const fileArray = Array.from(files);
+      const res = await parseUploadedFilesBatch(fileArray, uploadedArticles, 'qv-init');
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        lastFileName = file.name;
-        const res = await parseUploadedFile(file, 'qv-init');
-        allParsed.push(...res.papers);
-        totalDupes += res.duplicatesRemoved || 0;
+      setUploadedArticles(prev => [...prev, ...res.papers]);
+
+      let msg = `✓ Ingested ${res.papers.length} unique articles`;
+      const dupeNotes: string[] = [];
+      if (res.duplicateFilesSkipped > 0) {
+        dupeNotes.push(`${res.duplicateFilesSkipped} duplicate file${res.duplicateFilesSkipped > 1 ? 's' : ''} skipped`);
       }
+      if (res.duplicateDataRemoved > 0) {
+        dupeNotes.push(`${res.duplicateDataRemoved} duplicate record${res.duplicateDataRemoved > 1 ? 's' : ''} removed`);
+      }
+      if (dupeNotes.length > 0) {
+        msg += ` (${dupeNotes.join(', ')})`;
+      }
+      msg += ` with topics and AI screening recommendations assigned!`;
 
-      setUploadedArticles(prev => [...prev, ...allParsed]);
-      setUploadStatusMsg(`✓ Uploaded "${lastFileName}": Extracted ${allParsed.length} articles (${totalDupes} duplicates removed) with AI ratings assigned!`);
+      setUploadStatusMsg(msg);
     } catch (err) {
       console.error(err);
       alert('Error parsing uploaded file.');
@@ -710,10 +715,10 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                   <input
                     type="file"
                     multiple
-                    accept=".pdf,.ris,.csv,.json,.bib,.bibtex,.txt"
+                    accept=".pdf,.png,.jpg,.jpeg,.webp,.ris,.csv,.json,.bib,.bibtex,.txt"
                     onChange={(e) => handleStep2FileUpload(e.target.files)}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    title="Drop or select research paper files"
+                    title="Drop or select research paper files or images"
                   />
 
                   <div className="space-y-3 pointer-events-none">
@@ -721,21 +726,21 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                       <Upload className="w-6 h-6" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-[#FAF9F8]">Upload Research Articles</h4>
+                      <h4 className="text-sm font-bold text-[#FAF9F8]">Upload Research Articles & Visuals</h4>
                       <p className="text-xs text-[#E5E4E2]/80 mt-1 max-w-md mx-auto">
-                        Drag and drop <strong>.PDF</strong>, <strong>.RIS</strong>, <strong>.CSV</strong>, <strong>.BIB</strong>, or <strong>.JSON</strong> files. Any duplicates are automatically removed and AI ratings are computed with textual evidence!
+                        Drag and drop <strong>.PDF</strong>, <strong>Pictures/Posters</strong> (.PNG, .JPG), <strong>.RIS</strong>, <strong>.CSV</strong>, <strong>.BIB</strong>, or <strong>.JSON</strong>. Duplicate files & duplicate data are automatically removed, OCR is performed, non-English text is translated, and AI assigns topics and screening recommendations!
                       </p>
                     </div>
 
                     <div className="inline-flex items-center px-4 py-1.5 rounded-xl text-xs font-bold bg-[#E5E4E2] text-[#2C1E16] shadow-sm">
-                      <span>Browse Files</span>
+                      <span>Browse Files & Images</span>
                     </div>
                   </div>
 
                   {isUploading && (
                     <div className="absolute inset-0 bg-[#271911]/90 backdrop-blur-sm flex items-center justify-center space-x-2 z-20">
                       <div className="w-6 h-6 border-2 border-[#E6E0F0] border-t-transparent rounded-full animate-spin" />
-                      <span className="text-xs font-semibold text-[#FAF9F8]">Deduplicating & Computing AI Ratings...</span>
+                      <span className="text-xs font-semibold text-[#FAF9F8]">Analyzing Files, Purging Duplicates & Generating Topics...</span>
                     </div>
                   )}
                 </div>
@@ -752,18 +757,47 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 {uploadedArticles.length > 0 && (
                   <div className="space-y-2">
                     <span className="text-xs font-semibold text-[#FAF9F8] block">
-                      Uploaded Articles ({uploadedArticles.length}):
+                      Unique Articles Ingested ({uploadedArticles.length}):
                     </span>
-                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                       {uploadedArticles.map((art, idx) => (
-                        <div key={art.id || idx} className="p-2.5 rounded-xl bg-[#241710] border border-[#E6E0F0]/15 text-xs flex items-center justify-between gap-2">
-                          <div className="truncate flex-1">
-                            <span className="font-semibold text-[#FAF9F8] block truncate">{art.title}</span>
-                            <span className="text-[10px] text-[#E5E4E2]/70">{art.journal} • {art.year}</span>
+                        <div key={art.id || idx} className="p-2.5 rounded-xl bg-[#241710] border border-[#E6E0F0]/15 text-xs flex flex-col space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="truncate flex-1">
+                              <span className="font-semibold text-[#FAF9F8] block truncate">{art.title}</span>
+                              <span className="text-[10px] text-[#E5E4E2]/70">{art.journal} • {art.year}</span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/20 shrink-0">
+                              {art.ratingBadgeLabel || `${art.overallRatingScore || 85}/100`}
+                            </span>
                           </div>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/20 shrink-0">
-                            {art.ratingBadgeLabel || `${art.overallRatingScore || 85}/100`}
-                          </span>
+
+                          {/* Topics & Screening Recommendation Pills */}
+                          <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-[#E6E0F0]/10">
+                            {art.aiScreeningRecommendation && (
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-bold border flex items-center space-x-1 ${
+                                art.aiScreeningRecommendation === 'Included'
+                                  ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40'
+                                  : (art.aiScreeningRecommendation === 'Excluded'
+                                      ? 'bg-rose-950/70 text-rose-300 border-rose-500/40'
+                                      : 'bg-amber-950/70 text-amber-300 border-amber-500/40')
+                              }`}>
+                                <span>{art.aiScreeningRecommendation === 'Included' ? '✓' : (art.aiScreeningRecommendation === 'Excluded' ? '✕' : '?')} Suggested: {art.aiScreeningRecommendation}</span>
+                              </span>
+                            )}
+
+                            {art.isTranslated && (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-950/70 text-purple-200 border border-purple-500/30">
+                                🌐 Translated from {art.originalLanguage?.toUpperCase()}
+                              </span>
+                            )}
+
+                            {art.extractedTopics && art.extractedTopics.slice(0, 3).map((top, ti) => (
+                              <span key={ti} className="text-[10px] text-[#E6E0F0] font-mono bg-[#352318] px-1.5 py-0.5 rounded border border-[#E6E0F0]/10">
+                                #{top}
+                              </span>
+                            ))}
+                          </div>
                         </div>
                       ))}
                     </div>

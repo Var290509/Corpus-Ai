@@ -13,7 +13,7 @@ import {
   Star
 } from 'lucide-react';
 import { ResearchPaper } from '../types';
-import { parseUploadedFile, parseRawText } from '../services/fileParser';
+import { parseUploadedFile, parseRawText, parseUploadedFilesBatch } from '../services/fileParser';
 
 interface FileUploadDeskProps {
   onAddPapers: (newPapers: ResearchPaper[]) => void;
@@ -30,6 +30,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
     filename: string;
     count: number;
     duplicatesRemoved: number;
+    duplicateFilesSkipped?: number;
     format: string;
   } | null>(null);
 
@@ -42,32 +43,24 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
     setUploadStats(null);
 
     try {
-      const allExtracted: ResearchPaper[] = [];
-      let lastFilename = '';
-      let lastFormat = '';
-      let totalDupesRemoved = 0;
+      const fileArray = Array.from(files);
+      const res = await parseUploadedFilesBatch(fileArray, [], activeVersionId);
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const res = await parseUploadedFile(file, activeVersionId);
-        allExtracted.push(...res.papers);
-        lastFilename = res.filename;
-        lastFormat = res.format.toUpperCase();
-        totalDupesRemoved += res.duplicatesRemoved || 0;
-      }
-
-      if (allExtracted.length > 0) {
-        onAddPapers(allExtracted);
+      if (res.papers.length > 0) {
+        onAddPapers(res.papers);
         setUploadStats({
-          filename: lastFilename,
-          count: allExtracted.length,
-          duplicatesRemoved: totalDupesRemoved,
-          format: lastFormat
+          filename: res.processedFileNames.slice(0, 2).join(', ') + (res.processedFileNames.length > 2 ? ` (+${res.processedFileNames.length - 2} more)` : ''),
+          count: res.papers.length,
+          duplicatesRemoved: res.duplicateDataRemoved,
+          duplicateFilesSkipped: res.duplicateFilesSkipped,
+          format: 'MULTI-MODAL / OCR'
         });
+      } else if (res.duplicateFilesSkipped > 0) {
+        alert('All uploaded files were identified as duplicate files and skipped.');
       }
     } catch (e) {
       console.error(e);
-      alert('Error parsing citation file. Please verify format.');
+      alert('Error parsing uploaded files. Please verify format.');
     } finally {
       setIsProcessing(false);
     }
@@ -119,10 +112,10 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
         <input
           type="file"
           multiple
-          accept=".pdf,.ris,.csv,.json,.bib,.bibtex,.txt"
+          accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tiff,.ris,.csv,.json,.bib,.bibtex,.txt"
           onChange={(e) => handleFiles(e.target.files)}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-          title="Drop or select research paper files"
+          title="Drop or select research paper files or images"
         />
 
         <div className="max-w-md mx-auto space-y-4 pointer-events-none">
@@ -132,15 +125,15 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
 
           <div>
             <h3 className="text-base font-bold text-[#FAF9F8]">
-              Drop your citation or paper files here
+              Drop your citation files, PDFs, or research posters/images here
             </h3>
             <p className="text-xs text-[#E5E4E2]/80 mt-1 leading-relaxed">
-              Accepts <strong>.PDF</strong>, <strong>.RIS</strong> (EndNote/Zotero/Scopus), <strong>.CSV</strong>, <strong>.BIB</strong> (BibTeX), <strong>.JSON</strong>, or raw text.
+              Accepts <strong>.PDF</strong>, <strong>Pictures/Posters (.PNG, .JPG, .WEBP)</strong> via deep OCR, <strong>.RIS</strong> (Scopus/WoS/PubMed), <strong>.CSV</strong>, <strong>.BIB</strong>, or <strong>.JSON</strong>.
             </p>
           </div>
 
           <div className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold bg-[#E5E4E2] text-[#2C1E16] shadow-md">
-            <span>Browse Citation Files on Computer</span>
+            <span>Browse Research Files on Computer</span>
           </div>
         </div>
 

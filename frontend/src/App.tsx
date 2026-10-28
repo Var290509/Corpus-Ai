@@ -28,6 +28,7 @@ import { batchScreenPapers } from './services/screeningEngine';
 import { Level2LoopManager } from './services/level2LoopManager';
 import { fetchLiveEuropePMC } from './services/apiClient';
 import { firestoreService } from './services/firestoreService';
+import { authService } from './services/authService';
 import { Users, Edit3, Sparkles, Folder, Calendar } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -177,6 +178,7 @@ export const App: React.FC = () => {
   const handleLogout = () => {
     setCurrentUser(null);
     setCurrentProjectId(null);
+    authService.logOut();
     try {
       localStorage.removeItem('corpus_ai_user');
     } catch (e) {

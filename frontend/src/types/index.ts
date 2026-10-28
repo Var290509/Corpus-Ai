@@ -147,6 +147,17 @@ export interface ResearchPaper {
   picoSpans: PICOSpan[];
   aiBadges: AIBadge[];
   deepAnalysis: DeepAnalysisResult;
+
+  // Multilingual translation & OCR
+  originalLanguage?: string;
+  originalText?: string;
+  isTranslated?: boolean;
+  sourceFileType?: 'pdf' | 'image' | 'ris' | 'csv' | 'bib' | 'json' | 'txt';
+
+  // Extracted Topics & Autonomous Screening Criteria
+  extractedTopics?: string[]; // Topics discovered from total PDF / picture
+  aiScreeningRecommendation?: 'Included' | 'Excluded' | 'Maybe';
+  aiScreeningReason?: string;
 }
 
 export type DecisionStatus = 'include' | 'exclude' | 'maybe' | 'unscreened';

@@ -192,6 +192,65 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
             </div>
           )}
 
+          {/* Extracted Topics & AI Screening Recommendation */}
+          {(paper.extractedTopics || paper.aiScreeningRecommendation) && (
+            <div className="space-y-3 pt-3 border-t border-[#E6E0F0]/20">
+              {/* Screening Recommendation */}
+              {paper.aiScreeningRecommendation && (
+                <div className="p-3.5 rounded-xl bg-[#271911] border border-[#E6E0F0]/20 text-xs space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase text-[#E5E4E2]/70">
+                      Autonomous Screening Recommendation:
+                    </span>
+                    <span className={`px-2.5 py-0.5 rounded-lg font-bold border ${
+                      paper.aiScreeningRecommendation === 'Included'
+                        ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50'
+                        : (paper.aiScreeningRecommendation === 'Excluded'
+                            ? 'bg-rose-950/80 text-rose-300 border-rose-500/50'
+                            : 'bg-amber-950/80 text-amber-300 border-amber-500/50')
+                    }`}>
+                      {paper.aiScreeningRecommendation}
+                    </span>
+                  </div>
+                  <p className="text-[#FAF9F8] text-[11px] leading-relaxed">
+                    <strong>Criteria Analysis:</strong> {paper.aiScreeningReason || 'Evaluated against systematic review population, intervention, and design criteria.'}
+                  </p>
+                </div>
+              )}
+
+              {/* Topics Discovered */}
+              {paper.extractedTopics && paper.extractedTopics.length > 0 && (
+                <div className="space-y-1.5">
+                  <span className="text-xs font-bold text-[#FAF9F8] block">
+                    Topics Discovered from Full PDF / Picture:
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {paper.extractedTopics.map((top, idx) => (
+                      <span 
+                        key={idx} 
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-[#4A3324] border border-[#E6E0F0]/25 text-[#FAF9F8]"
+                      >
+                        #{top}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Multilingual Translation Details */}
+              {paper.isTranslated && (
+                <div className="p-3 rounded-xl bg-purple-950/60 border border-purple-500/40 text-xs text-purple-200 space-y-1">
+                  <span className="font-bold flex items-center space-x-1">
+                    <span>🌐 Multilingual Scientific Translation Applied</span>
+                  </span>
+                  <p className="text-[11px] text-purple-300/90 leading-relaxed">
+                    Original manuscript written in <strong>{paper.originalLanguage?.toUpperCase() || 'non-English'}</strong>. Translated to academic English with strict preservation of chemical entities, gene symbols, and Latin medical terminology.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
 
         {/* Footer */}

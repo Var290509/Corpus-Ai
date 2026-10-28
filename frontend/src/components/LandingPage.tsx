@@ -14,9 +14,11 @@ import {
   Layers,
   Search,
   BookOpen,
-  Cloud
+  Cloud,
+  AlertCircle
 } from 'lucide-react';
 import { User as UserType } from '../types';
+import { authService } from '../services/authService';
 import gsap from 'gsap';
 
 interface LandingPageProps {
@@ -29,6 +31,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
@@ -116,23 +119,40 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
   const handleAuthSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    setAuthError(null);
 
-    const loggedInUser: UserType = {
-      id: `usr-${Date.now()}`,
-      name: name.trim() || email.split('@')[0],
-      email: email.trim()
-    };
-
-    onLogin(loggedInUser);
+    if (isSignUp) {
+      const result = authService.signUp(name, email, password);
+      if (result.error) {
+        setAuthError(result.error);
+        return;
+      }
+      if (result.user) {
+        onLogin(result.user);
+      }
+    } else {
+      const result = authService.logIn(email, password);
+      if (result.error) {
+        setAuthError(result.error);
+        return;
+      }
+      if (result.user) {
+        onLogin(result.user);
+      }
+    }
   };
 
   const handleQuickDemoLogin = () => {
-    onLogin({
-      id: 'usr-demo',
-      name: 'Dr. Systematic Reviewer',
-      email: 'lead.investigator@corpus.ai'
-    });
+    const result = authService.logIn('demo@corpus.ai', 'Password123!');
+    if (result.user) {
+      onLogin(result.user);
+    } else {
+      onLogin({
+        id: 'usr-demo',
+        name: 'Dr. Lead Investigator',
+        email: 'demo@corpus.ai'
+      });
+    }
   };
 
   return (
@@ -319,6 +339,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               </p>
             </div>
 
+            {/* Error Banner */}
+            {authError && (
+              <div className="p-3 rounded-xl bg-rose-950/90 border border-rose-500/70 text-rose-200 text-xs flex items-center space-x-2 animate-fade-in shadow-md">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                <span className="leading-snug">{authError}</span>
+              </div>
+            )}
+
             <form onSubmit={handleAuthSubmit} className="space-y-3.5">
               {isSignUp && (
                 <div>
@@ -326,7 +354,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                   <input
                     type="text"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => { setName(e.target.value); setAuthError(null); }}
                     placeholder="Dr. Eleanor Vance"
                     className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#FAF9F8]"
                     required
@@ -339,7 +367,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); setAuthError(null); }}
                   placeholder="researcher@university.edu"
                   className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#FAF9F8]"
                   required
@@ -347,11 +375,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#FAF9F8] mb-1">Password</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-[#FAF9F8]">Password</label>
+                  <span className="text-[10px] text-[#E5E4E2]/60">min 6 characters</span>
+                </div>
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); setAuthError(null); }}
                   placeholder="••••••••••••"
                   className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#FAF9F8]"
                   required
@@ -366,15 +397,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
               </button>
             </form>
 
+            {/* Quick Demo Credentials Pill */}
+            {!isSignUp && (
+              <div className="p-2 rounded-xl bg-[#241710]/90 border border-[#E6E0F0]/15 text-[11px] text-[#E5E4E2]/70 flex items-center justify-between">
+                <span>Demo: <strong className="text-[#FAF9F8]">demo@corpus.ai</strong></span>
+                <span>Pass: <strong className="text-[#FAF9F8]">Password123!</strong></span>
+              </div>
+            )}
+
             <div className="pt-2 border-t border-[#E6E0F0]/15 flex items-center justify-between text-xs text-[#E5E4E2]/80">
               <button
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="hover:text-white transition-colors cursor-pointer"
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setAuthError(null);
+                }}
+                className="hover:text-white transition-colors cursor-pointer text-[#E6E0F0]"
               >
                 {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
               </button>
               <button
-                onClick={() => setShowAuthModal(false)}
+                type="button"
+                onClick={() => {
+                  setShowAuthModal(false);
+                  setAuthError(null);
+                }}
                 className="hover:text-white transition-colors cursor-pointer"
               >
                 Cancel

@@ -231,6 +231,62 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         )}
       </div>
 
+      {/* Extracted Topics from PDF / Picture */}
+      {paper.extractedTopics && paper.extractedTopics.length > 0 && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span className="text-[10px] font-mono uppercase text-[#E5E4E2]/60 mr-0.5">Topics:</span>
+          {paper.extractedTopics.map((topic, ti) => (
+            <span
+              key={ti}
+              className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#241710] border border-[#E6E0F0]/15 text-[#E6E0F0] hover:border-[#E6E0F0]/40 transition-colors"
+            >
+              #{topic}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* AI Screening Recommendation (Included / Excluded / Maybe) */}
+      {paper.aiScreeningRecommendation && (
+        <div className="mt-2.5 p-2 rounded-xl bg-[#241710]/90 border border-[#E6E0F0]/20 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="flex items-center space-x-2">
+            <span className="text-[10px] font-mono uppercase text-[#E5E4E2]/70">AI Recommendation:</span>
+            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border flex items-center space-x-1 ${
+              paper.aiScreeningRecommendation === 'Included'
+                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50'
+                : (paper.aiScreeningRecommendation === 'Excluded'
+                    ? 'bg-rose-950/80 text-rose-300 border-rose-500/50'
+                    : 'bg-amber-950/80 text-amber-300 border-amber-500/50')
+            }`}>
+              {paper.aiScreeningRecommendation === 'Included' && <Check className="w-3 h-3 mr-0.5" />}
+              {paper.aiScreeningRecommendation === 'Excluded' && <X className="w-3 h-3 mr-0.5" />}
+              {paper.aiScreeningRecommendation === 'Maybe' && <HelpCircle className="w-3 h-3 mr-0.5" />}
+              <span>{paper.aiScreeningRecommendation}</span>
+            </span>
+            {paper.aiScreeningReason && (
+              <span className="text-[11px] text-[#E5E4E2]/80 italic hidden sm:inline truncate max-w-sm" title={paper.aiScreeningReason}>
+                — {paper.aiScreeningReason}
+              </span>
+            )}
+          </div>
+
+          {/* Quick Apply Button */}
+          {status === 'unscreened' && (
+            <button
+              onClick={() => {
+                const targetStatus = paper.aiScreeningRecommendation === 'Included' ? 'include' : (paper.aiScreeningRecommendation === 'Excluded' ? 'exclude' : 'maybe');
+                onDecide(paper.id, targetStatus, paper.aiScreeningReason);
+              }}
+              className="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#4A3324] hover:bg-[#5C3F2D] text-[#FAF9F8] border border-[#E6E0F0]/30 transition-all flex items-center space-x-1 cursor-pointer shrink-0"
+              title="Accept the AI recommendation directly"
+            >
+              <Sparkles className="w-2.5 h-2.5 text-amber-300" />
+              <span>Apply AI Suggestion</span>
+            </button>
+          )}
+        </div>
+      )}
+
       {/* AI Badges Row & Recommender Button */}
       <div className="mt-3 flex flex-wrap gap-2 items-center justify-between">
         {paper.aiBadges && paper.aiBadges.length > 0 && (
