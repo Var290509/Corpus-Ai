@@ -71,12 +71,12 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h3 className="font-bold text-base text-[#FAF9F8]">{badge.label}</h3>
+                <h3 className="font-bold text-base text-[#E8D8CE]">{badge.label}</h3>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/25">
                   {badge.category} Category
                 </span>
               </div>
-              <p className="text-xs text-[#E5E4E2]/80">
+              <p className="text-xs text-[#E8D8CE]/80">
                 Autonomous Evidence Verification & Quality Audit
               </p>
             </div>
@@ -84,7 +84,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#E5E4E2] hover:text-white hover:bg-[#4A3324] transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#E8D8CE] hover:text-white hover:bg-[#4A3324] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -98,10 +98,10 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
             <span className="text-[10px] uppercase font-mono font-bold text-[#E6E0F0] tracking-wider block mb-1">
               Associated Research Study
             </span>
-            <div className="font-bold text-[#FAF9F8] line-clamp-2">
+            <div className="font-bold text-[#E8D8CE] line-clamp-2">
               {paper.title}
             </div>
-            <div className="text-[11px] text-[#E5E4E2]/70 mt-1 flex items-center space-x-2">
+            <div className="text-[11px] text-[#E8D8CE]/70 mt-1 flex items-center space-x-2">
               <span>{paper.authors[0] || 'Unknown'} et al.</span>
               <span>•</span>
               <span>{paper.journal} ({paper.year})</span>
@@ -126,7 +126,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
               </span>
             </div>
 
-            <p className="text-[#FAF9F8] leading-relaxed">
+            <p className="text-[#E8D8CE] leading-relaxed">
               <strong>Why This Rating Was Assigned:</strong> {paper.ratingRationale || badge.whySnippet}
             </p>
           </div>
@@ -134,28 +134,28 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
           {/* Strict Rationale: Why the AI Gave This Badge */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#FAF9F8] flex items-center space-x-1.5">
+              <span className="text-xs font-bold text-[#E8D8CE] flex items-center space-x-1.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                 <span>Explicit Badge Rationale</span>
               </span>
-              <span className="text-[11px] font-mono text-[#E5E4E2]/80">
+              <span className="text-[11px] font-mono text-[#E8D8CE]/80">
                 Confidence: <strong className="text-emerald-300">{Math.round(badge.confidence * 100)}%</strong>
               </span>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#271911] border border-[#E6E0F0]/20 text-xs text-[#FAF9F8] leading-relaxed">
+            <div className="p-4 rounded-xl bg-[#271911] border border-[#E6E0F0]/20 text-xs text-[#E8D8CE] leading-relaxed">
               {badge.whySnippet}
             </div>
           </div>
 
           {/* Text Evidence Snippet */}
           <div className="space-y-2">
-            <span className="text-xs font-bold text-[#FAF9F8] flex items-center space-x-1.5">
+            <span className="text-xs font-bold text-[#E8D8CE] flex items-center space-x-1.5">
               <Quote className="w-3.5 h-3.5 text-[#E6E0F0]" />
               <span>Verbatim Abstract Text Evidence Quote</span>
             </span>
 
-            <blockquote className="p-4 rounded-xl bg-[#20140D] border-l-4 border-amber-400 border-y border-r border-[#E6E0F0]/15 text-xs text-[#FAF9F8] italic leading-relaxed">
+            <blockquote className="p-4 rounded-xl bg-[#20140D] border-l-4 border-amber-400 border-y border-r border-[#E6E0F0]/15 text-xs text-[#E8D8CE] italic leading-relaxed">
               "{badge.textEvidence}"
             </blockquote>
           </div>
@@ -163,27 +163,27 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
           {/* Deep Quantitative Metrics Extracted from this paper */}
           {paper.deepAnalysis && (
             <div className="space-y-2 pt-2 border-t border-[#E6E0F0]/20">
-              <span className="text-xs font-bold text-[#FAF9F8]">
+              <span className="text-xs font-bold text-[#E8D8CE]">
                 Extracted Study Parameters
               </span>
 
               <div className="grid grid-cols-2 gap-2.5 text-xs">
                 <div className="p-2.5 rounded-lg bg-[#271911] border border-[#E6E0F0]/20">
-                  <span className="text-[10px] text-[#E5E4E2]/70 block">Extracted Study Design</span>
-                  <span className="font-bold text-[#FAF9F8]">{paper.deepAnalysis.studyDesign}</span>
+                  <span className="text-[10px] text-[#E8D8CE]/70 block">Extracted Study Design</span>
+                  <span className="font-bold text-[#E8D8CE]">{paper.deepAnalysis.studyDesign}</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-[#271911] border border-[#E6E0F0]/20">
-                  <span className="text-[10px] text-[#E5E4E2]/70 block">Verified Sample Power</span>
-                  <span className="font-bold text-[#FAF9F8]">
+                  <span className="text-[10px] text-[#E8D8CE]/70 block">Verified Sample Power</span>
+                  <span className="font-bold text-[#E8D8CE]">
                     {paper.deepAnalysis.sampleSize ? `N = ${paper.deepAnalysis.sampleSize.toLocaleString()}` : 'Not Specified'}
                   </span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-[#271911] border border-[#E6E0F0]/20">
-                  <span className="text-[10px] text-[#E5E4E2]/70 block">Primary Effect Metric</span>
+                  <span className="text-[10px] text-[#E8D8CE]/70 block">Primary Effect Metric</span>
                   <span className="font-bold text-[#E6E0F0]">{paper.deepAnalysis.primaryEffectMetric || 'N/A'}</span>
                 </div>
                 <div className="p-2.5 rounded-lg bg-[#271911] border border-[#E6E0F0]/20">
-                  <span className="text-[10px] text-[#E5E4E2]/70 block">Risk of Bias Level</span>
+                  <span className="text-[10px] text-[#E8D8CE]/70 block">Risk of Bias Level</span>
                   <span className={`font-bold ${
                     paper.deepAnalysis.biasAssessment.riskLevel === 'Low' ? 'text-emerald-300' : 'text-amber-300'
                   }`}>
@@ -201,7 +201,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
               {paper.aiScreeningRecommendation && (
                 <div className="p-3.5 rounded-xl bg-[#271911] border border-[#E6E0F0]/20 text-xs space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono uppercase text-[#E5E4E2]/70">
+                    <span className="text-[10px] font-mono uppercase text-[#E8D8CE]/70">
                       Autonomous Screening Recommendation:
                     </span>
                     <span className={`px-2.5 py-0.5 rounded-lg font-bold border ${
@@ -214,7 +214,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
                       {paper.aiScreeningRecommendation}
                     </span>
                   </div>
-                  <p className="text-[#FAF9F8] text-[11px] leading-relaxed">
+                  <p className="text-[#E8D8CE] text-[11px] leading-relaxed">
                     <strong>Criteria Analysis:</strong> {paper.aiScreeningReason || 'Evaluated against systematic review population, intervention, and design criteria.'}
                   </p>
                 </div>
@@ -222,7 +222,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
 
               {/* Analyzed Subtopics from Full PDF */}
               <div className="space-y-2 pt-2 border-t border-[#E6E0F0]/15">
-                <span className="text-xs font-bold text-[#FAF9F8] block">
+                <span className="text-xs font-bold text-[#E8D8CE] block">
                   Analyzed Subtopics in this Paper ({paper.extractedSubtopics?.length || paper.extractedTopics?.length || 0}):
                 </span>
                 <div className="flex flex-wrap gap-1.5">
@@ -252,7 +252,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
                     paper.extractedTopics && paper.extractedTopics.map((top, idx) => (
                       <span 
                         key={idx} 
-                        className="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-[#4A3324] border border-[#E6E0F0]/25 text-[#FAF9F8]"
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-mono bg-[#4A3324] border border-[#E6E0F0]/25 text-[#E8D8CE]"
                       >
                         #{top}
                       </span>
@@ -281,7 +281,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
         <div className="p-4 bg-[#271911] border-t border-[#E6E0F0]/20 flex flex-wrap items-center justify-between gap-3">
           {onDecide && paper ? (
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-[#FAF9F8] hidden sm:inline">Screening Action:</span>
+              <span className="text-xs font-bold text-[#E8D8CE] hidden sm:inline">Screening Action:</span>
               <button
                 onClick={() => {
                   onDecide(paper.id, 'include', 'Matches review criteria & target subtopics');
@@ -314,7 +314,7 @@ export const AIBadgeModal: React.FC<AIBadgeModalProps> = ({
 
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-bold bg-[#E5E4E2] text-[#2C1E16] hover:bg-white transition-all cursor-pointer shadow-md"
+            className="px-4 py-2 rounded-xl text-xs font-bold bg-[#E8D8CE] text-[#2C1E16] hover:bg-white transition-all cursor-pointer shadow-md"
           >
             Close Inspector
           </button>

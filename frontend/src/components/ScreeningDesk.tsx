@@ -115,7 +115,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
             className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
               statusFilter === 'all'
                 ? 'bg-[#6F4E37] text-white shadow-xs'
-                : 'bg-white/80 text-[#5F5C56] hover:bg-white border border-[#E5E4E2]'
+                : 'bg-white/80 text-[#5F5C56] hover:bg-white border border-[#E8D8CE]'
             }`}
           >
             All Screenable ({totalRepresentative})
@@ -162,7 +162,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
             className={`px-3 py-1.5 rounded-xl text-xs font-medium flex items-center space-x-1.5 transition-all ${
               statusFilter === 'unscreened'
                 ? 'bg-[#5F5C56] text-white shadow-xs'
-                : 'bg-white/80 text-[#7E7A72] hover:bg-white border border-[#E5E4E2]'
+                : 'bg-white/80 text-[#7E7A72] hover:bg-white border border-[#E8D8CE]'
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-[#B8B5AE]" />
@@ -196,7 +196,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="p-1.5 rounded-lg bg-white border border-[#E5E4E2] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
+            className="p-1.5 rounded-lg bg-white border border-[#E8D8CE] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -206,7 +206,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="p-1.5 rounded-lg bg-white border border-[#E5E4E2] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
+            className="p-1.5 rounded-lg bg-white border border-[#E8D8CE] disabled:opacity-40 text-[#462E1E] hover:bg-[#FAF9FD]"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
@@ -247,7 +247,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <button
             onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
             disabled={currentPage === 1}
-            className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E4E2] text-xs text-[#462E1E] disabled:opacity-40"
+            className="px-3 py-1.5 rounded-xl bg-white border border-[#E8D8CE] text-xs text-[#462E1E] disabled:opacity-40"
           >
             Previous
           </button>
@@ -257,7 +257,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <button
             onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
             disabled={currentPage === totalPages}
-            className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E4E2] text-xs text-[#462E1E] disabled:opacity-40"
+            className="px-3 py-1.5 rounded-xl bg-white border border-[#E8D8CE] text-xs text-[#462E1E] disabled:opacity-40"
           >
             Next
           </button>

@@ -418,7 +418,7 @@ export const App: React.FC = () => {
 
   // 3. Render Active Project Workspace in Warm Coffee Theme
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-radial from-[#4A3324] via-[#352318] to-[#241710] text-[#FAF9F8]">
+    <div className="min-h-screen flex flex-col font-sans bg-[#60433D] text-[#E8D8CE]">
       
       {/* Navigation Bar */}
       <Navbar
@@ -457,7 +457,7 @@ export const App: React.FC = () => {
                       </span>
                     )}
                   </div>
-                  <h2 className="text-xl font-bold text-[#FAF9F8] mt-1.5">
+                  <h2 className="text-xl font-bold text-[#E8D8CE] mt-1.5">
                     {currentProject.name}
                   </h2>
                   <p className="text-xs text-[#A59E98] mt-1 max-w-2xl leading-relaxed">
@@ -479,7 +479,7 @@ export const App: React.FC = () => {
 
                   <button
                     onClick={() => setActiveTab('search')}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E5E4E2] text-[#160E08] hover:bg-white shadow-md transition-all cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E8D8CE] text-[#160E08] hover:bg-white shadow-md transition-all cursor-pointer"
                   >
                     Upload & Search Papers &rarr;
                   </button>
@@ -488,7 +488,7 @@ export const App: React.FC = () => {
 
               {/* Review Members & Collaboration Team */}
               <div className="space-y-3 pt-2">
-                <span className="text-xs font-bold text-[#FAF9F8] flex items-center space-x-2">
+                <span className="text-xs font-bold text-[#E8D8CE] flex items-center space-x-2">
                   <Users className="w-4 h-4 text-[#E6E0F0]" />
                   <span>Review Team Members ({currentProject.members?.length || 1})</span>
                 </span>
@@ -502,11 +502,11 @@ export const App: React.FC = () => {
                       className="p-3 rounded-xl bg-[#160E08] border border-[#E6E0F0]/15 flex items-center justify-between text-xs"
                     >
                       <div className="flex items-center space-x-2.5">
-                        <div className="w-8 h-8 rounded-full bg-[#3B2518] text-[#FAF9F8] font-bold text-xs flex items-center justify-center border border-[#E6E0F0]/20">
+                        <div className="w-8 h-8 rounded-full bg-[#3B2518] text-[#E8D8CE] font-bold text-xs flex items-center justify-center border border-[#E6E0F0]/20">
                           {m.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-semibold text-[#FAF9F8]">{m.name}</div>
+                          <div className="font-semibold text-[#E8D8CE]">{m.name}</div>
                           <div className="text-[11px] text-[#8E8680] truncate max-w-[130px]">{m.email}</div>
                         </div>
                       </div>
@@ -522,7 +522,7 @@ export const App: React.FC = () => {
               {/* Exclusion Criteria Protocol */}
               {reviewQuestion && (
                 <div className="space-y-3 pt-4 border-t border-[#E6E0F0]/15">
-                  <h3 className="text-xs font-bold text-[#FAF9F8]">
+                  <h3 className="text-xs font-bold text-[#E8D8CE]">
                     Pre-Specified Screening Criteria
                   </h3>
 
@@ -535,7 +535,7 @@ export const App: React.FC = () => {
                             {crit.detectionType} detection
                           </span>
                         </div>
-                        <div className="font-semibold text-[#FAF9F8]">{crit.text}</div>
+                        <div className="font-semibold text-[#E8D8CE]">{crit.text}</div>
                         <p className="text-[11px] text-[#A59E98]">
                           <strong>Rationale:</strong> {crit.rationale}
                         </p>
@@ -639,17 +639,17 @@ export const App: React.FC = () => {
       />
 
       {/* Footer */}
-      <footer className="w-full bg-[#271911] border-t border-[#E6E0F0]/20 py-4 mt-8 text-xs text-[#E5E4E2]/70">
+      <footer className="w-full bg-[#271911] border-t border-[#E6E0F0]/20 py-4 mt-8 text-xs text-[#E8D8CE]/70">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center space-x-2">
-            <span className="font-semibold text-[#FAF9F8]">Corpus AI</span>
+            <span className="font-semibold text-[#E8D8CE]">Corpus AI</span>
             <span>•</span>
             <span>Review: {currentProject.name}</span>
           </div>
-          <div className="flex items-center space-x-4 text-[11px] text-[#E5E4E2]/80">
+          <div className="flex items-center space-x-4 text-[11px] text-[#E8D8CE]/80">
             <span>Google Cloud Firestore Integrated</span>
             <span>•</span>
-            <span>Theme: Medium Coffee #6F4E37 | Platinum #E5E4E2 | Lavender #E6E0F0</span>
+            <span>Theme: Medium Coffee #6F4E37 | Platinum #E8D8CE | Lavender #E6E0F0</span>
           </div>
         </div>
       </footer>

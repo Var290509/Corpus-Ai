@@ -64,11 +64,11 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
                 Agentic RAG Active
               </span>
             </div>
-            <h2 className="text-lg font-bold text-[#FAF9F8] mt-1.5 flex items-center space-x-2">
+            <h2 className="text-lg font-bold text-[#E8D8CE] mt-1.5 flex items-center space-x-2">
               <Cpu className="w-5 h-5 text-amber-300" />
               <span>Autonomous Deep Analysis & Agentic RAG Copilot</span>
             </h2>
-            <p className="text-xs text-[#E5E4E2]/80 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-xs text-[#E8D8CE]/80 mt-1 max-w-2xl leading-relaxed">
               Corpus AI performs <strong>deep automated evidence synthesis across the complete text</strong>. It extracts quantitative sample powers ($N$), hazard ratios, detects cross-study contradictions, and synthesizes evidence matrices across {papers.length.toLocaleString()} research papers.
             </p>
           </div>
@@ -76,19 +76,19 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
           {/* Quick Corpus Metrics Pill */}
           <div className="flex items-center space-x-3 bg-[#241710]/90 p-3 rounded-xl border border-[#E6E0F0]/20 text-xs">
             <div className="text-center px-2">
-              <span className="text-[10px] text-[#E5E4E2]/70 block font-mono">Total Corpus</span>
-              <span className="font-bold text-[#FAF9F8] text-sm">{papers.length.toLocaleString()}</span>
+              <span className="text-[10px] text-[#E8D8CE]/70 block font-mono">Total Corpus</span>
+              <span className="font-bold text-[#E8D8CE] text-sm">{papers.length.toLocaleString()}</span>
             </div>
             <div className="h-6 w-px bg-[#E6E0F0]/20" />
             <div className="text-center px-2">
-              <span className="text-[10px] text-[#E5E4E2]/70 block font-mono">RCTs Indexed</span>
+              <span className="text-[10px] text-[#E8D8CE]/70 block font-mono">RCTs Indexed</span>
               <span className="font-bold text-amber-300 text-sm">
                 {papers.filter(p => p.aiBadges?.some(b => b.type === 'rct_gold')).length}
               </span>
             </div>
             <div className="h-6 w-px bg-[#E6E0F0]/20" />
             <div className="text-center px-2">
-              <span className="text-[10px] text-[#E5E4E2]/70 block font-mono">Divergent Studies</span>
+              <span className="text-[10px] text-[#E8D8CE]/70 block font-mono">Divergent Studies</span>
               <span className="font-bold text-rose-400 text-sm">
                 {papers.filter(p => p.aiBadges?.some(b => b.type === 'contradiction')).length}
               </span>
@@ -98,7 +98,7 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
 
         {/* Suggested Query Chips */}
         <div className="mt-4 pt-3 border-t border-[#E6E0F0]/15">
-          <span className="text-[11px] font-mono text-[#E5E4E2]/70 uppercase block mb-2">
+          <span className="text-[11px] font-mono text-[#E8D8CE]/70 uppercase block mb-2">
             Click to run sample multi-hop synthesis queries:
           </span>
           <div className="flex flex-wrap gap-2">
@@ -107,7 +107,7 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
                 key={idx}
                 onClick={() => handleRunQuery(q)}
                 disabled={isSynthesizing}
-                className="text-left px-3 py-1.5 rounded-xl text-xs bg-[#241710] hover:bg-[#4A3324] text-[#FAF9F8] border border-[#E6E0F0]/20 hover:border-[#E6E0F0]/40 shadow-sm transition-all flex items-center space-x-1.5 group cursor-pointer"
+                className="text-left px-3 py-1.5 rounded-xl text-xs bg-[#241710] hover:bg-[#4A3324] text-[#E8D8CE] border border-[#E6E0F0]/20 hover:border-[#E6E0F0]/40 shadow-sm transition-all flex items-center space-x-1.5 group cursor-pointer"
               >
                 <Sparkles className="w-3 h-3 text-amber-300 group-hover:scale-110 transition-transform" />
                 <span className="truncate max-w-md">{q}</span>
@@ -131,12 +131,12 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
             }}
             placeholder="Ask the Autonomous Agent to synthesize anything across the entire research corpus... (Press Enter to query)"
             rows={2}
-            className="flex-1 rounded-xl px-3.5 py-2.5 text-xs text-[#FAF9F8] placeholder-[#E5E4E2]/50 bg-[#241710] border border-[#E6E0F0]/20 resize-none focus:outline-none focus:ring-1 focus:ring-[#E6E0F0]/50"
+            className="flex-1 rounded-xl px-3.5 py-2.5 text-xs text-[#E8D8CE] placeholder-[#E8D8CE]/50 bg-[#241710] border border-[#E6E0F0]/20 resize-none focus:outline-none focus:ring-1 focus:ring-[#E6E0F0]/50"
           />
           <button
             onClick={() => handleRunQuery(inputText)}
             disabled={!inputText.trim() || isSynthesizing}
-            className="h-12 px-5 rounded-xl bg-[#E5E4E2] hover:bg-white text-[#2C1E16] text-xs font-bold flex items-center space-x-2 shadow-md transition-all disabled:opacity-50 cursor-pointer"
+            className="h-12 px-5 rounded-xl bg-[#E8D8CE] hover:bg-white text-[#2C1E16] text-xs font-bold flex items-center space-x-2 shadow-md transition-all disabled:opacity-50 cursor-pointer"
           >
             <span>{isSynthesizing ? 'Synthesizing...' : 'Synthesize'}</span>
             <Send className="w-3.5 h-3.5 text-[#2C1E16]" />
@@ -154,15 +154,15 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
             {/* Header: Question & Consensus Breakdown */}
             <div className="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-[#E6E0F0]/15 gap-3">
               <div>
-                <span className="text-[10px] font-mono uppercase text-[#E5E4E2]/60">Research Query</span>
-                <h3 className="text-base font-semibold text-[#FAF9F8] mt-0.5">
+                <span className="text-[10px] font-mono uppercase text-[#E8D8CE]/60">Research Query</span>
+                <h3 className="text-base font-semibold text-[#E8D8CE] mt-0.5">
                   "{queryResult.question}"
                 </h3>
               </div>
 
               {/* Consensus Meter */}
               <div className="flex items-center space-x-3 bg-[#241710] px-3.5 py-1.5 rounded-xl border border-[#E6E0F0]/20 text-xs">
-                <span className="text-[10px] uppercase font-mono text-[#E5E4E2]/60">Consensus:</span>
+                <span className="text-[10px] uppercase font-mono text-[#E8D8CE]/60">Consensus:</span>
                 <span className="text-emerald-400 font-semibold flex items-center">
                   <CheckCircle className="w-3 h-3 mr-1" />
                   {queryResult.consensusSummary.supportingCount} Supporting
@@ -175,13 +175,13 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
             </div>
 
             {/* Synthesized Answer (Markdown styled) */}
-            <div className="text-xs text-[#E5E4E2] leading-relaxed whitespace-pre-line bg-[#241710] p-4 rounded-xl border border-[#E6E0F0]/15">
+            <div className="text-xs text-[#E8D8CE] leading-relaxed whitespace-pre-line bg-[#241710] p-4 rounded-xl border border-[#E6E0F0]/15">
               {queryResult.answer}
             </div>
 
             {/* Extracted Evidence Quotes with Citations */}
             <div>
-              <span className="text-xs font-semibold text-[#FAF9F8] flex items-center space-x-1.5 mb-2.5">
+              <span className="text-xs font-semibold text-[#E8D8CE] flex items-center space-x-1.5 mb-2.5">
                 <Quote className="w-3.5 h-3.5 text-amber-300" />
                 <span>Extracted Multi-Hop Evidence Passages ({queryResult.evidenceQuotes.length} Citations)</span>
               </span>
@@ -198,7 +198,7 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
                       </span>
                     </div>
 
-                    <p className="text-[11px] text-[#E5E4E2]/90 italic leading-snug">
+                    <p className="text-[11px] text-[#E8D8CE]/90 italic leading-snug">
                       "{ev.quote}"
                     </p>
                   </div>
@@ -212,8 +212,8 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
         {queriesHistory.length === 0 && (
           <div className="p-12 text-center glass-panel rounded-2xl border border-dashed border-[#E6E0F0]/25 bg-[#352318]/50">
             <Cpu className="w-10 h-10 text-amber-300/60 mx-auto mb-3" />
-            <h4 className="text-sm font-semibold text-[#FAF9F8]">Autonomous Synthesizer Ready</h4>
-            <p className="text-xs text-[#E5E4E2]/70 max-w-md mx-auto mt-1">
+            <h4 className="text-sm font-semibold text-[#E8D8CE]">Autonomous Synthesizer Ready</h4>
+            <p className="text-xs text-[#E8D8CE]/70 max-w-md mx-auto mt-1">
               Select one of the sample prompt chips above or type a research question to analyze the active {papers.length.toLocaleString()} research records.
             </p>
           </div>

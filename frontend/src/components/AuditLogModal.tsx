@@ -46,7 +46,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({
           {logs.map((log) => (
             <div 
               key={log.id} 
-              className="p-3 rounded-xl bg-white border border-[#E5E4E2] space-y-1 shadow-2xs"
+              className="p-3 rounded-xl bg-white border border-[#E8D8CE] space-y-1 shadow-2xs"
             >
               <div className="flex items-center justify-between text-[11px]">
                 <div className="flex items-center space-x-2">
