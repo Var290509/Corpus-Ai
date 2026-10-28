@@ -13,7 +13,7 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Step 0: Review Questions & Protocol
+    # Protocol Formulation: Review Questions
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS review_questions (
         id TEXT PRIMARY KEY,
@@ -27,7 +27,7 @@ def init_db():
     );
     """)
 
-    # Step 1 & Level 2: Query Versions
+    # Query Management & Level 2 Versions
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS query_versions (
         id TEXT PRIMARY KEY,
@@ -42,7 +42,7 @@ def init_db():
     );
     """)
 
-    # Step 3: Papers (Immutability Layer - Nothing Deleted)
+    # Ingested Papers (Immutability Layer - Nothing Deleted)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS papers (
         id TEXT PRIMARY KEY,
@@ -71,7 +71,7 @@ def init_db():
     );
     """)
 
-    # Step 4: Duplicate Groups
+    # Entity Clustering: Duplicate Groups
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS duplicate_groups (
         group_id TEXT PRIMARY KEY,
@@ -82,7 +82,7 @@ def init_db():
     );
     """)
 
-    # Step 5: Reviewer Decisions (Keep Reviewer Decisions Across Loop)
+    # Screening: Reviewer Decisions (Keep Reviewer Decisions Across Loop)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS reviewer_decisions (
         paper_id TEXT PRIMARY KEY,

@@ -109,9 +109,9 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
         <div>
           <div className="flex items-center space-x-2">
             <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#6F4E37] text-white">
-              Step 7
+              PRISMA 2020
             </span>
-            <span className="text-xs font-mono text-[#7E7A72]">PRISMA 2020 Compliant</span>
+            <span className="text-xs font-mono text-[#7E7A72]">Synthesis Reporting</span>
           </div>
           <h2 className="text-base font-bold text-[#462E1E] mt-1 flex items-center space-x-2">
             <Download className="w-4 h-4 text-[#6F4E37]" />
@@ -175,7 +175,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
 
           {/* Phase 2: Deduplication */}
           <div className="w-full bg-white p-4 rounded-xl border border-[#E5E4E2] text-center shadow-2xs">
-            <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Deduplication (Step 4)</span>
+            <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Deduplication</span>
             <div className="text-sm font-bold text-[#462E1E] mt-0.5">
               Duplicate records marked & hidden (n = {duplicateRecordsHidden.toLocaleString()})
             </div>
@@ -189,7 +189,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
           {/* Phase 3: Screening */}
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="bg-white p-4 rounded-xl border border-[#E5E4E2] text-center shadow-2xs">
-              <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Screening (Step 5)</span>
+              <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Screening</span>
               <div className="text-sm font-bold text-[#462E1E] mt-0.5">
                 Records screened (n = {screenedCount.toLocaleString()})
               </div>

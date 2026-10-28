@@ -25,12 +25,12 @@ export const AgenticRAGDesk: React.FC<AgenticRAGDeskProps> = ({ papers }) => {
   const [isSynthesizing, setIsSynthesizing] = useState(false);
   const [queriesHistory, setQueriesHistory] = useState<RAGSynthesisQuery[]>([]);
 
-  // Default suggested research prompts for judges & reviewers
+  // Universal research synthesis queries
   const suggestedQueries = [
-    "What are the safety and tolerability signals regarding gastrointestinal adverse events?",
-    "Which trials showed divergent or null cognitive effects and what were their methodological limitations?",
-    "Synthesize the biological impact on CSF p-tau181 and hippocampal MRI volumetry.",
-    "Compare effect sizes between oral semaglutide and subcutaneous liraglutide."
+    "Synthesize the primary clinical endpoints and statistical significance across all studies.",
+    "Which studies report divergent, inconclusive, or conflicting findings?",
+    "Summarize safety signals, adverse event profiles, and treatment discontinuation rates.",
+    "Compare sample size power and risk-of-bias across all randomized clinical trials."
   ];
 
   const handleRunQuery = async (queryText: string) => {

@@ -37,11 +37,18 @@ export const App: React.FC = () => {
     }
   });
 
-  // Projects State (Defaults to empty; NO pre-seeded sample example)
+  // Projects State (Clean: NO hardcoded sample papers)
   const [projects, setProjects] = useState<Project[]>(() => {
     try {
       const saved = localStorage.getItem('corpus_ai_projects');
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.map((p: Project) => ({
+          ...p,
+          papers: (p.papers || []).filter(item => !item.id.startsWith('paper-'))
+        }));
+      }
+      return [];
     } catch {
       return [];
     }
@@ -167,15 +174,15 @@ export const App: React.FC = () => {
 
     const combined = Array.from(existingMap.values());
 
-    // Step 4: Run Deduplication
+    // Run Entity Deduplication
     const { updatedPapers } = runDeduplication(combined, decisions);
 
-    // Step 5: Run Batch Screening against project criteria
+    // Run Batch Screening against project criteria
     const updatedDecisions = batchScreenPapers(updatedPapers, decisions, reviewQuestion.exclusionCriteria);
 
     const logEntry = Level2LoopManager.createAuditLog(
       activeVersion?.versionNumber || 1,
-      '2_Fetch',
+      'Fetch',
       `Ingested ${newPapers.length} Research Papers`,
       'human',
       `Uploaded and analyzed ${newPapers.length} research records. Total project papers: ${updatedPapers.length}.`
@@ -194,7 +201,7 @@ export const App: React.FC = () => {
     });
   };
 
-  // Step 5 Human Override
+  // Reviewer Decision Override
   const handleDecide = (paperId: string, status: 'include' | 'exclude' | 'maybe', reason?: string, note?: string) => {
     const targetPaper = papers.find(p => p.id === paperId);
     const prevStatus = decisions[paperId]?.status || 'unscreened';
@@ -216,7 +223,7 @@ export const App: React.FC = () => {
 
     const newLog = Level2LoopManager.createAuditLog(
       activeVersion?.versionNumber || 1,
-      '5_Screen',
+      'Screening',
       `Reviewer Override on Paper ${paperId}`,
       'human',
       `Changed status from "${prevStatus}" to "${status}"${reason ? ` (${reason})` : ''}`
@@ -414,7 +421,7 @@ export const App: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E6E0F0] pb-4">
                 <div>
                   <span className="text-[10px] font-mono font-semibold px-2.5 py-0.5 rounded bg-[#6F4E37] text-white">
-                    Step 0 Protocol
+                    Protocol Formulation
                   </span>
                   <h2 className="text-lg font-bold text-[#462E1E] mt-1">
                     {reviewQuestion.title || 'Systematic Review Protocol'}
@@ -455,7 +462,7 @@ export const App: React.FC = () => {
               {/* Exclusion Criteria Table */}
               <div className="space-y-3 pt-3 border-t border-[#E6E0F0]">
                 <h3 className="text-sm font-semibold text-[#462E1E]">
-                  Pre-Specified Exclusion Criteria (Applied in Step 5 Screening)
+                  Pre-Specified Exclusion Criteria (Screening Protocol)
                 </h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">

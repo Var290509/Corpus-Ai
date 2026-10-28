@@ -95,7 +95,7 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
           <div>
             <h2 className="text-base font-bold text-[#462E1E] flex items-center space-x-2">
               <CheckCircle2 className="w-5 h-5 text-[#6F4E37]" />
-              <span>Step 4, 5 & 6: Deduplication, Screening & PICO Tagging</span>
+              <span>Deduplication, Screening & PICO Tagging</span>
             </h2>
             <p className="text-xs text-[#7E7A72] mt-0.5">
               Review records, inspect explainable AI badges, override automated decisions, and verify PICO spans.
@@ -250,8 +250,15 @@ export const ScreeningDesk: React.FC<ScreeningDeskProps> = ({
 
         {paginatedPapers.length === 0 && (
           <div className="glass-panel rounded-2xl p-12 text-center border border-[#E6E0F0]">
-            <p className="text-sm font-semibold text-[#462E1E]">No research papers match the current filters</p>
-            <p className="text-xs text-[#7E7A72] mt-1">Try resetting the status or badge facet filters above.</p>
+            <Layers className="w-10 h-10 text-[#6F4E37]/40 mx-auto mb-3" />
+            <p className="text-sm font-semibold text-[#462E1E]">
+              {papers.length === 0 ? 'No Research Papers Ingested Yet' : 'No research papers match the current filters'}
+            </p>
+            <p className="text-xs text-[#7E7A72] mt-1 max-w-md mx-auto">
+              {papers.length === 0
+                ? 'Navigate to the "Search & Upload" tab to upload your research files (RIS, CSV, BibTeX) or run a live literature search.'
+                : 'Try resetting the status or badge facet filters above.'}
+            </p>
           </div>
         )}
       </div>

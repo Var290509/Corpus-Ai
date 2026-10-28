@@ -50,13 +50,13 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
       groupId: 'grp-conflict-demo',
       paperA: {
         id: 'p-conf-1',
-        title: "Oral Semaglutide in Mild Cognitive Impairment: A Multi-Center Phase 2 Cohort",
+        title: "Randomized Trial of Active Intervention vs Comparator in Target Population",
         decision: 'include',
-        reason: 'Randomized Phase 2 trial meeting primary PICO criteria'
+        reason: 'Randomized Phase 3 trial meeting primary protocol criteria'
       },
       paperB: {
         id: 'p-conf-2',
-        title: "Oral Semaglutide in Mild Cognitive Impairment: Phase 2 Pilot (Conference Abstract)",
+        title: "Trial of Active Intervention vs Comparator: Preliminary Conference Abstract",
         decision: 'exclude',
         reason: 'EXC-CASE: Preliminary unreviewed meeting abstract'
       }

@@ -89,16 +89,16 @@ export function evaluatePaperForScreening(
     });
   }
 
-  // 5. Calculate Semantic Relevance Score
+  // Calculate Semantic Relevance Score
   let relevanceScore = 50;
   const isHumanClinical = !animalMatch && !simMatch && !caseMatch;
-  const hasTargetDrug = /\b(semaglutide|liraglutide|tirzepatide|dulaglutide|glp-1|incretin)\b/i.test(textToScan);
-  const hasTargetEndpoint = /\b(cognitive|cognition|alzheimer|dementia|adas-cog|cdr-sb|mci|memory)\b/i.test(textToScan);
-  const isRCT = /\b(randomized|randomised|double-blind|placebo-controlled|clinical trial)\b/i.test(textToScan);
+  const hasIntervention = /\b(trial|treated|treatment|intervention|therapy|administered|dose|group|placebo)\b/i.test(textToScan);
+  const hasOutcome = /\b(endpoint|outcome|efficacy|safety|significant|progression|score|survival|rate)\b/i.test(textToScan);
+  const isRCT = /\b(randomized|randomised|double-blind|placebo-controlled|clinical trial|control group)\b/i.test(textToScan);
 
   if (isHumanClinical) relevanceScore += 20;
-  if (hasTargetDrug) relevanceScore += 15;
-  if (hasTargetEndpoint) relevanceScore += 15;
+  if (hasIntervention) relevanceScore += 15;
+  if (hasOutcome) relevanceScore += 15;
   if (isRCT) relevanceScore += 15;
   if (detectedCriteria.length > 0) relevanceScore = Math.max(5, relevanceScore - 40);
 

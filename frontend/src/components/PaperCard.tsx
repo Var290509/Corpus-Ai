@@ -259,7 +259,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         </div>
       )}
 
-      {/* Screening Action Bar (Step 5 Human-in-the-Loop Controls) */}
+      {/* Screening Action Bar (Human-in-the-Loop Controls) */}
       <div className="mt-4 pt-3 border-t border-[#E6E0F0] flex flex-wrap items-center justify-between gap-2">
         <div className="text-[11px] text-[#7E7A72] flex items-center space-x-1.5">
           {decision?.decidedBy === 'human' ? (

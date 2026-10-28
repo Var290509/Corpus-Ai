@@ -187,7 +187,7 @@ export interface AuditRunLog {
   id: string;
   timestamp: string;
   versionNumber: number;
-  step: '0_Question' | '1_Query' | '2_Fetch' | '3_Database' | '4_Deduplicate' | '5_Screen' | '6_PICO' | '7_Review' | 'Level2_Loop';
+  step: 'Protocol' | 'Query' | 'Fetch' | 'Database' | 'Deduplicate' | 'Screening' | 'PICO' | 'Review' | 'Level2_Loop';
   action: string;
   actor: 'human' | 'system';
   details: string;

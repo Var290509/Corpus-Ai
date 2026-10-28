@@ -41,7 +41,7 @@ class PubMedClient:
                 return 1420
 
     async def fetch_abstracts(self, query: str, max_records: int = 25) -> List[Dict[str, Any]]:
-        # Step 1: ESearch
+        # Search via ESearch
         search_url = f"{NCBI_BASE_URL}/esearch.fcgi"
         params = {
             "db": "pubmed",
@@ -62,7 +62,7 @@ class PubMedClient:
                 if not id_list:
                     return []
 
-                # Step 2: ESummary or EFetch
+                # Fetch details via ESummary
                 summary_url = f"{NCBI_BASE_URL}/esummary.fcgi"
                 sum_params = {
                     "db": "pubmed",

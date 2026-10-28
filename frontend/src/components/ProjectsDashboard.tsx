@@ -92,7 +92,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
         {
           id: `log-${Date.now()}`,
           versionNumber: 1,
-          step: '0_Question',
+          step: 'Protocol',
           action: 'Created New Project Workspace',
           actor: 'human',
           details: `Initialized project "${projectName}" with user-defined PICO parameters`,
@@ -274,7 +274,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 <div>
                   <h3 className="text-sm font-bold text-[#462E1E]">Create New Systematic Review Project</h3>
                   <p className="text-[11px] text-[#7E7A72]">
-                    Formulate your Step 0 PICO question and set up your research workspace.
+                    Formulate your PICO research question and set up your research workspace.
                   </p>
                 </div>
               </div>
@@ -307,7 +307,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
                 <div>
                   <label className="block text-xs font-semibold text-[#462E1E] mb-1">
-                    Review Question (Step 0)
+                    Review Question
                   </label>
                   <textarea
                     value={question}

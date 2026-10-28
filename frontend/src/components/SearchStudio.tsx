@@ -84,13 +84,13 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
   return (
     <div className="space-y-6">
       
-      {/* Top Banner: Step 0 Review Question Summary */}
+      {/* Top Banner: Review Question Summary */}
       <div className="glass-panel rounded-2xl p-5 border border-[#E6E0F0]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center space-x-2">
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-[#6F4E37] text-white">
-                Step 0
+              <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-semibold bg-[#6F4E37] text-white">
+                Protocol
               </span>
               <h2 className="text-sm font-semibold text-[#462E1E]">Active Systematic Review Protocol</h2>
             </div>
@@ -155,7 +155,7 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
             <div>
               <h3 className="text-base font-semibold text-[#462E1E] flex items-center space-x-2">
                 <Search className="w-4 h-4 text-[#6F4E37]" />
-                <span>Step 1: Multi-Database Search Query</span>
+                <span>Multi-Database Search Query</span>
               </h3>
               <p className="text-xs text-[#7E7A72] mt-0.5">
                 Construct Boolean queries, inspect live hits across PubMed and Europe PMC, and create query versions.
@@ -177,7 +177,7 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
               onChange={(e) => setKeyphraseInput(e.target.value)}
               rows={3}
               className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs font-mono text-[#2D2521] leading-relaxed resize-none focus:ring-1 focus:ring-[#6F4E37]"
-              placeholder='e.g., ("mild cognitive impairment" OR "Alzheimer") AND (semaglutide OR liraglutide) AND placebo'
+              placeholder='e.g., ("targeted therapy" OR "intervention") AND ("condition" OR "disease") AND placebo'
             />
           </div>
 
@@ -236,7 +236,7 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
             <div>
               <div className="text-xs font-medium text-[#462E1E] flex items-center space-x-1.5">
                 <Database className="w-3.5 h-3.5 text-[#6F4E37]" />
-                <span>Live Pre-Search Hit Count (Step 1 / 2 Check)</span>
+                <span>Live Pre-Search Hit Count</span>
               </div>
               <div className="flex items-center space-x-4 mt-1 text-xs text-[#5F5C56]">
                 <span>PubMed hits: <strong className="text-[#6F4E37]">{estimatedHits ? estimatedHits.pubmed.toLocaleString() : '...'}</strong></span>
@@ -253,25 +253,15 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
             </button>
           </div>
 
-          {/* Action Buttons: Live Ingest vs 1000+ Scalability Benchmark */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+          {/* Action Button: Live Ingest */}
+          <div className="pt-2 flex items-center">
             <button
               onClick={() => handleExecutePull(false)}
               disabled={isLoading}
-              className="w-full sm:w-auto flex-1 flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-md shadow-[#6F4E37]/20 transition-all"
+              className="w-full flex items-center justify-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-md shadow-[#6F4E37]/20 transition-all"
             >
               <DownloadCloud className="w-4 h-4 text-[#E6E0F0]" />
-              <span>{isLoading ? 'Executing Fetch & Deduplication...' : 'Pull Live Search & Ingest'}</span>
-            </button>
-
-            <button
-              onClick={() => handleExecutePull(true)}
-              disabled={isLoading}
-              className="w-full sm:w-auto flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-[#E6E0F0] hover:bg-[#d4c8e4] text-[#462E1E] border border-[#d4c8e4] transition-all"
-              title="Loads the 1,000+ paper multi-center clinical corpus to demonstrate high-performance processing"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-              <span>Load 1,000+ Papers Benchmark</span>
+              <span>{isLoading ? 'Executing Fetch & Deduplication...' : 'Pull Live Search Results & Ingest'}</span>
             </button>
           </div>
 
@@ -281,7 +271,7 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
           </div>
         </div>
 
-        {/* Right Column: Query Version History (Step 3: Database & Immutability) */}
+        {/* Right Column: Query Version History (Database Provenance & Immutability) */}
         <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0] flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
@@ -335,7 +325,7 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
           <div className="mt-4 pt-3 border-t border-[#E6E0F0] text-[11px] text-[#7E7A72] flex items-start space-x-2">
             <AlertCircle className="w-3.5 h-3.5 text-[#6F4E37] shrink-0 mt-0.5" />
             <span>
-              <strong>Step 3 Database Rule:</strong> Nothing is ever deleted. Old versions remain preserved and can be inspected anytime.
+              <strong>Database Immutability Rule:</strong> Nothing is ever deleted. Old versions remain preserved and can be inspected anytime.
             </span>
           </div>
 
