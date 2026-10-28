@@ -1,3 +1,22 @@
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  reviewQuestion: ReviewQuestion;
+  papers: ResearchPaper[];
+  queryVersions: QueryVersion[];
+  decisions: Record<string, ReviewerDecision>;
+  auditLogs: AuditRunLog[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface ReviewQuestion {
   id: string;
   title: string;

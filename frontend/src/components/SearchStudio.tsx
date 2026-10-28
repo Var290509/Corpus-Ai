@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Search, 
+  Upload,
   Plus, 
   DownloadCloud, 
   Database, 
@@ -13,8 +14,9 @@ import {
   ExternalLink,
   RotateCcw
 } from 'lucide-react';
-import { QueryVersion, ReviewQuestion } from '../types';
+import { QueryVersion, ReviewQuestion, ResearchPaper } from '../types';
 import { searchPubMedHitCount, searchEuropePMCHitCount } from '../services/apiClient';
+import { FileUploadDesk } from './FileUploadDesk';
 
 interface SearchStudioProps {
   reviewQuestion: ReviewQuestion;
@@ -28,6 +30,7 @@ interface SearchStudioProps {
     useFullCorpusBenchmark?: boolean
   ) => Promise<void>;
   onSelectVersion: (versionId: string) => void;
+  onAddPapers: (papers: ResearchPaper[]) => void;
   isLoading: boolean;
 }
 
@@ -37,9 +40,15 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
   activeVersion,
   onRunSearchAndFetch,
   onSelectVersion,
+  onAddPapers,
   isLoading
 }) => {
-  const [keyphraseInput, setKeyphraseInput] = useState('("early Alzheimer\'s" OR "mild cognitive impairment") AND (semaglutide OR liraglutide OR "GLP-1")');
+  const [activeMode, setActiveMode] = useState<'upload' | 'search'>('upload');
+  const [keyphraseInput, setKeyphraseInput] = useState(
+    reviewQuestion.intervention 
+      ? `"${reviewQuestion.population}" AND "${reviewQuestion.intervention}"`
+      : ''
+  );
   const [dateStart, setDateStart] = useState('2018');
   const [dateEnd, setDateEnd] = useState('2026');
   const [usePubMed, setUsePubMed] = useState(true);
@@ -107,8 +116,38 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
         </div>
       </div>
 
-      {/* Main Search Builder Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Ingestion Mode Selector (Upload Files vs Live Search) */}
+      <div className="flex items-center space-x-2 border-b border-[#E6E0F0] pb-2">
+        <button
+          onClick={() => setActiveMode('upload')}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+            activeMode === 'upload'
+              ? 'bg-[#6F4E37] text-white shadow-sm'
+              : 'bg-white/70 text-[#5F5C56] hover:bg-white border border-[#E5E4E2]'
+          }`}
+        >
+          <Upload className="w-3.5 h-3.5" />
+          <span>Upload Research Papers (RIS / CSV / BibTeX)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveMode('search')}
+          className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+            activeMode === 'search'
+              ? 'bg-[#6F4E37] text-white shadow-sm'
+              : 'bg-white/70 text-[#5F5C56] hover:bg-white border border-[#E5E4E2]'
+          }`}
+        >
+          <Search className="w-3.5 h-3.5" />
+          <span>Live API Search (PubMed & Europe PMC)</span>
+        </button>
+      </div>
+
+      {activeMode === 'upload' ? (
+        <FileUploadDesk onAddPapers={onAddPapers} activeVersionId={activeVersion.id} />
+      ) : (
+        /* Main Search Builder Grid */
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Left Column: Query Builder & Fetcher */}
         <div className="lg:col-span-2 glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0] space-y-5">
@@ -301,9 +340,9 @@ export const SearchStudio: React.FC<SearchStudioProps> = ({
           </div>
 
         </div>
-
       </div>
+    )}
 
-    </div>
-  );
+  </div>
+);
 };

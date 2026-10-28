@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { LandingPage } from './components/LandingPage';
+import { ProjectsDashboard } from './components/ProjectsDashboard';
 import { Navbar } from './components/Navbar';
 import { SearchStudio } from './components/SearchStudio';
 import { ScreeningDesk } from './components/ScreeningDesk';
@@ -9,6 +11,8 @@ import { AIBadgeModal } from './components/AIBadgeModal';
 import { AuditLogModal } from './components/AuditLogModal';
 
 import { 
+  Project, 
+  User, 
   ReviewQuestion, 
   QueryVersion, 
   ResearchPaper, 
@@ -17,175 +21,247 @@ import {
   AuditRunLog 
 } from './types';
 
-import { generateLargeCorpus } from './services/dataCorpus';
 import { runDeduplication } from './services/deduplication';
 import { batchScreenPapers } from './services/screeningEngine';
 import { Level2LoopManager } from './services/level2LoopManager';
 import { fetchLiveEuropePMC } from './services/apiClient';
 
-// Step 0 Systematic Review Question (NO diabetes/metformin example from PDF!)
-const initialReviewQuestion: ReviewQuestion = {
-  id: 'rev-q1',
-  title: "GLP-1 Receptor Agonists in Mild Cognitive Impairment & Early Alzheimer's Disease",
-  question: "In older adults with mild cognitive impairment or early-stage Alzheimer's disease, does GLP-1 receptor agonist therapy, compared with placebo or standard care, reduce cognitive decline rate and cerebral amyloid/tau biomarker burden?",
-  population: "Older adults (≥55 years) with mild cognitive impairment (MCI) or early Alzheimer's disease",
-  intervention: "GLP-1 receptor agonists (oral/subcutaneous Semaglutide, Liraglutide, Tirzepatide)",
-  comparator: "Matching placebo or active standard-of-care neuroprotective therapy",
-  outcome: "Cognitive decline rate (CDR-SB, ADAS-Cog-13) and fluid/neuroimaging biomarkers (p-tau181, MRI volumetry)",
-  inclusionCriteria: [
-    { id: 'inc-1', code: 'INC-RCT', text: 'Human randomized double-blind clinical trials (Phase II/III)', rationale: 'Highest clinical evidence hierarchy for causal therapeutic efficacy', detectionType: 'metadata', active: true },
-    { id: 'inc-2', code: 'INC-POP', text: 'Adults with confirmed MCI or biomarker-verified early Alzheimer pathology', rationale: 'Directly aligns with targeted patient population', detectionType: 'algorithm', active: true },
-    { id: 'inc-3', code: 'INC-END', text: 'Validated objective cognitive scales (CDR-SB, ADAS-Cog, MMSE)', rationale: 'Ensures quantitative endpoint measurement', detectionType: 'algorithm', active: true }
-  ],
-  exclusionCriteria: [
-    { id: 'exc-1', code: 'EXC-ANIMAL', text: 'Animal / Rodent preclinical studies', rationale: 'Rodent behavioral models lack cortical translation to human Alzheimer progression', detectionType: 'algorithm', active: true },
-    { id: 'exc-2', code: 'EXC-NON-ENG', text: 'Non-English language publications', rationale: 'Team cannot independently audit clinical trial statistical tables without certified translation', detectionType: 'metadata', active: true },
-    { id: 'exc-3', code: 'EXC-SIM', text: 'In silico computational simulations / molecular docking', rationale: 'Computational models lack in vivo human biological outcomes', detectionType: 'algorithm', active: true },
-    { id: 'exc-4', code: 'EXC-CASE', text: 'Single case reports (N=1)', rationale: 'Single-subject reports cannot establish causal treatment effects', detectionType: 'metadata', active: true },
-    { id: 'exc-5', code: 'EXC-NO-PICO', text: 'Studies without neurological/cognitive endpoints', rationale: 'Studies focused solely on glycemic control do not answer the cognitive review question', detectionType: 'algorithm', active: true }
-  ]
-};
-
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('overview');
-  const [reviewQuestion, setReviewQuestion] = useState<ReviewQuestion>(initialReviewQuestion);
-
-  // Papers Corpus (initialized with 1,050 papers)
-  const [papers, setPapers] = useState<ResearchPaper[]>(() => generateLargeCorpus(1050));
-
-  // Query Versions
-  const [queryVersions, setQueryVersions] = useState<QueryVersion[]>([
-    {
-      id: 'qv-1',
-      versionNumber: 1,
-      label: 'Initial broad incretin cognitive search',
-      queryString: '("early Alzheimer\'s" OR "mild cognitive impairment") AND (semaglutide OR liraglutide OR "GLP-1") AND placebo',
-      keyphrases: ["early Alzheimer's", "mild cognitive impairment", "semaglutide", "liraglutide", "GLP-1", "placebo"],
-      booleanLogic: 'AND',
-      dateStart: '2018',
-      dateEnd: '2026',
-      sources: ['pubmed', 'europe_pmc'],
-      hitCount: 2310,
-      pulledCount: 1050,
-      createdAt: '10:00 AM',
-      isActive: true
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    try {
+      const saved = localStorage.getItem('corpus_ai_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
     }
-  ]);
+  });
 
-  const [activeVersionId, setActiveVersionId] = useState<string>('qv-1');
-  const activeVersion = queryVersions.find(v => v.id === activeVersionId) || queryVersions[0];
+  // Projects State (Defaults to empty; NO pre-seeded sample example)
+  const [projects, setProjects] = useState<Project[]>(() => {
+    try {
+      const saved = localStorage.getItem('corpus_ai_projects');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
 
-  // Reviewer Decisions & Audit Logs
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
+
+  // Active Project Reference
+  const currentProject = projects.find(p => p.id === currentProjectId) || null;
+
+  // Active Workspace State
+  const [activeTab, setActiveTab] = useState<string>('search');
+  const [papers, setPapers] = useState<ResearchPaper[]>([]);
+  const [queryVersions, setQueryVersions] = useState<QueryVersion[]>([]);
+  const [activeVersionId, setActiveVersionId] = useState<string>('');
   const [decisions, setDecisions] = useState<Record<string, ReviewerDecision>>({});
-  const [auditLogs, setAuditLogs] = useState<AuditRunLog[]>([
-    Level2LoopManager.createAuditLog(1, '0_Question', 'Initialized Review Protocol & PICO Criteria', 'human', 'Protocol set for GLP-1 RAs in early Alzheimer disease'),
-    Level2LoopManager.createAuditLog(1, '1_Query', 'Created Query Version 1', 'human', 'Executed query across PubMed E-utilities and Europe PMC'),
-    Level2LoopManager.createAuditLog(1, '2_Fetch', 'Fetched 1,050 research papers', 'system', 'Completed retrieval into local database cache'),
-    Level2LoopManager.createAuditLog(1, '4_Deduplicate', 'Executed exact DOI & fuzzy title deduplication', 'system', 'Clustered duplicate records, representative selected')
-  ]);
+  const [auditLogs, setAuditLogs] = useState<AuditRunLog[]>([]);
+  const [reviewQuestion, setReviewQuestion] = useState<ReviewQuestion | null>(null);
 
-  // Loading indicator & Modals
+  // Loading & Modal States
   const [isLoading, setIsLoading] = useState(false);
   const [selectedBadge, setSelectedBadge] = useState<AIBadge | null>(null);
   const [selectedBadgePaper, setSelectedBadgePaper] = useState<ResearchPaper | null>(null);
   const [isAuditLogOpen, setIsAuditLogOpen] = useState(false);
 
-  // Initial Deduplication & Screening on Mount
+  // Sync workspace state when active project changes
   useEffect(() => {
-    // Run Deduplication
-    const { updatedPapers } = runDeduplication(papers, decisions);
-    
-    // Run initial Auto-Screening
-    const initialDecisions = batchScreenPapers(updatedPapers, decisions, reviewQuestion.exclusionCriteria);
-    
-    setPapers(updatedPapers);
-    setDecisions(initialDecisions);
-  }, []);
+    if (currentProject) {
+      setPapers(currentProject.papers || []);
+      setQueryVersions(currentProject.queryVersions || []);
+      setActiveVersionId(currentProject.queryVersions?.[0]?.id || 'qv-1');
+      setDecisions(currentProject.decisions || {});
+      setAuditLogs(currentProject.auditLogs || []);
+      setReviewQuestion(currentProject.reviewQuestion);
+      setActiveTab(currentProject.papers?.length > 0 ? 'screening' : 'search');
+    }
+  }, [currentProjectId]);
 
-  // Handle Reviewer Decision override (Step 5)
+  // Persist projects to localStorage whenever updated
+  const saveProjects = (updatedProjects: Project[]) => {
+    setProjects(updatedProjects);
+    try {
+      localStorage.setItem('corpus_ai_projects', JSON.stringify(updatedProjects));
+    } catch (e) {
+      console.warn('LocalStorage save error:', e);
+    }
+  };
+
+  // Update current project state in projects list
+  const updateActiveProject = (partial: {
+    papers?: ResearchPaper[];
+    queryVersions?: QueryVersion[];
+    decisions?: Record<string, ReviewerDecision>;
+    auditLogs?: AuditRunLog[];
+    reviewQuestion?: ReviewQuestion;
+  }) => {
+    if (!currentProjectId) return;
+
+    const updated = projects.map(p => {
+      if (p.id === currentProjectId) {
+        return {
+          ...p,
+          papers: partial.papers !== undefined ? partial.papers : p.papers,
+          queryVersions: partial.queryVersions !== undefined ? partial.queryVersions : p.queryVersions,
+          decisions: partial.decisions !== undefined ? partial.decisions : p.decisions,
+          auditLogs: partial.auditLogs !== undefined ? partial.auditLogs : p.auditLogs,
+          reviewQuestion: partial.reviewQuestion !== undefined ? partial.reviewQuestion : p.reviewQuestion,
+          updatedAt: new Date().toLocaleDateString()
+        };
+      }
+      return p;
+    });
+
+    saveProjects(updated);
+  };
+
+  const handleLogin = (user: User) => {
+    setCurrentUser(user);
+    try {
+      localStorage.setItem('corpus_ai_user', JSON.stringify(user));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setCurrentProjectId(null);
+    try {
+      localStorage.removeItem('corpus_ai_user');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleCreateProject = (newProject: Project) => {
+    const updated = [newProject, ...projects];
+    saveProjects(updated);
+    setCurrentProjectId(newProject.id);
+  };
+
+  const handleDeleteProject = (projectId: string) => {
+    const updated = projects.filter(p => p.id !== projectId);
+    saveProjects(updated);
+    if (currentProjectId === projectId) {
+      setCurrentProjectId(null);
+    }
+  };
+
+  // Handle Uploading / Adding Research Papers
+  const handleAddPapers = (newPapers: ResearchPaper[]) => {
+    if (!reviewQuestion) return;
+
+    // Merge new papers with existing papers
+    const existingMap = new Map<string, ResearchPaper>();
+    papers.forEach(p => existingMap.set(p.id, p));
+
+    newPapers.forEach(np => {
+      if (!existingMap.has(np.id)) {
+        existingMap.set(np.id, np);
+      }
+    });
+
+    const combined = Array.from(existingMap.values());
+
+    // Step 4: Run Deduplication
+    const { updatedPapers } = runDeduplication(combined, decisions);
+
+    // Step 5: Run Batch Screening against project criteria
+    const updatedDecisions = batchScreenPapers(updatedPapers, decisions, reviewQuestion.exclusionCriteria);
+
+    const logEntry = Level2LoopManager.createAuditLog(
+      activeVersion?.versionNumber || 1,
+      '2_Fetch',
+      `Ingested ${newPapers.length} Research Papers`,
+      'human',
+      `Uploaded and analyzed ${newPapers.length} research records. Total project papers: ${updatedPapers.length}.`
+    );
+
+    const updatedLogs = [logEntry, ...auditLogs];
+
+    setPapers(updatedPapers);
+    setDecisions(updatedDecisions);
+    setAuditLogs(updatedLogs);
+
+    updateActiveProject({
+      papers: updatedPapers,
+      decisions: updatedDecisions,
+      auditLogs: updatedLogs
+    });
+  };
+
+  // Step 5 Human Override
   const handleDecide = (paperId: string, status: 'include' | 'exclude' | 'maybe', reason?: string, note?: string) => {
     const targetPaper = papers.find(p => p.id === paperId);
     const prevStatus = decisions[paperId]?.status || 'unscreened';
 
-    setDecisions(prev => ({
-      ...prev,
+    const newDecisions = {
+      ...decisions,
       [paperId]: {
         paperId,
         groupId: targetPaper?.groupId || `grp-${paperId}`,
         status,
         reason: reason || (status === 'include' ? 'Validated PICO criteria verified by human reviewer' : undefined),
         notes: note,
-        decidedBy: 'human',
+        decidedBy: 'human' as const,
         decidedAt: new Date().toLocaleTimeString(),
         isOverridden: true,
         previousDecision: prevStatus
       }
-    }));
+    };
 
-    // Add to audit trail
-    setAuditLogs(prev => [
-      Level2LoopManager.createAuditLog(
-        activeVersion.versionNumber,
-        '5_Screen',
-        `Human Reviewer Override: Paper ${paperId}`,
-        'human',
-        `Changed decision from "${prevStatus}" to "${status}"${reason ? ` (Reason: ${reason})` : ''}`
-      ),
-      ...prev
-    ]);
+    const newLog = Level2LoopManager.createAuditLog(
+      activeVersion?.versionNumber || 1,
+      '5_Screen',
+      `Reviewer Override on Paper ${paperId}`,
+      'human',
+      `Changed status from "${prevStatus}" to "${status}"${reason ? ` (${reason})` : ''}`
+    );
+
+    const updatedLogs = [newLog, ...auditLogs];
+
+    setDecisions(newDecisions);
+    setAuditLogs(updatedLogs);
+
+    updateActiveProject({
+      decisions: newDecisions,
+      auditLogs: updatedLogs
+    });
   };
 
-  // Run Batch Auto-Screen
+  // Batch Auto-Screen
   const handleRunBatchAutoScreen = () => {
+    if (!reviewQuestion) return;
     const updated = batchScreenPapers(papers, decisions, reviewQuestion.exclusionCriteria);
     setDecisions(updated);
-    setAuditLogs(prev => [
-      Level2LoopManager.createAuditLog(
-        activeVersion.versionNumber,
-        '5_Screen',
-        'Batch Auto-Screening Rerun across Corpus',
-        'system',
-        'Evaluated active exclusion criteria and PICO concordance scores'
-      ),
-      ...prev
-    ]);
+    updateActiveProject({ decisions: updated });
   };
 
-  // Run Search & Ingest (Level 2 Loop)
+  // Search and Fetch (Level 2 Loop)
   const handleRunSearchAndFetch = async (
     query: string,
     sources: ('pubmed' | 'europe_pmc')[],
     dateStart?: string,
-    dateEnd?: string,
-    useFullCorpusBenchmark: boolean = false
+    dateEnd?: string
   ) => {
+    if (!reviewQuestion) return;
     setIsLoading(true);
 
     try {
       const nextVersionNum = queryVersions.length + 1;
       const newVersionId = `qv-${nextVersionNum}`;
 
-      let fetchedNewPapers: ResearchPaper[] = [];
+      // Fetch live records from Europe PMC
+      const liveResults = await fetchLiveEuropePMC(query, 25, newVersionId);
 
-      if (useFullCorpusBenchmark) {
-        // High scalability benchmark: expand to 1,200 papers
-        fetchedNewPapers = generateLargeCorpus(1200);
-      } else {
-        // Try live Europe PMC API fetch
-        const liveResults = await fetchLiveEuropePMC(query, 15, newVersionId);
-        if (liveResults.length > 0) {
-          fetchedNewPapers = liveResults;
-        } else {
-          // Fallback simulation
-          fetchedNewPapers = generateLargeCorpus(1080);
-        }
-      }
-
-      // Merge records with existing corpus (remembering which versions found each record)
       const existingMap = new Map<string, ResearchPaper>();
       papers.forEach(p => existingMap.set(p.id, p));
 
-      fetchedNewPapers.forEach(newP => {
+      liveResults.forEach(newP => {
         if (existingMap.has(newP.id)) {
           const existing = existingMap.get(newP.id)!;
           if (!existing.queryVersionIds.includes(newVersionId)) {
@@ -198,14 +274,9 @@ export const App: React.FC = () => {
       });
 
       const combinedPapers = Array.from(existingMap.values());
-
-      // Level 2 Requirement: Rerun deduplication on combined set, keeping reviewer decisions safe
-      const { updatedPapers, detectedConflicts } = runDeduplication(combinedPapers, decisions);
-
-      // Re-screen only what is new
+      const { updatedPapers } = runDeduplication(combinedPapers, decisions);
       const updatedDecisions = batchScreenPapers(updatedPapers, decisions, reviewQuestion.exclusionCriteria);
 
-      // Register new Query Version
       const newQueryVersion: QueryVersion = {
         id: newVersionId,
         versionNumber: nextVersionNum,
@@ -216,31 +287,36 @@ export const App: React.FC = () => {
         dateStart,
         dateEnd,
         sources,
-        hitCount: 2310 + nextVersionNum * 120,
+        hitCount: liveResults.length * 45,
         pulledCount: updatedPapers.length,
         createdAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         isActive: true
       };
 
-      setQueryVersions(prev => [...prev.map(v => ({ ...v, isActive: false })), newQueryVersion]);
+      const updatedVersions = [...queryVersions.map(v => ({ ...v, isActive: false })), newQueryVersion];
+      const newLog = Level2LoopManager.createAuditLog(
+        nextVersionNum,
+        'Level2_Loop',
+        `Executed Query Version ${nextVersionNum}`,
+        'human',
+        `Retrieved live records. Total project papers: ${updatedPapers.length}. Previous human decisions kept.`
+      );
+      const updatedLogs = [newLog, ...auditLogs];
+
+      setQueryVersions(updatedVersions);
       setActiveVersionId(newVersionId);
       setPapers(updatedPapers);
       setDecisions(updatedDecisions);
+      setAuditLogs(updatedLogs);
 
-      // Add to audit trail
-      setAuditLogs(prev => [
-        Level2LoopManager.createAuditLog(
-          nextVersionNum,
-          'Level2_Loop',
-          `Executed Query Version ${nextVersionNum} Loop`,
-          'human',
-          `Reran pipeline from fetch. Total records in database: ${updatedPapers.length}. Past decisions preserved.`
-        ),
-        ...prev
-      ]);
+      updateActiveProject({
+        papers: updatedPapers,
+        queryVersions: updatedVersions,
+        decisions: updatedDecisions,
+        auditLogs: updatedLogs
+      });
 
-      // Automatically switch to Level 2 Diff tab so user sees the change!
-      setActiveTab('level2_loop');
+      setActiveTab('screening');
     } catch (err) {
       console.error(err);
     } finally {
@@ -248,7 +324,6 @@ export const App: React.FC = () => {
     }
   };
 
-  // Revert to historical version
   const handleRevertToVersion = (versionNum: number) => {
     const targetVersion = queryVersions.find(v => v.versionNumber === versionNum);
     if (!targetVersion) return;
@@ -256,20 +331,9 @@ export const App: React.FC = () => {
     const reverted = Level2LoopManager.revertToVersion(papers, targetVersion.id);
     setPapers(reverted);
     setActiveVersionId(targetVersion.id);
-
-    setAuditLogs(prev => [
-      Level2LoopManager.createAuditLog(
-        versionNum,
-        'Level2_Loop',
-        `Exact Revert to Version ${versionNum}`,
-        'human',
-        `Reverted active record set and groups deterministically to Version ${versionNum} snapshot.`
-      ),
-      ...prev
-    ]);
+    updateActiveProject({ papers: reverted });
   };
 
-  // Resolve Merge Conflict
   const handleResolveConflict = (groupId: string, chosenStatus: 'include' | 'exclude' | 'maybe') => {
     const groupMembers = papers.filter(p => p.groupId === groupId);
     const updated = { ...decisions };
@@ -285,37 +349,65 @@ export const App: React.FC = () => {
       };
     });
     setDecisions(updated);
-    setAuditLogs(prev => [
-      Level2LoopManager.createAuditLog(
-        activeVersion.versionNumber,
-        '4_Deduplicate',
-        `Resolved Merge Conflict for Group ${groupId}`,
-        'human',
-        `Assigned unanimous group decision: ${chosenStatus.toUpperCase()}`
-      ),
-      ...prev
-    ]);
+    updateActiveProject({ decisions: updated });
+  };
+
+  // 1. If not logged in, show Opening / Landing Page with Sign In & Sign Up
+  if (!currentUser) {
+    return <LandingPage onLogin={handleLogin} />;
+  }
+
+  // 2. If logged in but no project is opened, show Projects Dashboard
+  if (!currentProject || !reviewQuestion) {
+    return (
+      <ProjectsDashboard
+        user={currentUser}
+        projects={projects}
+        onSelectProject={(id) => setCurrentProjectId(id)}
+        onCreateProject={handleCreateProject}
+        onDeleteProject={handleDeleteProject}
+        onLogout={handleLogout}
+      />
+    );
+  }
+
+  const activeVersion = queryVersions.find(v => v.id === activeVersionId) || queryVersions[0] || {
+    id: 'qv-1',
+    versionNumber: 1,
+    label: 'Version 1',
+    queryString: '',
+    keyphrases: [],
+    booleanLogic: 'AND' as const,
+    sources: ['pubmed' as const, 'europe_pmc' as const],
+    hitCount: 0,
+    pulledCount: papers.length,
+    createdAt: 'Initial',
+    isActive: true
   };
 
   const includedCount = papers.filter(p => p.isRepresentative && decisions[p.id]?.status === 'include').length;
 
+  // 3. Render Active Project Workspace
   return (
     <div className="min-h-screen flex flex-col font-sans bg-gradient-to-br from-[#F5F4F2] via-[#EBE9E6] to-[#ECE7F4] text-[#2D2521]">
       
-      {/* Navigation Bar */}
+      {/* Navigation Bar with Back to Projects & User Info */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         activeVersionNumber={activeVersion.versionNumber}
         totalPapersCount={papers.length}
         includedCount={includedCount}
+        projectName={currentProject.name}
+        onBackToProjects={() => setCurrentProjectId(null)}
+        onLogout={handleLogout}
         onOpenAuditLog={() => setIsAuditLogOpen(true)}
       />
 
-      {/* Main Container */}
+      {/* Main Workspace Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
-        {/* Tab 0 / Overview: Systematic Review Protocol & Architecture */}
+        {/* Tab 0: Protocol & PICO Framework */}
         {activeTab === 'overview' && (
           <div className="space-y-6 text-left">
             <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E6E0F0] space-y-5">
@@ -325,10 +417,10 @@ export const App: React.FC = () => {
                     Step 0 Protocol
                   </span>
                   <h2 className="text-lg font-bold text-[#462E1E] mt-1">
-                    Systematic Review Question & Pre-Specified Criteria
+                    {reviewQuestion.title || 'Systematic Review Protocol'}
                   </h2>
                   <p className="text-xs text-[#7E7A72]">
-                    Formulated before literature searching; criteria automatically applied during screening.
+                    Question: {reviewQuestion.question}
                   </p>
                 </div>
 
@@ -336,7 +428,7 @@ export const App: React.FC = () => {
                   onClick={() => setActiveTab('search')}
                   className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#6F4E37] text-white hover:bg-[#5A3D29] shadow-sm transition-all"
                 >
-                  Proceed to Step 1 & 2: Search Studio &rarr;
+                  Upload & Search Papers &rarr;
                 </button>
               </div>
 
@@ -387,7 +479,7 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 1: Search Studio (Steps 1, 2, 3) */}
+        {/* Tab 1: Search & Upload Studio */}
         {activeTab === 'search' && (
           <SearchStudio
             reviewQuestion={reviewQuestion}
@@ -395,11 +487,12 @@ export const App: React.FC = () => {
             activeVersion={activeVersion}
             onRunSearchAndFetch={handleRunSearchAndFetch}
             onSelectVersion={(vId) => setActiveVersionId(vId)}
+            onAddPapers={handleAddPapers}
             isLoading={isLoading}
           />
         )}
 
-        {/* Tab 2: Screening & PICO Tagging (Steps 4, 5, 6) */}
+        {/* Tab 2: Screening & Badges */}
         {activeTab === 'screening' && (
           <ScreeningDesk
             papers={papers}
@@ -414,7 +507,7 @@ export const App: React.FC = () => {
           />
         )}
 
-        {/* Tab 3: Agentic RAG Copilot (The Core Innovation) */}
+        {/* Tab 3: Agentic RAG Copilot */}
         {activeTab === 'agentic_rag' && (
           <AgenticRAGDesk papers={papers} />
         )}
@@ -430,7 +523,7 @@ export const App: React.FC = () => {
           />
         )}
 
-        {/* Tab 5: PRISMA & Export (Step 7) */}
+        {/* Tab 5: PRISMA & Export */}
         {activeTab === 'review_export' && (
           <PRISMAReviewDesk
             papers={papers}
@@ -441,7 +534,7 @@ export const App: React.FC = () => {
 
       </main>
 
-      {/* AI Badge Rationale Modal */}
+      {/* AI Badge Explainability Modal */}
       <AIBadgeModal
         badge={selectedBadge}
         paper={selectedBadgePaper}
@@ -464,12 +557,10 @@ export const App: React.FC = () => {
           <div className="flex items-center space-x-2">
             <span className="font-semibold text-[#462E1E]">Corpus AI</span>
             <span>•</span>
-            <span>Autonomous Systematic Review & Agentic RAG</span>
+            <span>Project: {currentProject.name}</span>
           </div>
           <div className="flex items-center space-x-4 text-[11px]">
-            <span>Theme: #6F4E37 (Coffee) | #E5E4E2 (Platinum) | #E6E0F0 (Lavender)</span>
-            <span>•</span>
-            <span>Google Colab & Free Tier Ready</span>
+            <span>Theme: #6F4E37 | #E5E4E2 | #E6E0F0</span>
           </div>
         </div>
       </footer>

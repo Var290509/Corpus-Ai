@@ -6,9 +6,11 @@ import {
   Cpu, 
   GitBranch, 
   Download, 
-  FileText,
   Activity,
-  Sparkles
+  Sparkles,
+  ArrowLeft,
+  Folder,
+  LogOut
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -17,6 +19,9 @@ interface NavbarProps {
   activeVersionNumber: number;
   totalPapersCount: number;
   includedCount: number;
+  projectName?: string;
+  onBackToProjects?: () => void;
+  onLogout?: () => void;
   onOpenAuditLog: () => void;
 }
 
@@ -26,11 +31,14 @@ export const Navbar: React.FC<NavbarProps> = ({
   activeVersionNumber,
   totalPapersCount,
   includedCount,
+  projectName,
+  onBackToProjects,
+  onLogout,
   onOpenAuditLog
 }) => {
   const tabs = [
     { id: 'overview', label: 'Protocol & PICO', icon: Compass },
-    { id: 'search', label: 'Search & Query V' + activeVersionNumber, icon: Search },
+    { id: 'search', label: 'Search & Upload', icon: Search },
     { id: 'screening', label: 'Screening & Badges', icon: CheckSquare },
     { id: 'agentic_rag', label: 'Agentic RAG Copilot', icon: Cpu, isSpecial: true },
     { id: 'level2_loop', label: 'Level 2 Loop Diff', icon: GitBranch },
@@ -42,21 +50,36 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
-          {/* Logo & Brand */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('overview')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#8A5F40] flex items-center justify-center shadow-md shadow-[#6F4E37]/20 border border-[#E6E0F0]">
-              <span className="text-[#E6E0F0] font-bold text-xl font-mono">C</span>
-            </div>
-            <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold text-lg tracking-tight text-[#462E1E]">Corpus AI</span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[#E6E0F0] text-[#5A3D29] border border-[#d4c8e4]">
-                  v2.4 Agentic
-                </span>
+          {/* Logo, Brand & Projects Back Button */}
+          <div className="flex items-center space-x-3">
+            {onBackToProjects && (
+              <button
+                onClick={onBackToProjects}
+                className="p-1.5 rounded-xl bg-white/70 hover:bg-white text-[#5A3D29] border border-[#E6E0F0] transition-all flex items-center space-x-1 text-xs font-semibold mr-1"
+                title="Return to Projects Dashboard"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Projects</span>
+              </button>
+            )}
+
+            <div 
+              className="flex items-center space-x-2.5 cursor-pointer" 
+              onClick={() => setActiveTab('overview')}
+            >
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#8A5F40] flex items-center justify-center shadow-md shadow-[#6F4E37]/20 border border-[#E6E0F0]">
+                <span className="text-[#E6E0F0] font-bold text-lg font-mono">C</span>
               </div>
-              <p className="text-[11px] text-[#7E7A72] tracking-wide -mt-0.5">
-                Autonomous Systematic Literature Review
-              </p>
+              <div>
+                <div className="flex items-center space-x-1.5">
+                  <span className="font-semibold text-base tracking-tight text-[#462E1E]">Corpus AI</span>
+                  {projectName && (
+                    <span className="max-w-[140px] md:max-w-[180px] truncate text-xs font-medium text-[#7E7A72] border-l border-[#d4c8e4] pl-2">
+                      {projectName}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -69,7 +92,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 ${
                     isActive
                       ? 'bg-[#6F4E37] text-white shadow-sm shadow-[#6F4E37]/30'
                       : 'text-[#5F5C56] hover:text-[#462E1E] hover:bg-white/60'
@@ -85,14 +108,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Quick Metrics & Audit Log Trigger */}
-          <div className="flex items-center space-x-3">
+          {/* Quick Metrics, Run Log & Logout */}
+          <div className="flex items-center space-x-2.5">
             <div className="hidden lg:flex items-center space-x-2 px-3 py-1 rounded-xl bg-white/70 border border-[#E6E0F0] text-xs text-[#5F5C56]">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span>Corpus: <strong className="text-[#462E1E]">{totalPapersCount.toLocaleString()}</strong> papers</span>
+              <span>Corpus: <strong className="text-[#462E1E]">{totalPapersCount.toLocaleString()}</strong></span>
               <span className="text-[#B8B5AE]">|</span>
               <span>Included: <strong className="text-[#6F4E37]">{includedCount}</strong></span>
             </div>
@@ -103,8 +122,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Inspect Audit Run Log"
             >
               <Activity className="w-3.5 h-3.5 text-[#6F4E37]" />
-              <span className="hidden sm:inline">Run Log</span>
+              <span className="hidden sm:inline">Log</span>
             </button>
+
+            {onLogout && (
+              <button
+                onClick={onLogout}
+                className="p-1.5 rounded-xl bg-white/80 hover:bg-white text-[#7E7A72] hover:text-rose-600 border border-[#E6E0F0] transition-all"
+                title="Log Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
         </div>
