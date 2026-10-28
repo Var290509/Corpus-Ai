@@ -314,39 +314,39 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-[#0A1225] text-[#F9F8FD]">
+    <div className="min-h-screen flex flex-col font-sans bg-[#13091F]/40 backdrop-blur-[1px] text-[#FAF5FF]">
       
       {/* Top Navbar */}
-      <header className="border-b border-[#E0E5E7]/20 bg-[#0A1225]/85 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-[#D4C4E2]/20 bg-[#13091F]/85 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#192440] to-[#2B3B60] border border-[#E0E5E7]/25 flex items-center justify-center text-white shadow-md">
-              <Sparkles className="w-4 h-4 text-[#E7DCC1]" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#24143D] to-[#43226D] border border-[#D4C4E2]/25 flex items-center justify-center text-white shadow-md">
+              <Sparkles className="w-4 h-4 text-[#E8BA9B]" />
             </div>
             <div>
-              <span className="font-bold text-sm tracking-tight text-[#F9F8FD]">
-                CORPUS <span className="text-[#E0E5E7] font-light">AI</span>
+              <span className="font-bold text-sm tracking-tight text-[#FAF5FF]">
+                CORPUS <span className="text-[#D4C4E2] font-light">AI</span>
               </span>
-              <span className="ml-2 text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full bg-[#E7DCC1] text-[#0A1225] shadow-sm">
+              <span className="ml-2 text-[10px] uppercase tracking-wider font-bold px-2.5 py-0.5 rounded-full bg-[#E8BA9B] text-[#13091F] shadow-sm">
                 Reviews
               </span>
             </div>
           </div>
 
           <div className="flex items-center space-x-4">
-            <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#192440] border border-emerald-400/40 text-emerald-200 text-xs">
+            <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#24143D] border border-emerald-400/40 text-emerald-200 text-xs">
               <Cloud className="w-3.5 h-3.5" />
               <span>Google Cloud Firestore: Spark Free Tier Active</span>
             </div>
 
             <div className="text-right">
-              <div className="text-xs font-semibold text-[#F9F8FD]">{user.name}</div>
-              <div className="text-[11px] text-[#F9F8FD]/70">{user.email}</div>
+              <div className="text-xs font-semibold text-[#FAF5FF]">{user.name}</div>
+              <div className="text-[11px] text-[#FAF5FF]/70">{user.email}</div>
             </div>
 
             <button
               onClick={onLogout}
-              className="p-2 rounded-xl text-[#F9F8FD] hover:text-white hover:bg-[#192440] transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-[#FAF5FF] hover:text-white hover:bg-[#24143D] transition-colors cursor-pointer"
               title="Sign Out"
             >
               <LogOut className="w-4 h-4" />
@@ -359,16 +359,16 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
         {/* Welcome Banner */}
-        <div className="glass-panel-elevated rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#E0E5E7]/25">
+        <div className="glass-panel-elevated rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#D4C4E2]/25">
           <div className="space-y-2 max-w-2xl text-left">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#192440] border border-[#E0E5E7]/25 text-[#E0E5E7] text-xs font-medium">
-              <Sparkles className="w-3.5 h-3.5 text-[#F9F8FD]" />
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#24143D] border border-[#D4C4E2]/25 text-[#D4C4E2] text-xs font-medium">
+              <Sparkles className="w-3.5 h-3.5 text-[#FAF5FF]" />
               <span>Systematic Literature Review & Multi-Index Recommender</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F9F8FD] tracking-tight">
-              Welcome back, <span className="text-[#E7DCC1] font-extrabold">{user.name.split(' ')[0]}</span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#FAF5FF] tracking-tight">
+              Welcome back, <span className="text-[#E8BA9B] font-extrabold">{user.name.split(' ')[0]}</span>
             </h1>
-            <p className="text-xs sm:text-sm text-[#D7DBE6] leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#D4C4E2] leading-relaxed">
               Upload citation files (.ris, .csv, .bib, .json), automatically deduplicate records, explore explainable AI ratings with text evidence, and discover related literature from Scopus, Web of Science, PubMed, and IEEE Xplore.
             </p>
           </div>
@@ -378,7 +378,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
               setCreateStep(1);
               setShowCreateModal(true);
             }}
-            className="px-5 py-3 rounded-xl font-bold text-xs bg-white text-[#0A1225] hover:bg-[#F0F4F8] shadow-xl flex items-center justify-center space-x-2 transition-all cursor-pointer shrink-0"
+            className="px-5 py-3 rounded-xl font-bold text-xs bg-white text-[#13091F] hover:bg-[#F3E8FF] shadow-xl flex items-center justify-center space-x-2 transition-all cursor-pointer shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>Create New Review</span>
@@ -388,28 +388,28 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
         {/* Reviews Grid Header & Search Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
           <div className="flex items-center space-x-2">
-            <Folder className="w-4 h-4 text-[#E0E5E7]" />
-            <h2 className="text-sm font-bold text-[#F9F8FD]">Active Systematic Reviews</h2>
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#192440] text-[#E0E5E7] font-semibold border border-[#E0E5E7]/20">
+            <Folder className="w-4 h-4 text-[#D4C4E2]" />
+            <h2 className="text-sm font-bold text-[#FAF5FF]">Active Systematic Reviews</h2>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-[#24143D] text-[#D4C4E2] font-semibold border border-[#D4C4E2]/20">
               {searchQuery.trim() ? `${filteredProjects.length} of ${projects.length}` : projects.length}
             </span>
           </div>
 
           {/* Search Input for Reviews / Tasks */}
           <div className="relative w-full sm:w-80">
-            <Search className="w-3.5 h-3.5 text-[#E0E5E7]/70 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-[#D4C4E2]/70 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Search reviews by name, domain, member..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 rounded-xl text-xs bg-[#0A1225]/90 border border-[#F9F8FD]/15 text-[#F9F8FD] placeholder-[#F9F8FD]/40 focus:outline-none focus:border-[#E0E5E7]/60 focus:ring-1 focus:ring-[#E0E5E7]/40 transition-all shadow-inner"
+              className="w-full pl-9 pr-8 py-2 rounded-xl text-xs bg-[#13091F]/90 border border-[#FAF5FF]/15 text-[#FAF5FF] placeholder-[#FAF5FF]/40 focus:outline-none focus:border-[#D4C4E2]/60 focus:ring-1 focus:ring-[#D4C4E2]/40 transition-all shadow-inner"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#F9F8FD]/50 hover:text-white transition-colors cursor-pointer"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#FAF5FF]/50 hover:text-white transition-colors cursor-pointer"
                 title="Clear search filter"
               >
                 <X className="w-3.5 h-3.5" />
@@ -429,12 +429,12 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
             return (
               <div
                 key={proj.id}
-                className="glass-card rounded-2xl p-5 border border-[#E0E5E7]/20 flex flex-col justify-between hover:border-[#E0E5E7]/50 transition-all group text-left"
+                className="glass-card rounded-2xl p-5 border border-[#D4C4E2]/20 flex flex-col justify-between hover:border-[#D4C4E2]/50 transition-all group text-left"
               >
                 <div className="space-y-3">
                   {/* Top Bar: Review Type & Action Buttons */}
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-[#192440] text-[#E0E5E7] border border-[#E0E5E7]/25">
+                    <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-[#24143D] text-[#D4C4E2] border border-[#D4C4E2]/25">
                       {proj.reviewType || 'Literature review'}
                     </span>
 
@@ -442,7 +442,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                       {/* Edit Details Button */}
                       <button
                         onClick={(e) => openEditModal(proj, e)}
-                        className="p-1.5 rounded-lg text-[#F9F8FD] hover:text-white hover:bg-[#192440] transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-[#FAF5FF] hover:text-white hover:bg-[#24143D] transition-colors cursor-pointer"
                         title="Edit Review Details"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -451,7 +451,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                       {/* Manage Members Button */}
                       <button
                         onClick={(e) => openMembersModal(proj, e)}
-                        className="p-1.5 rounded-lg text-[#F9F8FD] hover:text-white hover:bg-[#192440] transition-colors cursor-pointer"
+                        className="p-1.5 rounded-lg text-[#FAF5FF] hover:text-white hover:bg-[#24143D] transition-colors cursor-pointer"
                         title="Review Team Members"
                       >
                         <Users className="w-3.5 h-3.5" />
@@ -476,51 +476,51 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
                   {/* Title & Description */}
                   <div>
-                    <h3 className="text-sm font-bold text-[#F9F8FD] group-hover:text-white transition-colors line-clamp-1">
+                    <h3 className="text-sm font-bold text-[#FAF5FF] group-hover:text-white transition-colors line-clamp-1">
                       {proj.name}
                     </h3>
-                    <p className="text-xs text-[#F9F8FD]/80 mt-1 line-clamp-2">
+                    <p className="text-xs text-[#FAF5FF]/80 mt-1 line-clamp-2">
                       {proj.description || 'Systematic literature review workspace.'}
                     </p>
                   </div>
 
                   {/* Domain Tag */}
                   {proj.reviewDomain && (
-                    <div className="text-[11px] text-[#F9F8FD]/70 flex items-center space-x-1">
-                      <span className="font-medium text-[#F9F8FD]">Domain:</span>
-                      <span className="text-[#E0E5E7]">{proj.reviewDomain}</span>
+                    <div className="text-[11px] text-[#FAF5FF]/70 flex items-center space-x-1">
+                      <span className="font-medium text-[#FAF5FF]">Domain:</span>
+                      <span className="text-[#D4C4E2]">{proj.reviewDomain}</span>
                     </div>
                   )}
 
                   {/* Metrics Row */}
-                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#E0E5E7]/15 text-xs">
-                    <div className="p-2 rounded-xl bg-[#0A1225] border border-[#E0E5E7]/15">
-                      <span className="text-[10px] text-[#F9F8FD]/70 block">Papers Uploaded</span>
-                      <span className="font-bold text-[#F9F8FD]">{proj.papers?.length || 0}</span>
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#D4C4E2]/15 text-xs">
+                    <div className="p-2 rounded-xl bg-[#13091F] border border-[#D4C4E2]/15">
+                      <span className="text-[10px] text-[#FAF5FF]/70 block">Papers Uploaded</span>
+                      <span className="font-bold text-[#FAF5FF]">{proj.papers?.length || 0}</span>
                     </div>
-                    <div className="p-2 rounded-xl bg-[#0A1225] border border-[#E0E5E7]/15">
-                      <span className="text-[10px] text-[#F9F8FD]/70 block">Included Studies</span>
+                    <div className="p-2 rounded-xl bg-[#13091F] border border-[#D4C4E2]/15">
+                      <span className="text-[10px] text-[#FAF5FF]/70 block">Included Studies</span>
                       <span className="font-bold text-emerald-300">{includedCount}</span>
                     </div>
                   </div>
 
                   {/* Review Team Members Display */}
                   <div className="pt-2">
-                    <span className="text-[10px] font-semibold text-[#F9F8FD]/70 block mb-1">
+                    <span className="text-[10px] font-semibold text-[#FAF5FF]/70 block mb-1">
                       Review Members ({members.length})
                     </span>
                     <div className="flex items-center space-x-1.5">
                       {members.slice(0, 3).map((m, i) => (
                         <div
                           key={m.id || i}
-                          className="w-6 h-6 rounded-full bg-[#192440] border border-[#E0E5E7]/35 flex items-center justify-center text-[10px] font-bold text-[#F9F8FD]"
+                          className="w-6 h-6 rounded-full bg-[#24143D] border border-[#D4C4E2]/35 flex items-center justify-center text-[10px] font-bold text-[#FAF5FF]"
                           title={`${m.name} (${m.role})`}
                         >
                           {m.name.charAt(0).toUpperCase()}
                         </div>
                       ))}
                       {members.length > 3 && (
-                        <span className="text-[10px] text-[#F9F8FD]/70">
+                        <span className="text-[10px] text-[#FAF5FF]/70">
                           +{members.length - 3} more
                         </span>
                       )}
@@ -529,14 +529,14 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 </div>
 
                 {/* Footer Action */}
-                <div className="pt-4 mt-3 border-t border-[#E0E5E7]/15 flex items-center justify-between">
-                  <span className="text-[10px] text-[#F9F8FD]/60">
+                <div className="pt-4 mt-3 border-t border-[#D4C4E2]/15 flex items-center justify-between">
+                  <span className="text-[10px] text-[#FAF5FF]/60">
                     Updated {proj.updatedAt}
                   </span>
 
                   <button
                     onClick={() => onSelectProject(proj.id)}
-                    className="flex items-center space-x-1.5 text-xs font-semibold text-[#E0E5E7] hover:text-white group-hover:translate-x-1 transition-all cursor-pointer"
+                    className="flex items-center space-x-1.5 text-xs font-semibold text-[#D4C4E2] hover:text-white group-hover:translate-x-1 transition-all cursor-pointer"
                   >
                     <span>Open Review Desk</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -548,16 +548,16 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
           {/* No Search Results State */}
           {projects.length > 0 && filteredProjects.length === 0 && (
-            <div className="col-span-full rounded-2xl p-10 text-center bg-[#0A1225]/70 border border-[#F9F8FD]/10 space-y-3">
-              <Search className="w-8 h-8 text-[#E0E5E7]/40 mx-auto" />
-              <h3 className="text-sm font-bold text-[#F9F8FD]">No reviews matching "{searchQuery}"</h3>
-              <p className="text-xs text-[#F9F8FD]/70 max-w-sm mx-auto">
+            <div className="col-span-full rounded-2xl p-10 text-center bg-[#13091F]/70 border border-[#FAF5FF]/10 space-y-3">
+              <Search className="w-8 h-8 text-[#D4C4E2]/40 mx-auto" />
+              <h3 className="text-sm font-bold text-[#FAF5FF]">No reviews matching "{searchQuery}"</h3>
+              <p className="text-xs text-[#FAF5FF]/70 max-w-sm mx-auto">
                 No systematic review tasks matched your search query. Try searching by review title, domain, or team member.
               </p>
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#192440] text-[#F9F8FD] border border-[#F9F8FD]/15 hover:bg-[#223154] transition-all cursor-pointer shadow-sm"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-[#24143D] text-[#FAF5FF] border border-[#FAF5FF]/15 hover:bg-[#381F5C] transition-all cursor-pointer shadow-sm"
               >
                 Clear Search Filter
               </button>
@@ -566,10 +566,10 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
           {/* Zero Projects Total Empty State */}
           {projects.length === 0 && (
-            <div className="col-span-full glass-card rounded-2xl p-12 text-center border border-[#E0E5E7]/25 relative overflow-hidden">
-              <Folder className="w-12 h-12 text-[#E7DCC1] mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-[#F9F8FD]">No Systematic Reviews Yet</h3>
-              <p className="text-xs text-[#D7DBE6] mt-1 max-w-sm mx-auto">
+            <div className="col-span-full glass-card rounded-2xl p-12 text-center border border-[#D4C4E2]/25 relative overflow-hidden">
+              <Folder className="w-12 h-12 text-[#E8BA9B] mx-auto mb-3" />
+              <h3 className="text-sm font-semibold text-[#FAF5FF]">No Systematic Reviews Yet</h3>
+              <p className="text-xs text-[#D4C4E2] mt-1 max-w-sm mx-auto">
                 Click "Create New Review" to set up your review title, domain, and upload articles.
               </p>
               <button
@@ -577,7 +577,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                   setCreateStep(1);
                   setShowCreateModal(true);
                 }}
-                className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#0A1225] hover:bg-[#F0F4F8] shadow-md inline-flex items-center space-x-1.5 cursor-pointer"
+                className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#13091F] hover:bg-[#F3E8FF] shadow-md inline-flex items-center space-x-1.5 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Create First Review</span>
@@ -592,74 +592,74 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div 
             ref={createModalRef}
-            className="w-full max-w-2xl bg-[#0B1630] border border-[#E0E5E7]/30 rounded-2xl shadow-2xl p-6 space-y-6 max-h-[85vh] overflow-y-auto text-left"
+            className="w-full max-w-2xl bg-[#1A0D2E] border border-[#D4C4E2]/30 rounded-2xl shadow-2xl p-6 space-y-6 max-h-[85vh] overflow-y-auto text-left"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header matching Image 2 */}
-            <div className="flex items-center justify-between pb-3 border-b border-[#E0E5E7]/20">
+            <div className="flex items-center justify-between pb-3 border-b border-[#D4C4E2]/20">
               <div className="flex items-center space-x-2.5">
-                <div className="w-7 h-7 rounded-lg bg-[#192440] border border-[#E0E5E7]/25 flex items-center justify-center text-[#E0E5E7]">
+                <div className="w-7 h-7 rounded-lg bg-[#24143D] border border-[#D4C4E2]/25 flex items-center justify-center text-[#D4C4E2]">
                   <Folder className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-bold text-[#F9F8FD]">Create new review</h3>
+                <h3 className="text-base font-bold text-[#FAF5FF]">Create new review</h3>
               </div>
 
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="text-[#F9F8FD] hover:text-white transition-colors p-1 cursor-pointer"
+                className="text-[#FAF5FF] hover:text-white transition-colors p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Stepper matching Image 2 */}
-            <div className="flex items-center justify-between border-b border-[#E0E5E7]/20 pb-4">
+            <div className="flex items-center justify-between border-b border-[#D4C4E2]/20 pb-4">
               <button 
                 onClick={() => setCreateStep(1)}
                 className={`flex items-center space-x-2 pb-1 transition-all cursor-pointer ${
                   createStep === 1 
                     ? 'border-b-2 border-indigo-300 text-indigo-200 font-bold' 
-                    : 'text-[#F9F8FD]/70 hover:text-white'
+                    : 'text-[#FAF5FF]/70 hover:text-white'
                 }`}
               >
                 <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-bold ${
-                  createStep === 1 ? 'bg-indigo-600 text-white' : 'bg-[#192440] text-[#F9F8FD]'
+                  createStep === 1 ? 'bg-indigo-600 text-white' : 'bg-[#24143D] text-[#FAF5FF]'
                 }`}>
                   1
                 </span>
                 <span className="text-xs">Add review info</span>
               </button>
 
-              <ChevronRight className="w-4 h-4 text-[#F9F8FD]/40" />
+              <ChevronRight className="w-4 h-4 text-[#FAF5FF]/40" />
 
               <button 
                 onClick={() => setCreateStep(2)}
                 className={`flex items-center space-x-2 pb-1 transition-all cursor-pointer ${
                   createStep === 2 
                     ? 'border-b-2 border-indigo-300 text-indigo-200 font-bold' 
-                    : 'text-[#F9F8FD]/70 hover:text-white'
+                    : 'text-[#FAF5FF]/70 hover:text-white'
                 }`}
               >
                 <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-bold ${
-                  createStep === 2 ? 'bg-indigo-600 text-white' : 'bg-[#192440] text-[#F9F8FD]'
+                  createStep === 2 ? 'bg-indigo-600 text-white' : 'bg-[#24143D] text-[#FAF5FF]'
                 }`}>
                   2
                 </span>
                 <span className="text-xs">Upload articles</span>
               </button>
 
-              <ChevronRight className="w-4 h-4 text-[#F9F8FD]/40" />
+              <ChevronRight className="w-4 h-4 text-[#FAF5FF]/40" />
 
               <button 
                 onClick={() => setCreateStep(3)}
                 className={`flex items-center space-x-2 pb-1 transition-all cursor-pointer ${
                   createStep === 3 
                     ? 'border-b-2 border-indigo-300 text-indigo-200 font-bold' 
-                    : 'text-[#F9F8FD]/70 hover:text-white'
+                    : 'text-[#FAF5FF]/70 hover:text-white'
                 }`}
               >
                 <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center font-bold ${
-                  createStep === 3 ? 'bg-indigo-600 text-white' : 'bg-[#192440] text-[#F9F8FD]'
+                  createStep === 3 ? 'bg-indigo-600 text-white' : 'bg-[#24143D] text-[#FAF5FF]'
                 }`}>
                   3
                 </span>
@@ -672,7 +672,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
               <div className="space-y-4">
                 {/* Review title * */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
+                  <label className="block text-xs font-semibold text-[#FAF5FF] mb-1.5">
                     Review title <span className="text-rose-400">*</span>
                   </label>
                   <input
@@ -680,7 +680,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                     value={reviewTitle}
                     onChange={(e) => setReviewTitle(e.target.value)}
                     placeholder="Review title has to be unique"
-                    className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#F9F8FD] placeholder-[#C5BFB8]/60"
+                    className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#FAF5FF] placeholder-[#C5BFB8]/60"
                     required
                   />
                 </div>
@@ -688,16 +688,16 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 {/* Review type * and Review domain * */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
+                    <label className="block text-xs font-semibold text-[#FAF5FF] mb-1.5">
                       Review type <span className="text-rose-400">*</span>
                     </label>
                     <select
                       value={reviewType}
                       onChange={(e) => setReviewType(e.target.value)}
-                      className="w-full bg-[#060D1E] border border-[#E0E5E7]/30 text-[#F9F8FD] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#E0E5E7]"
+                      className="w-full bg-[#170A26] border border-[#D4C4E2]/30 text-[#FAF5FF] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#D4C4E2]"
                     >
                       {RAYYAN_REVIEW_TYPES.map(type => (
-                        <option key={type} value={type} className="bg-[#060D1E] text-[#F9F8FD]">
+                        <option key={type} value={type} className="bg-[#170A26] text-[#FAF5FF]">
                           {type}
                         </option>
                       ))}
@@ -705,13 +705,13 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
+                    <label className="block text-xs font-semibold text-[#FAF5FF] mb-1.5">
                       Review domain <span className="text-rose-400">*</span>
                     </label>
                     <select
                       value={reviewDomain}
                       onChange={(e) => setReviewDomain(e.target.value)}
-                      className="w-full bg-[#060D1E] border border-[#E0E5E7]/30 text-[#F9F8FD] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#E0E5E7]"
+                      className="w-full bg-[#170A26] border border-[#D4C4E2]/30 text-[#FAF5FF] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#D4C4E2]"
                     >
                       <option value="Biomedical">Biomedical</option>
                       <option value="Clinical Medicine">Clinical Medicine</option>
@@ -727,7 +727,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
                 {/* Description */}
                 <div>
-                  <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
+                  <label className="block text-xs font-semibold text-[#FAF5FF] mb-1.5">
                     Description
                   </label>
                   <textarea
@@ -735,16 +735,16 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe your review!"
                     rows={4}
-                    className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#F9F8FD] placeholder-[#C5BFB8]/60 resize-none"
+                    className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#FAF5FF] placeholder-[#C5BFB8]/60 resize-none"
                   />
                 </div>
 
                 {/* Navigation */}
-                <div className="pt-4 flex items-center justify-between border-t border-[#E0E5E7]/20">
+                <div className="pt-4 flex items-center justify-between border-t border-[#D4C4E2]/20">
                   <button
                     type="button"
                     onClick={() => setShowCreateModal(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#F9F8FD] hover:text-white cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#FAF5FF] hover:text-white cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -758,7 +758,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                       }
                       setCreateStep(2);
                     }}
-                    className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] hover:bg-white flex items-center space-x-1.5 cursor-pointer shadow-md"
+                    className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#FAF5FF] text-[#13091F] hover:bg-white flex items-center space-x-1.5 cursor-pointer shadow-md"
                   >
                     <span>Next: Upload articles</span>
                     <ChevronRight className="w-4 h-4" />
@@ -770,7 +770,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
             {/* STEP 2: Upload articles (Interactive file uploader, deduplication & AI ratings) */}
             {createStep === 2 && (
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-[#E0E5E7]/35 rounded-2xl p-6 text-center bg-[#060D1E]/80 relative hover:border-[#E0E5E7]/60 transition-all">
+                <div className="border-2 border-dashed border-[#D4C4E2]/35 rounded-2xl p-6 text-center bg-[#170A26]/80 relative hover:border-[#D4C4E2]/60 transition-all">
                   <input
                     type="file"
                     multiple
@@ -781,25 +781,25 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                   />
 
                   <div className="space-y-3 pointer-events-none">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#9E88BE] flex items-center justify-center mx-auto text-white shadow-md">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#2E1945] to-[#9E88BE] flex items-center justify-center mx-auto text-white shadow-md">
                       <Upload className="w-6 h-6" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-[#F9F8FD]">Upload Research Articles & Visuals</h4>
-                      <p className="text-xs text-[#F9F8FD]/80 mt-1 max-w-md mx-auto">
+                      <h4 className="text-sm font-bold text-[#FAF5FF]">Upload Research Articles & Visuals</h4>
+                      <p className="text-xs text-[#FAF5FF]/80 mt-1 max-w-md mx-auto">
                         Drag and drop <strong>.PDF</strong>, <strong>Pictures/Posters</strong> (.PNG, .JPG), <strong>.RIS</strong>, <strong>.CSV</strong>, <strong>.BIB</strong>, or <strong>.JSON</strong>. Duplicate files & duplicate data are automatically removed, OCR is performed, non-English text is translated, and AI assigns topics and screening recommendations!
                       </p>
                     </div>
 
-                    <div className="inline-flex items-center px-4 py-1.5 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] shadow-sm">
+                    <div className="inline-flex items-center px-4 py-1.5 rounded-xl text-xs font-bold bg-[#FAF5FF] text-[#13091F] shadow-sm">
                       <span>Browse Files & Images</span>
                     </div>
                   </div>
 
                   {isUploading && (
-                    <div className="absolute inset-0 bg-[#060D1E]/90 backdrop-blur-sm flex items-center justify-center space-x-2 z-20">
-                      <div className="w-6 h-6 border-2 border-[#E0E5E7] border-t-transparent rounded-full animate-spin" />
-                      <span className="text-xs font-semibold text-[#F9F8FD]">Analyzing Files, Purging Duplicates & Generating Topics...</span>
+                    <div className="absolute inset-0 bg-[#170A26]/90 backdrop-blur-sm flex items-center justify-center space-x-2 z-20">
+                      <div className="w-6 h-6 border-2 border-[#D4C4E2] border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs font-semibold text-[#FAF5FF]">Analyzing Files, Purging Duplicates & Generating Topics...</span>
                     </div>
                   )}
                 </div>
@@ -815,24 +815,24 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 {/* Preview of Uploaded Articles with Ratings */}
                 {uploadedArticles.length > 0 && (
                   <div className="space-y-2">
-                    <span className="text-xs font-semibold text-[#F9F8FD] block">
+                    <span className="text-xs font-semibold text-[#FAF5FF] block">
                       Unique Articles Ingested ({uploadedArticles.length}):
                     </span>
                     <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                       {uploadedArticles.map((art, idx) => (
-                        <div key={art.id || idx} className="p-2.5 rounded-xl bg-[#0A1225] border border-[#E0E5E7]/15 text-xs flex flex-col space-y-2">
+                        <div key={art.id || idx} className="p-2.5 rounded-xl bg-[#13091F] border border-[#D4C4E2]/15 text-xs flex flex-col space-y-2">
                           <div className="flex items-center justify-between gap-2">
                             <div className="truncate flex-1">
-                              <span className="font-semibold text-[#F9F8FD] block truncate">{art.title}</span>
-                              <span className="text-[10px] text-[#F9F8FD]/70">{art.journal} • {art.year}</span>
+                              <span className="font-semibold text-[#FAF5FF] block truncate">{art.title}</span>
+                              <span className="text-[10px] text-[#FAF5FF]/70">{art.journal} • {art.year}</span>
                             </div>
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#192440] text-[#E0E5E7] border border-[#E0E5E7]/20 shrink-0">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#24143D] text-[#D4C4E2] border border-[#D4C4E2]/20 shrink-0">
                               {art.ratingBadgeLabel || `${art.overallRatingScore || 85}/100`}
                             </span>
                           </div>
 
                           {/* Topics & Screening Recommendation Pills */}
-                          <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-[#E0E5E7]/10">
+                          <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-[#D4C4E2]/10">
                             {art.aiScreeningRecommendation && (
                               <span className={`px-2 py-0.5 rounded text-[10px] font-bold border flex items-center space-x-1 ${
                                 art.aiScreeningRecommendation === 'Included'
@@ -853,14 +853,14 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
                             {art.extractedSubtopics && art.extractedSubtopics.length > 0 ? (
                               art.extractedSubtopics.slice(0, 4).map((sub, ti) => (
-                                <span key={ti} className="text-[10px] text-[#F9F8FD] font-mono bg-[#0A1225] px-1.5 py-0.5 rounded border border-[#E0E5E7]/15" title={`${sub.category}: ${sub.name}`}>
-                                  <span className="text-[#F9F8FD]/60 mr-1">[{sub.category.slice(0, 4).toUpperCase()}]</span>
+                                <span key={ti} className="text-[10px] text-[#FAF5FF] font-mono bg-[#13091F] px-1.5 py-0.5 rounded border border-[#D4C4E2]/15" title={`${sub.category}: ${sub.name}`}>
+                                  <span className="text-[#FAF5FF]/60 mr-1">[{sub.category.slice(0, 4).toUpperCase()}]</span>
                                   <span>{sub.name}</span>
                                 </span>
                               ))
                             ) : (
                               art.extractedTopics && art.extractedTopics.slice(0, 3).map((top, ti) => (
-                                <span key={ti} className="text-[10px] text-[#E0E5E7] font-mono bg-[#0A1225] px-1.5 py-0.5 rounded border border-[#E0E5E7]/10">
+                                <span key={ti} className="text-[10px] text-[#D4C4E2] font-mono bg-[#13091F] px-1.5 py-0.5 rounded border border-[#D4C4E2]/10">
                                   #{top}
                                 </span>
                               ))
@@ -873,11 +873,11 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 )}
 
                 {/* Navigation */}
-                <div className="pt-4 flex items-center justify-between border-t border-[#E0E5E7]/20">
+                <div className="pt-4 flex items-center justify-between border-t border-[#D4C4E2]/20">
                   <button
                     type="button"
                     onClick={() => setCreateStep(1)}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#F9F8FD] hover:text-white cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#FAF5FF] hover:text-white cursor-pointer"
                   >
                     Back
                   </button>
@@ -885,7 +885,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                   <button
                     type="button"
                     onClick={() => setCreateStep(3)}
-                    className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] hover:bg-white flex items-center space-x-1.5 cursor-pointer shadow-md"
+                    className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#FAF5FF] text-[#13091F] hover:bg-white flex items-center space-x-1.5 cursor-pointer shadow-md"
                   >
                     <span>Next: Invite members</span>
                     <ChevronRight className="w-4 h-4" />
@@ -898,7 +898,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
             {createStep === 3 && (
               <div className="space-y-4">
                 <div className="space-y-3">
-                  <label className="block text-xs font-semibold text-[#F9F8FD]">
+                  <label className="block text-xs font-semibold text-[#FAF5FF]">
                     Invite Team Members to this Review:
                   </label>
 
@@ -908,12 +908,12 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                       placeholder="Enter collaborator email..."
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
-                      className="flex-1 glass-input rounded-xl px-3 py-2 text-xs text-[#F9F8FD]"
+                      className="flex-1 glass-input rounded-xl px-3 py-2 text-xs text-[#FAF5FF]"
                     />
                     <select
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value as any)}
-                      className="bg-[#060D1E] border border-[#E0E5E7]/30 text-[#F9F8FD] rounded-xl px-3 py-2 text-xs"
+                      className="bg-[#170A26] border border-[#D4C4E2]/30 text-[#FAF5FF] rounded-xl px-3 py-2 text-xs"
                     >
                       <option value="Reviewer">Reviewer</option>
                       <option value="Collaborator">Collaborator</option>
@@ -922,7 +922,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                     <button
                       type="button"
                       onClick={handleAddInviteMember}
-                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#192440] text-[#E0E5E7] border border-[#E0E5E7]/35 hover:bg-[#223154] cursor-pointer"
+                      className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#24143D] text-[#D4C4E2] border border-[#D4C4E2]/35 hover:bg-[#381F5C] cursor-pointer"
                     >
                       Add
                     </button>
@@ -933,19 +933,19 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                     {membersList.map((m) => (
                       <div 
                         key={m.id}
-                        className="flex items-center justify-between p-2.5 rounded-xl bg-[#060D1E] border border-[#E0E5E7]/20 text-xs"
+                        className="flex items-center justify-between p-2.5 rounded-xl bg-[#170A26] border border-[#D4C4E2]/20 text-xs"
                       >
                         <div className="flex items-center space-x-2.5">
-                          <div className="w-7 h-7 rounded-full bg-[#192440] text-[#F9F8FD] font-bold text-xs flex items-center justify-center">
+                          <div className="w-7 h-7 rounded-full bg-[#24143D] text-[#FAF5FF] font-bold text-xs flex items-center justify-center">
                             {m.name.charAt(0).toUpperCase()}
                           </div>
                           <div>
-                            <span className="font-semibold text-[#F9F8FD]">{m.name}</span>
-                            <span className="text-[11px] text-[#F9F8FD]/70 ml-2">({m.email})</span>
+                            <span className="font-semibold text-[#FAF5FF]">{m.name}</span>
+                            <span className="text-[11px] text-[#FAF5FF]/70 ml-2">({m.email})</span>
                           </div>
                         </div>
 
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#0A1225] text-[#E0E5E7] border border-[#E0E5E7]/25">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#13091F] text-[#D4C4E2] border border-[#D4C4E2]/25">
                           {m.role}
                         </span>
                       </div>
@@ -954,11 +954,11 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 </div>
 
                 {/* Navigation */}
-                <div className="pt-4 flex items-center justify-between border-t border-[#E0E5E7]/20">
+                <div className="pt-4 flex items-center justify-between border-t border-[#D4C4E2]/20">
                   <button
                     type="button"
                     onClick={() => setCreateStep(2)}
-                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#F9F8FD] hover:text-white cursor-pointer"
+                    className="px-4 py-2 rounded-xl text-xs font-medium text-[#FAF5FF] hover:text-white cursor-pointer"
                   >
                     Back
                   </button>
@@ -966,7 +966,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                   <button
                     type="button"
                     onClick={() => handleFinalCreate()}
-                    className="px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-[#F9F8FD] to-[#E0E5E7] text-[#0A1225] hover:brightness-105 flex items-center space-x-1.5 cursor-pointer shadow-lg"
+                    className="px-6 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-[#FAF5FF] to-[#D4C4E2] text-[#13091F] hover:brightness-105 flex items-center space-x-1.5 cursor-pointer shadow-lg"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     <span>Create Review & Open Workspace ({uploadedArticles.length} papers)</span>
@@ -982,17 +982,17 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
       {editingProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div 
-            className="w-full max-w-xl bg-[#0B1630] border border-[#E0E5E7]/30 rounded-2xl shadow-2xl p-6 space-y-5 text-left"
+            className="w-full max-w-xl bg-[#1A0D2E] border border-[#D4C4E2]/30 rounded-2xl shadow-2xl p-6 space-y-5 text-left"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-[#E0E5E7]/20">
+            <div className="flex items-center justify-between pb-3 border-b border-[#D4C4E2]/20">
               <div className="flex items-center space-x-2">
-                <Edit3 className="w-4 h-4 text-[#E0E5E7]" />
-                <h3 className="text-base font-bold text-[#F9F8FD]">Edit Review Details</h3>
+                <Edit3 className="w-4 h-4 text-[#D4C4E2]" />
+                <h3 className="text-base font-bold text-[#FAF5FF]">Edit Review Details</h3>
               </div>
               <button 
                 onClick={() => setEditingProject(null)}
-                className="text-[#F9F8FD] hover:text-white cursor-pointer"
+                className="text-[#FAF5FF] hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1000,30 +1000,30 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
             <form onSubmit={handleSaveEdit} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
+                <label className="block text-xs font-semibold text-[#FAF5FF] mb-1.5">
                   Review Title <span className="text-rose-400">*</span>
                 </label>
                 <input
                   type="text"
                   value={editTitle}
                   onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#F9F8FD]"
+                  className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#FAF5FF]"
                   required
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
+                  <label className="block text-xs font-semibold text-[#FAF5FF] mb-1.5">
                     Review Type
                   </label>
                   <select
                     value={editType}
                     onChange={(e) => setEditType(e.target.value)}
-                    className="w-full bg-[#060D1E] border border-[#E0E5E7]/30 text-[#F9F8FD] rounded-xl px-3 py-2 text-xs"
+                    className="w-full bg-[#170A26] border border-[#D4C4E2]/30 text-[#FAF5FF] rounded-xl px-3 py-2 text-xs"
                   >
                     {RAYYAN_REVIEW_TYPES.map(type => (
-                      <option key={type} value={type} className="bg-[#060D1E] text-[#F9F8FD]">
+                      <option key={type} value={type} className="bg-[#170A26] text-[#FAF5FF]">
                         {type}
                       </option>
                     ))}
@@ -1031,13 +1031,13 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
+                  <label className="block text-xs font-semibold text-[#FAF5FF] mb-1.5">
                     Review Domain
                   </label>
                   <select
                     value={editDomain}
                     onChange={(e) => setEditDomain(e.target.value)}
-                    className="w-full bg-[#060D1E] border border-[#E0E5E7]/30 text-[#F9F8FD] rounded-xl px-3 py-2 text-xs"
+                    className="w-full bg-[#170A26] border border-[#D4C4E2]/30 text-[#FAF5FF] rounded-xl px-3 py-2 text-xs"
                   >
                     <option value="Biomedical">Biomedical</option>
                     <option value="Clinical Medicine">Clinical Medicine</option>
@@ -1052,28 +1052,28 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#F9F8FD] mb-1.5">
+                <label className="block text-xs font-semibold text-[#FAF5FF] mb-1.5">
                   Description
                 </label>
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
                   rows={3}
-                  className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#F9F8FD] resize-none"
+                  className="w-full glass-input rounded-xl px-3.5 py-2.5 text-xs text-[#FAF5FF] resize-none"
                 />
               </div>
 
-              <div className="pt-3 flex items-center justify-end space-x-2 border-t border-[#E0E5E7]/20">
+              <div className="pt-3 flex items-center justify-end space-x-2 border-t border-[#D4C4E2]/20">
                 <button
                   type="button"
                   onClick={() => setEditingProject(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-[#F9F8FD] hover:text-white cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-[#FAF5FF] hover:text-white cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] hover:bg-white shadow-md cursor-pointer"
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-[#FAF5FF] text-[#13091F] hover:bg-white shadow-md cursor-pointer"
                 >
                   Save Changes
                 </button>
@@ -1087,19 +1087,19 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
       {managingMembersProject && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div 
-            className="w-full max-w-lg bg-[#0B1630] border border-[#E0E5E7]/30 rounded-2xl shadow-2xl p-6 space-y-5 text-left"
+            className="w-full max-w-lg bg-[#1A0D2E] border border-[#D4C4E2]/30 rounded-2xl shadow-2xl p-6 space-y-5 text-left"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-[#E0E5E7]/20">
+            <div className="flex items-center justify-between pb-3 border-b border-[#D4C4E2]/20">
               <div className="flex items-center space-x-2">
-                <Users className="w-4 h-4 text-[#E0E5E7]" />
-                <h3 className="text-base font-bold text-[#F9F8FD]">
+                <Users className="w-4 h-4 text-[#D4C4E2]" />
+                <h3 className="text-base font-bold text-[#FAF5FF]">
                   Review Members • {managingMembersProject.name}
                 </h3>
               </div>
               <button 
                 onClick={() => setManagingMembersProject(null)}
-                className="text-[#F9F8FD] hover:text-white cursor-pointer"
+                className="text-[#FAF5FF] hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1107,7 +1107,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
             {/* Invite New Member */}
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-[#F9F8FD]">
+              <label className="block text-xs font-semibold text-[#FAF5FF]">
                 Add Reviewer / Collaborator:
               </label>
               <div className="flex gap-2">
@@ -1116,12 +1116,12 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                   placeholder="name@institution.edu"
                   value={newMemberEmail}
                   onChange={(e) => setNewMemberEmail(e.target.value)}
-                  className="flex-1 glass-input rounded-xl px-3 py-2 text-xs text-[#F9F8FD]"
+                  className="flex-1 glass-input rounded-xl px-3 py-2 text-xs text-[#FAF5FF]"
                 />
                 <select
                   value={newMemberRole}
                   onChange={(e) => setNewMemberRole(e.target.value as any)}
-                  className="bg-[#060D1E] border border-[#E0E5E7]/30 text-[#F9F8FD] rounded-xl px-2.5 py-2 text-xs"
+                  className="bg-[#170A26] border border-[#D4C4E2]/30 text-[#FAF5FF] rounded-xl px-2.5 py-2 text-xs"
                 >
                   <option value="Reviewer">Reviewer</option>
                   <option value="Collaborator">Collaborator</option>
@@ -1130,7 +1130,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 <button
                   type="button"
                   onClick={handleAddMemberToProject}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] hover:bg-white flex items-center space-x-1 cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#FAF5FF] text-[#13091F] hover:bg-white flex items-center space-x-1 cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                   <span>Invite</span>
@@ -1140,7 +1140,7 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
 
             {/* Existing Members */}
             <div className="space-y-2 pt-2">
-              <span className="text-[11px] font-semibold text-[#F9F8FD]/70 block">
+              <span className="text-[11px] font-semibold text-[#FAF5FF]/70 block">
                 Current Members ({managingMembersProject.members?.length || 1}):
               </span>
               <div className="space-y-2 max-h-52 overflow-y-auto">
@@ -1149,19 +1149,19 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
                 ]).map((m) => (
                   <div
                     key={m.id}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#060D1E] border border-[#E0E5E7]/20 text-xs"
+                    className="flex items-center justify-between p-2.5 rounded-xl bg-[#170A26] border border-[#D4C4E2]/20 text-xs"
                   >
                     <div className="flex items-center space-x-2.5">
-                      <div className="w-7 h-7 rounded-full bg-[#192440] text-[#F9F8FD] font-bold text-xs flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-full bg-[#24143D] text-[#FAF5FF] font-bold text-xs flex items-center justify-center">
                         {m.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <span className="font-semibold text-[#F9F8FD]">{m.name}</span>
-                        <span className="text-[11px] text-[#F9F8FD]/70 ml-2">({m.email})</span>
+                        <span className="font-semibold text-[#FAF5FF]">{m.name}</span>
+                        <span className="text-[11px] text-[#FAF5FF]/70 ml-2">({m.email})</span>
                       </div>
                     </div>
 
-                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#0A1225] text-[#E0E5E7] border border-[#E0E5E7]/25">
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#13091F] text-[#D4C4E2] border border-[#D4C4E2]/25">
                       {m.role}
                     </span>
                   </div>
@@ -1169,11 +1169,11 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
               </div>
             </div>
 
-            <div className="pt-3 flex justify-end border-t border-[#E0E5E7]/20">
+            <div className="pt-3 flex justify-end border-t border-[#D4C4E2]/20">
               <button
                 type="button"
                 onClick={() => setManagingMembersProject(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] hover:bg-white cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-[#FAF5FF] text-[#13091F] hover:bg-white cursor-pointer"
               >
                 Done
               </button>

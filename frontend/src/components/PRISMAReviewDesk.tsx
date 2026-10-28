@@ -105,16 +105,16 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
     <div className="space-y-6 text-left">
       
       {/* Header */}
-      <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E0E5E7] flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-panel-elevated rounded-2xl p-6 border border-[#D4C4E2] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#6F4E37] text-white">
+            <span className="px-2.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#2E1945] text-white">
               PRISMA 2020
             </span>
             <span className="text-xs font-mono text-[#7E7A72]">Synthesis Reporting</span>
           </div>
-          <h2 className="text-base font-bold text-[#462E1E] mt-1 flex items-center space-x-2">
-            <Download className="w-4 h-4 text-[#6F4E37]" />
+          <h2 className="text-base font-bold text-[#201035] mt-1 flex items-center space-x-2">
+            <Download className="w-4 h-4 text-[#2E1945]" />
             <span>PRISMA Flow Diagram & Synthesis Export Center</span>
           </h2>
           <p className="text-xs text-[#5F5C56] mt-0.5">
@@ -126,7 +126,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={() => exportData('csv')}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#6F4E37] hover:bg-[#5A3D29] text-white shadow-md shadow-[#6F4E37]/20 transition-all"
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-[#2E1945] hover:bg-[#2B1544] text-white shadow-md shadow-[#2E1945]/20 transition-all"
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
             <span>Export CSV</span>
@@ -134,36 +134,36 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
 
           <button
             onClick={() => exportData('ris')}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-[#FAF9FD] text-[#5A3D29] border border-[#E0E5E7] transition-all"
+            className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-[#FAF9FD] text-[#2B1544] border border-[#D4C4E2] transition-all"
             title="Standard RIS format for EndNote, Zotero, and Mendeley"
           >
-            <FileText className="w-3.5 h-3.5 text-[#6F4E37]" />
+            <FileText className="w-3.5 h-3.5 text-[#2E1945]" />
             <span>RIS Citations</span>
           </button>
 
           <button
             onClick={() => exportData('json')}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-[#FAF9FD] text-[#5A3D29] border border-[#E0E5E7] transition-all"
+            className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-[#FAF9FD] text-[#2B1544] border border-[#D4C4E2] transition-all"
           >
-            <FileCode className="w-3.5 h-3.5 text-[#6F4E37]" />
+            <FileCode className="w-3.5 h-3.5 text-[#2E1945]" />
             <span>JSON</span>
           </button>
         </div>
       </div>
 
       {/* PRISMA 2020 Flow Diagram Cards */}
-      <div className="glass-panel rounded-2xl p-6 border border-[#E0E5E7] space-y-4">
-        <h3 className="text-sm font-semibold text-[#462E1E] flex items-center space-x-2">
-          <Layers className="w-4 h-4 text-[#6F4E37]" />
+      <div className="glass-panel rounded-2xl p-6 border border-[#D4C4E2] space-y-4">
+        <h3 className="text-sm font-semibold text-[#201035] flex items-center space-x-2">
+          <Layers className="w-4 h-4 text-[#2E1945]" />
           <span>PRISMA 2020 Systematic Review Flow</span>
         </h3>
 
         <div className="flex flex-col items-center space-y-3 max-w-xl mx-auto">
           
           {/* Phase 1: Identification */}
-          <div className="w-full bg-white p-4 rounded-xl border border-[#F9F8FD] text-center shadow-2xs">
-            <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Identification</span>
-            <div className="text-sm font-bold text-[#462E1E] mt-0.5">
+          <div className="w-full bg-white p-4 rounded-xl border border-[#FAF5FF] text-center shadow-2xs">
+            <span className="text-[10px] uppercase font-mono font-bold text-[#2E1945]">Identification</span>
+            <div className="text-sm font-bold text-[#201035] mt-0.5">
               Records identified from databases (n = {totalIdentified.toLocaleString()})
             </div>
             <div className="text-[11px] text-[#7E7A72] mt-0.5">
@@ -171,12 +171,12 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
             </div>
           </div>
 
-          <ArrowDown className="w-4 h-4 text-[#6F4E37]" />
+          <ArrowDown className="w-4 h-4 text-[#2E1945]" />
 
           {/* Phase 2: Deduplication */}
-          <div className="w-full bg-white p-4 rounded-xl border border-[#F9F8FD] text-center shadow-2xs">
-            <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Deduplication</span>
-            <div className="text-sm font-bold text-[#462E1E] mt-0.5">
+          <div className="w-full bg-white p-4 rounded-xl border border-[#FAF5FF] text-center shadow-2xs">
+            <span className="text-[10px] uppercase font-mono font-bold text-[#2E1945]">Deduplication</span>
+            <div className="text-sm font-bold text-[#201035] mt-0.5">
               Duplicate records marked & hidden (n = {duplicateRecordsHidden.toLocaleString()})
             </div>
             <div className="text-[11px] text-[#7E7A72] mt-0.5">
@@ -184,13 +184,13 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
             </div>
           </div>
 
-          <ArrowDown className="w-4 h-4 text-[#6F4E37]" />
+          <ArrowDown className="w-4 h-4 text-[#2E1945]" />
 
           {/* Phase 3: Screening */}
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="bg-white p-4 rounded-xl border border-[#F9F8FD] text-center shadow-2xs">
-              <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Screening</span>
-              <div className="text-sm font-bold text-[#462E1E] mt-0.5">
+            <div className="bg-white p-4 rounded-xl border border-[#FAF5FF] text-center shadow-2xs">
+              <span className="text-[10px] uppercase font-mono font-bold text-[#2E1945]">Screening</span>
+              <div className="text-sm font-bold text-[#201035] mt-0.5">
                 Records screened (n = {screenedCount.toLocaleString()})
               </div>
               <div className="text-[11px] text-[#7E7A72] mt-0.5">
@@ -212,7 +212,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
             </div>
           </div>
 
-          <ArrowDown className="w-4 h-4 text-[#6F4E37]" />
+          <ArrowDown className="w-4 h-4 text-[#2E1945]" />
 
           {/* Phase 4: Included */}
           <div className="w-full bg-emerald-50/80 p-4 rounded-xl border border-emerald-300 text-center shadow-2xs">
@@ -229,10 +229,10 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
       </div>
 
       {/* Audit Run Log Section */}
-      <div className="glass-panel-elevated rounded-2xl p-6 border border-[#E0E5E7] space-y-3">
+      <div className="glass-panel-elevated rounded-2xl p-6 border border-[#D4C4E2] space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-[#462E1E] flex items-center space-x-2">
-            <Activity className="w-4 h-4 text-[#6F4E37]" />
+          <h3 className="text-sm font-semibold text-[#201035] flex items-center space-x-2">
+            <Activity className="w-4 h-4 text-[#2E1945]" />
             <span>Audit Trail & Provenance Run Log</span>
           </h3>
           <span className="text-xs font-mono text-[#7E7A72]">
@@ -242,13 +242,13 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
 
         <div className="max-h-60 overflow-y-auto space-y-2 pr-1 font-mono text-xs">
           {auditLogs.map((log) => (
-            <div key={log.id} className="p-2.5 rounded-lg bg-white/70 border border-[#F9F8FD] flex items-center justify-between text-[11px]">
+            <div key={log.id} className="p-2.5 rounded-lg bg-white/70 border border-[#FAF5FF] flex items-center justify-between text-[11px]">
               <div className="flex items-center space-x-2.5">
                 <span className="text-[#7E7A72]">{log.timestamp}</span>
-                <span className="px-1.5 py-0.5 rounded bg-[#E0E5E7] text-[#5A3D29] font-semibold">
+                <span className="px-1.5 py-0.5 rounded bg-[#D4C4E2] text-[#2B1544] font-semibold">
                   {log.step}
                 </span>
-                <span className="text-[#462E1E] font-medium">{log.action}</span>
+                <span className="text-[#201035] font-medium">{log.action}</span>
               </div>
               <span className={`px-2 py-0.5 rounded text-[10px] ${
                 log.actor === 'human' ? 'bg-amber-100 text-amber-800' : 'bg-stone-100 text-stone-700'

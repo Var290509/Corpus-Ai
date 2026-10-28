@@ -18,16 +18,16 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in text-left">
       <div 
-        className="w-full max-w-2xl glass-panel-elevated rounded-2xl border border-[#E0E5E7] shadow-2xl overflow-hidden"
+        className="w-full max-w-2xl glass-panel-elevated rounded-2xl border border-[#D4C4E2] shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-5 border-b border-[#E0E5E7] flex items-center justify-between bg-white/90">
+        <div className="p-5 border-b border-[#D4C4E2] flex items-center justify-between bg-white/90">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[#6F4E37] flex items-center justify-center text-white">
+            <div className="w-8 h-8 rounded-lg bg-[#2E1945] flex items-center justify-center text-white">
               <Activity className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-[#462E1E]">Provenance & Audit Run Log</h3>
+              <h3 className="text-sm font-semibold text-[#201035]">Provenance & Audit Run Log</h3>
               <p className="text-[11px] text-[#7E7A72]">
                 Chronological log of version edits, automated algorithms, and human reviewer decisions.
               </p>
@@ -36,7 +36,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#7E7A72] hover:text-[#462E1E]"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#7E7A72] hover:text-[#201035]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -46,12 +46,12 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({
           {logs.map((log) => (
             <div 
               key={log.id} 
-              className="p-3 rounded-xl bg-white border border-[#F9F8FD] space-y-1 shadow-2xs"
+              className="p-3 rounded-xl bg-white border border-[#FAF5FF] space-y-1 shadow-2xs"
             >
               <div className="flex items-center justify-between text-[11px]">
                 <div className="flex items-center space-x-2">
                   <span className="text-[#7E7A72]">{log.timestamp}</span>
-                  <span className="px-1.5 py-0.5 rounded bg-[#E0E5E7] text-[#5A3D29] font-bold">
+                  <span className="px-1.5 py-0.5 rounded bg-[#D4C4E2] text-[#2B1544] font-bold">
                     V{log.versionNumber} • {log.step}
                   </span>
                 </div>
@@ -63,7 +63,7 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({
                 </span>
               </div>
 
-              <div className="font-semibold text-[#462E1E] text-xs">
+              <div className="font-semibold text-[#201035] text-xs">
                 {log.action}
               </div>
 
@@ -74,10 +74,10 @@ export const AuditLogModal: React.FC<AuditLogModalProps> = ({
           ))}
         </div>
 
-        <div className="p-4 bg-white/70 border-t border-[#E0E5E7] flex justify-end">
+        <div className="p-4 bg-white/70 border-t border-[#D4C4E2] flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-[#6F4E37] text-white"
+            className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-[#2E1945] text-white"
           >
             Close Log
           </button>

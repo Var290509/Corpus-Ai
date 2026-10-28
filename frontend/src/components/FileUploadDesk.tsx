@@ -103,10 +103,10 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
           setIsDragging(false);
           handleFiles(e.dataTransfer.files);
         }}
-        className={`glass-panel-elevated rounded-2xl p-8 sm:p-12 border-2 border-dashed transition-all text-center relative overflow-hidden bg-[#0B1630]/90 ${
+        className={`glass-panel-elevated rounded-2xl p-8 sm:p-12 border-2 border-dashed transition-all text-center relative overflow-hidden bg-[#1A0D2E]/90 ${
           isDragging 
-            ? 'border-[#E0E5E7] bg-[#192440]/95 scale-[1.01]' 
-            : 'border-[#E0E5E7]/30 hover:border-[#E0E5E7]/50'
+            ? 'border-[#D4C4E2] bg-[#24143D]/95 scale-[1.01]' 
+            : 'border-[#D4C4E2]/30 hover:border-[#D4C4E2]/50'
         }`}
       >
         <input
@@ -119,28 +119,28 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
         />
 
         <div className="max-w-md mx-auto space-y-4 pointer-events-none">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#6F4E37] to-[#9E88BE] flex items-center justify-center mx-auto text-white shadow-xl">
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#2E1945] to-[#9E88BE] flex items-center justify-center mx-auto text-white shadow-xl">
             <Upload className="w-7 h-7" />
           </div>
 
           <div>
-            <h3 className="text-base font-bold text-[#F9F8FD]">
+            <h3 className="text-base font-bold text-[#FAF5FF]">
               Drop your citation files, PDFs, or research posters/images here
             </h3>
-            <p className="text-xs text-[#F9F8FD]/80 mt-1 leading-relaxed">
+            <p className="text-xs text-[#FAF5FF]/80 mt-1 leading-relaxed">
               Accepts <strong>.PDF</strong>, <strong>Pictures/Posters (.PNG, .JPG, .WEBP)</strong> via deep OCR, <strong>.RIS</strong> (Scopus/WoS/PubMed), <strong>.CSV</strong>, <strong>.BIB</strong>, or <strong>.JSON</strong>.
             </p>
           </div>
 
-          <div className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] shadow-md">
+          <div className="inline-flex items-center px-4 py-2 rounded-xl text-xs font-bold bg-[#FAF5FF] text-[#13091F] shadow-md">
             <span>Browse Research Files on Computer</span>
           </div>
         </div>
 
         {isProcessing && (
-          <div className="absolute inset-0 bg-[#060D1E]/90 backdrop-blur-sm flex flex-col items-center justify-center space-y-2 z-20">
-            <div className="w-8 h-8 border-2 border-[#E0E5E7] border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs font-bold text-[#F9F8FD]">Deduplicating & Computing AI Ratings with Evidence...</span>
+          <div className="absolute inset-0 bg-[#170A26]/90 backdrop-blur-sm flex flex-col items-center justify-center space-y-2 z-20">
+            <div className="w-8 h-8 border-2 border-[#D4C4E2] border-t-transparent rounded-full animate-spin" />
+            <span className="text-xs font-bold text-[#FAF5FF]">Deduplicating & Computing AI Ratings with Evidence...</span>
           </div>
         )}
       </div>
@@ -151,7 +151,7 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
           <div className="flex items-center space-x-3">
             <CheckCircle className="w-5 h-5 text-emerald-300 shrink-0" />
             <div>
-              <span className="font-bold text-[#F9F8FD]">
+              <span className="font-bold text-[#FAF5FF]">
                 Successfully imported {uploadStats.count} research papers!
               </span>
               <p className="text-[11px] text-emerald-200 mt-0.5">
@@ -167,37 +167,37 @@ export const FileUploadDesk: React.FC<FileUploadDeskProps> = ({
       )}
 
       {/* Quick Paste Alternative */}
-      <div className="glass-panel rounded-2xl p-5 border border-[#E0E5E7]/20 bg-[#0B1630]/85 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="glass-panel rounded-2xl p-5 border border-[#D4C4E2]/20 bg-[#1A0D2E]/85 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center space-x-3">
-          <ClipboardPaste className="w-5 h-5 text-[#E0E5E7]" />
+          <ClipboardPaste className="w-5 h-5 text-[#D4C4E2]" />
           <div>
-            <h4 className="text-xs font-bold text-[#F9F8FD]">Have raw text or copied RIS entries?</h4>
-            <p className="text-[11px] text-[#F9F8FD]/70">Paste citations directly without saving a file.</p>
+            <h4 className="text-xs font-bold text-[#FAF5FF]">Have raw text or copied RIS entries?</h4>
+            <p className="text-[11px] text-[#FAF5FF]/70">Paste citations directly without saving a file.</p>
           </div>
         </div>
 
         <button
           onClick={() => setShowPasteBox(!showPasteBox)}
-          className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#192440] hover:bg-[#223154] text-[#F9F8FD] border border-[#E0E5E7]/25 transition-all cursor-pointer"
+          className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-[#24143D] hover:bg-[#381F5C] text-[#FAF5FF] border border-[#D4C4E2]/25 transition-all cursor-pointer"
         >
           {showPasteBox ? 'Hide Paste Box' : 'Open Paste Box'}
         </button>
       </div>
 
       {showPasteBox && (
-        <div className="glass-panel-elevated rounded-2xl p-5 border border-[#E0E5E7]/25 bg-[#0B1630]/95 space-y-3 animate-fade-in">
+        <div className="glass-panel-elevated rounded-2xl p-5 border border-[#D4C4E2]/25 bg-[#1A0D2E]/95 space-y-3 animate-fade-in">
           <textarea
             value={pastedText}
             onChange={(e) => setPastedText(e.target.value)}
             rows={5}
             placeholder="Paste raw RIS (e.g. TY  - JOUR ... ER  - ) or Title / Abstract blocks..."
-            className="w-full glass-input rounded-xl p-3 text-xs font-mono text-[#F9F8FD] resize-none"
+            className="w-full glass-input rounded-xl p-3 text-xs font-mono text-[#FAF5FF] resize-none"
           />
           <div className="flex justify-end">
             <button
               onClick={handlePasteSubmit}
               disabled={!pastedText.trim() || isProcessing}
-              className="px-4 py-2 rounded-xl text-xs font-bold bg-[#F9F8FD] text-[#0A1225] hover:bg-white transition-all cursor-pointer shadow-md disabled:opacity-50"
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-[#FAF5FF] text-[#13091F] hover:bg-white transition-all cursor-pointer shadow-md disabled:opacity-50"
             >
               Parse Pasted Citations
             </button>
