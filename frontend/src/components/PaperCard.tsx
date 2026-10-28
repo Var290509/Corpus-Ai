@@ -536,157 +536,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         </div>
       </div>
 
-      {/* Interactive AI Screening Assistant: Prominently Asking to Include or Exclude */}
-      <div className="mt-3.5 p-4 rounded-2xl bg-gradient-to-r from-[#2B1B12] via-[#352317] to-[#2B1B12] border-2 border-[#E6E0F0]/30 shadow-lg space-y-3">
-        {/* Header & Question */}
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center space-x-2">
-            <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-300">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="text-xs font-bold text-[#FAF9F8] uppercase tracking-wider block">
-                AI Screening Assistant: Do you want to INCLUDE or EXCLUDE this study?
-              </span>
-              <span className="text-[11px] text-[#E5E4E2]/80">
-                Evaluate against your systematic review criteria using the analyzed subtopics above
-              </span>
-            </div>
-          </div>
 
-          {/* AI Suggested Decision Pill */}
-          {paper.aiScreeningRecommendation && (
-            <div className="flex items-center space-x-1.5 bg-[#1C110B] px-2.5 py-1 rounded-xl border border-[#E6E0F0]/20 text-xs">
-              <span className="text-[10px] font-mono text-[#E5E4E2]/70 uppercase">AI Suggestion:</span>
-              <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border flex items-center space-x-1 ${
-                paper.aiScreeningRecommendation === 'Included'
-                  ? 'bg-emerald-950 text-emerald-300 border-emerald-500/50'
-                  : (paper.aiScreeningRecommendation === 'Excluded'
-                      ? 'bg-rose-950 text-rose-300 border-rose-500/50'
-                      : 'bg-amber-950 text-amber-300 border-amber-500/50')
-              }`}>
-                <span>{paper.aiScreeningRecommendation}</span>
-              </span>
-            </div>
-          )}
-        </div>
-
-        {/* Clinical Screening Rationale */}
-        {paper.aiScreeningReason && (
-          <div className="p-2.5 rounded-xl bg-[#1C110B] border border-[#E6E0F0]/15 text-xs text-[#FAF9F8] flex items-start space-x-2">
-            <Info className="w-4 h-4 text-amber-300 shrink-0 mt-0.5" />
-            <div className="text-[11px] leading-relaxed">
-              <strong className="text-amber-200">Screening Rationale: </strong>
-              <span className="text-[#E5E4E2]/90">{paper.aiScreeningReason}</span>
-            </div>
-          </div>
-        )}
-
-        {/* Dynamic Subtopic Impact on Screening */}
-        {excludedSubCount > 0 && (
-          <div className="p-2.5 rounded-xl bg-rose-950/80 border border-rose-500/50 text-xs text-rose-200 flex items-start space-x-2 animate-fade-in">
-            <X className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-            <div className="text-[11px] leading-relaxed">
-              <strong>Subtopic Reviewer Flag: </strong>
-              <span>You have marked {excludedSubCount} subtopic(s) as Excluded ({currentSubtopics.filter(s => s.userDecision === 'excluded').map(s => s.name).slice(0, 3).join(', ')}). Consider excluding this study if these criteria are mandatory for your review.</span>
-            </div>
-          </div>
-        )}
-
-        {/* The Action Buttons Prompt */}
-        <div className="pt-2 border-t border-[#E6E0F0]/20 flex flex-wrap items-center justify-between gap-3">
-          <span className="text-xs font-bold text-[#FAF9F8] flex items-center space-x-1.5">
-            <HelpCircle className="w-4 h-4 text-emerald-400" />
-            <span>Select Screening Decision:</span>
-          </span>
-
-          <div className="flex flex-wrap items-center gap-2 relative">
-            {/* Include Button */}
-            <button
-              onClick={() => onDecide(paper.id, 'include', 'Matches review criteria & target subtopics')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md ${
-                status === 'include'
-                  ? 'bg-emerald-600 text-white ring-2 ring-emerald-400 shadow-emerald-900/50'
-                  : 'bg-emerald-950/80 hover:bg-emerald-700 text-emerald-200 border border-emerald-500/60'
-              }`}
-              title="Include this paper in systematic review"
-            >
-              <Check className="w-4 h-4" />
-              <span>{status === 'include' ? '✓ Included in Review' : 'Include Paper'}</span>
-            </button>
-
-            {/* Exclude Button with Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setShowReasonDropdown(!showReasonDropdown)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-md ${
-                  status === 'exclude'
-                    ? 'bg-rose-600 text-white ring-2 ring-rose-400 shadow-rose-900/50'
-                    : 'bg-rose-950/80 hover:bg-rose-700 text-rose-200 border border-rose-500/60'
-                }`}
-                title="Exclude this paper and provide exclusion criterion"
-              >
-                <X className="w-4 h-4" />
-                <span>{status === 'exclude' ? '✕ Excluded' : 'Exclude Paper'}</span>
-                <ChevronDown className="w-3.5 h-3.5 ml-0.5" />
-              </button>
-
-              {showReasonDropdown && (
-                <div className="absolute right-0 top-full mt-2 w-72 bg-[#362419] border border-[#E6E0F0]/30 rounded-xl shadow-2xl p-2 z-40 text-xs animate-fade-in">
-                  <span className="text-[10px] font-mono text-[#E5E4E2]/70 px-2 py-1 block border-b border-[#E6E0F0]/15 mb-1">
-                    Select Specific Reason to Exclude:
-                  </span>
-                  {exclusionOptions.map((opt) => (
-                    <button
-                      key={opt.code}
-                      onClick={() => {
-                        onDecide(paper.id, 'exclude', `${opt.code}: ${opt.label}`);
-                        setShowReasonDropdown(false);
-                      }}
-                      className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-rose-950/80 hover:text-rose-200 transition-colors block text-[11px] cursor-pointer"
-                    >
-                      <span className="font-mono font-bold mr-1 text-[#E6E0F0]">{opt.code}</span>
-                      <span>{opt.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Maybe / Hold Button */}
-            <button
-              onClick={() => onDecide(paper.id, 'maybe', 'Requires full-text appraisal against subtopic criteria')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all cursor-pointer ${
-                status === 'maybe'
-                  ? 'bg-[#4A3324] text-[#E6E0F0] ring-2 ring-[#E6E0F0]/50'
-                  : 'bg-[#271911] hover:bg-[#4A3324] text-[#E5E4E2] border border-[#E6E0F0]/25'
-              }`}
-              title="Mark as Maybe for team consensus"
-            >
-              <HelpCircle className="w-3.5 h-3.5" />
-              <span>{status === 'maybe' ? '? Marked as Maybe' : 'Maybe / Hold'}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Current Decision Pill if already reviewed */}
-        {status !== 'unscreened' && (
-          <div className={`p-2.5 rounded-xl border text-xs flex items-center justify-between ${
-            status === 'include'
-              ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-200'
-              : (status === 'exclude'
-                  ? 'bg-rose-950/60 border-rose-500/40 text-rose-200'
-                  : 'bg-[#3A281E] border-[#E6E0F0]/30 text-[#E6E0F0]')
-          }`}>
-            <span className="font-semibold flex items-center space-x-1.5">
-              <span>Current Review Decision:</span>
-              <strong className="uppercase underline tracking-wider">{status}</strong>
-              {decision?.reason && <span>— "{decision.reason}"</span>}
-            </span>
-            <span className="text-[10px] opacity-75">(Click any button above to change)</span>
-          </div>
-        )}
-      </div>
 
       {/* Related Research Papers Recommender */}
       {onDiscoverSimilar && (
@@ -760,56 +610,86 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         </div>
       )}
 
-      {/* Screening Action Bar */}
-      <div className="mt-4 pt-3 border-t border-[#E6E0F0]/15 flex flex-wrap items-center justify-between gap-2">
-        <div className="text-[11px] text-[#E5E4E2]/70 flex items-center space-x-1.5">
-          {decision?.decidedBy === 'human' ? (
-            <span className="flex items-center text-[#E6E0F0] font-medium">
-              <UserCheck className="w-3.5 h-3.5 mr-1" />
-              Reviewed by Human
-            </span>
-          ) : (
-            <span className="flex items-center text-[#E5E4E2]/60">
-              <Bot className="w-3.5 h-3.5 mr-1" />
-              Auto-Classified
+      {/* Rayyan-Style Bottom Screening Decision Bar */}
+      <div className="mt-4 pt-3 border-t border-[#FAF9F8]/10 flex flex-wrap items-center justify-between gap-3">
+        {/* Left: Review Status & Decision Indicator */}
+        <div className="flex items-center space-x-2 text-xs">
+          {status === 'include' && (
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-950/90 text-emerald-300 border border-emerald-500/40 font-bold flex items-center space-x-1 text-[11px] shadow-sm">
+              <Check className="w-3.5 h-3.5" />
+              <span>Included</span>
             </span>
           )}
+          {status === 'exclude' && (
+            <span className="px-2.5 py-1 rounded-lg bg-rose-950/90 text-rose-300 border border-rose-500/40 font-bold flex items-center space-x-1 text-[11px] shadow-sm" title={decision?.reason}>
+              <X className="w-3.5 h-3.5" />
+              <span className="truncate max-w-[180px]">{decision?.reason ? `Excluded (${decision.reason.split(':')[0]})` : 'Excluded'}</span>
+            </span>
+          )}
+          {status === 'maybe' && (
+            <span className="px-2.5 py-1 rounded-lg bg-[#3D281C] text-amber-200 border border-amber-500/40 font-bold flex items-center space-x-1 text-[11px] shadow-sm">
+              <HelpCircle className="w-3.5 h-3.5" />
+              <span>Maybe</span>
+            </span>
+          )}
+          {status === 'unscreened' && (
+            <span className="text-[11px] text-[#FAF9F8]/50 italic flex items-center space-x-1">
+              <span>Unscreened</span>
+            </span>
+          )}
+
+          {/* Decision Auditor / Origin */}
+          <div className="text-[11px] text-[#FAF9F8]/50 flex items-center space-x-1 pl-1">
+            {decision?.decidedBy === 'human' ? (
+              <span className="flex items-center text-[#FAF9F8]/80 font-medium" title="Decided by reviewer">
+                <UserCheck className="w-3 h-3 mr-1 text-[#E6E0F0]" />
+                Human
+              </span>
+            ) : (
+              <span className="flex items-center text-[#FAF9F8]/45" title="Automated classification">
+                <Bot className="w-3 h-3 mr-1" />
+                Auto
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* 3-way Triage Action Buttons */}
-        <div className="flex items-center space-x-1.5">
+        {/* Right: The 3 Rayyan Action Buttons (✓ Include, ✕ Exclude, ? Maybe) */}
+        <div className="flex items-center space-x-2 relative">
           {/* Include Button */}
           <button
-            onClick={() => onDecide(paper.id, 'include')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all cursor-pointer ${
+            onClick={() => onDecide(paper.id, 'include', 'Matches review criteria & target subtopics')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm ${
               status === 'include'
-                ? 'bg-emerald-600 text-white shadow-md'
-                : 'bg-[#271911] hover:bg-emerald-950 text-emerald-300 border border-emerald-600/50'
+                ? 'bg-emerald-600 text-white ring-2 ring-emerald-400 shadow-emerald-950/60'
+                : 'bg-[#1C110B] hover:bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400'
             }`}
+            title="Include this paper in systematic review"
           >
             <Check className="w-3.5 h-3.5" />
-            <span>Include</span>
+            <span>✓ Include</span>
           </button>
 
-          {/* Exclude with Dropdown */}
+          {/* Exclude Button with Dropdown */}
           <div className="relative">
             <button
               onClick={() => setShowReasonDropdown(!showReasonDropdown)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm ${
                 status === 'exclude'
-                  ? 'bg-rose-600 text-white shadow-md'
-                  : 'bg-[#271911] hover:bg-rose-950 text-rose-300 border border-rose-600/50'
+                  ? 'bg-rose-600 text-white ring-2 ring-rose-400 shadow-rose-950/60'
+                  : 'bg-[#1C110B] hover:bg-rose-950/80 text-rose-300 border border-rose-500/40 hover:border-rose-400'
               }`}
+              title="Exclude this paper and select reason"
             >
               <X className="w-3.5 h-3.5" />
-              <span>Exclude</span>
+              <span>✕ Exclude</span>
               <ChevronDown className="w-3 h-3 ml-0.5" />
             </button>
 
             {showReasonDropdown && (
-              <div className="absolute right-0 bottom-full mb-1.5 w-64 bg-[#362419] border border-[#E6E0F0]/30 rounded-xl shadow-xl p-2 z-30 text-xs">
-                <span className="text-[10px] font-mono text-[#E5E4E2]/70 px-2 py-1 block">
-                  Select Required Exclusion Reason:
+              <div className="absolute right-0 bottom-full mb-2 w-72 bg-[#2D1B11] border border-[#FAF9F8]/20 rounded-xl shadow-2xl p-2 z-40 text-xs animate-fade-in backdrop-blur-md">
+                <span className="text-[10px] font-mono text-[#FAF9F8]/60 px-2 py-1 block border-b border-[#FAF9F8]/10 mb-1">
+                  Select Reason for Exclusion:
                 </span>
                 {exclusionOptions.map((opt) => (
                   <button
@@ -818,10 +698,10 @@ export const PaperCard: React.FC<PaperCardProps> = ({
                       onDecide(paper.id, 'exclude', `${opt.code}: ${opt.label}`);
                       setShowReasonDropdown(false);
                     }}
-                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-rose-950/80 hover:text-rose-200 transition-colors block text-[11px]"
+                    className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-rose-950/80 hover:text-rose-200 transition-colors block text-[11px] cursor-pointer"
                   >
-                    <span className="font-mono font-bold mr-1 text-[#E6E0F0]">{opt.code}</span>
-                    <span>{opt.label}</span>
+                    <span className="font-mono font-bold mr-1.5 text-rose-300">{opt.code}</span>
+                    <span className="text-[#FAF9F8]">{opt.label}</span>
                   </button>
                 ))}
               </div>
@@ -830,15 +710,16 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
           {/* Maybe Button */}
           <button
-            onClick={() => onDecide(paper.id, 'maybe', 'Needs full-text review for dosage and clinical outcomes')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 transition-all cursor-pointer ${
+            onClick={() => onDecide(paper.id, 'maybe', 'Requires full-text appraisal')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all cursor-pointer shadow-sm ${
               status === 'maybe'
-                ? 'bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/40 shadow-md'
-                : 'bg-[#271911] hover:bg-[#4A3324] text-[#E5E4E2] border border-[#E6E0F0]/20'
+                ? 'bg-[#4A3324] text-amber-200 ring-2 ring-amber-400/50 shadow-md'
+                : 'bg-[#1C110B] hover:bg-[#3D281C] text-[#FAF9F8]/80 border border-[#FAF9F8]/20 hover:text-white'
             }`}
+            title="Mark as Maybe for consensus / full-text review"
           >
-            <HelpCircle className="w-3.5 h-3.5" />
-            <span>Maybe</span>
+            <HelpCircle className="w-3.5 h-3.5 text-amber-300" />
+            <span>? Maybe</span>
           </button>
         </div>
       </div>
