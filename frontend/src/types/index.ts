@@ -118,9 +118,15 @@ export interface DeepAnalysisResult {
 }
 
 export interface ExtractedSubtopic {
-  category: 'Condition' | 'Biomarkers' | 'Population' | 'Methodology' | 'Outcomes' | 'Pharmacology';
+  id?: string;
+  category: 'Condition' | 'Biomarkers' | 'Population' | 'Methodology' | 'Outcomes' | 'Pharmacology' | string;
   name: string;
   snippet?: string;
+  relevanceScore?: number; // 0 - 100 assigned by Gemini AI
+  aiPriority?: 'High' | 'Medium' | 'Low' | 'Exclude';
+  aiReasoning?: string;
+  recommendation?: 'Include' | 'Exclude' | 'Maybe';
+  userDecision?: 'included' | 'excluded' | 'neutral'; // whether human reviewer marked this subtopic as included or excluded
 }
 
 export interface ResearchPaper {

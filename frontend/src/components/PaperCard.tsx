@@ -13,10 +13,15 @@ import {
   UserCheck,
   Bot,
   Star,
-  Quote
+  Quote,
+  Key,
+  RefreshCw,
+  SlidersHorizontal,
+  ArrowUpDown
 } from 'lucide-react';
-import { ResearchPaper, ReviewerDecision, AIBadge, PICOSpan } from '../types';
+import { ResearchPaper, ReviewerDecision, AIBadge, PICOSpan, ExtractedSubtopic } from '../types';
 import { extractDetailedSubtopics } from '../services/fileParser';
+import { sortSubtopicsWithGemini, getGeminiApiKey, setGeminiApiKey } from '../services/geminiService';
 
 interface PaperCardProps {
   paper: ResearchPaper;
@@ -135,6 +140,76 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       displayAuthors = [authorMatch[0].replace(/\b\d+\s*\*?/g, '').trim()];
     }
   }
+
+  // Subtopics and Gemini AI sorting state
+  const [currentSubtopics, setCurrentSubtopics] = useState<ExtractedSubtopic[]>(subtopics);
+  const [isSortingSubtopics, setIsSortingSubtopics] = useState(false);
+  const [sortSummary, setSortSummary] = useState<string | null>(null);
+  const [geminiKeyInput, setGeminiKeyInput] = useState<string>(getGeminiApiKey());
+  const [showKeyConfig, setShowKeyConfig] = useState(false);
+  const [keySaveSuccess, setKeySaveSuccess] = useState(false);
+
+  const handleToggleSubtopic = (idx: number, targetDecision: 'included' | 'excluded' | 'neutral') => {
+    const updated = [...currentSubtopics];
+    updated[idx] = {
+      ...updated[idx],
+      userDecision: updated[idx].userDecision === targetDecision ? 'neutral' : targetDecision
+    };
+    setCurrentSubtopics(updated);
+  };
+
+  const handleIncludeAllSubtopics = () => {
+    setCurrentSubtopics(currentSubtopics.map(s => ({ ...s, userDecision: 'included' })));
+  };
+
+  const handleResetSubtopics = () => {
+    setCurrentSubtopics(currentSubtopics.map(s => ({ ...s, userDecision: 'neutral' })));
+  };
+
+  const handleSortWithGemini = async () => {
+    setIsSortingSubtopics(true);
+    setSortSummary(null);
+    try {
+      const res = await sortSubtopicsWithGemini(displayTitle, paper.abstract, currentSubtopics, geminiKeyInput);
+      setCurrentSubtopics(res.sortedSubtopics);
+      setSortSummary(res.aiSummary);
+      setTimeout(() => setSortSummary(null), 8000);
+    } catch (err) {
+      console.error('Gemini sort error:', err);
+    } finally {
+      setIsSortingSubtopics(false);
+    }
+  };
+
+  const handleSaveGeminiKey = (e: React.FormEvent) => {
+    e.preventDefault();
+    setGeminiApiKey(geminiKeyInput);
+    setKeySaveSuccess(true);
+    setTimeout(() => {
+      setKeySaveSuccess(false);
+      setShowKeyConfig(false);
+    }, 1500);
+  };
+
+  const getCategoryBadgeStyle = (cat: string) => {
+    switch (cat) {
+      case 'Condition':
+        return 'bg-rose-950/70 text-rose-200 border-rose-500/40';
+      case 'Biomarkers':
+        return 'bg-cyan-950/70 text-cyan-200 border-cyan-500/40';
+      case 'Population':
+        return 'bg-amber-950/70 text-amber-200 border-amber-500/40';
+      case 'Methodology':
+        return 'bg-indigo-950/70 text-indigo-200 border-indigo-500/40';
+      case 'Outcomes':
+        return 'bg-emerald-950/70 text-emerald-200 border-emerald-500/40';
+      default:
+        return 'bg-[#4A3324] text-[#E6E0F0] border-[#E6E0F0]/30';
+    }
+  };
+
+  const includedSubCount = currentSubtopics.filter(s => s.userDecision === 'included').length;
+  const excludedSubCount = currentSubtopics.filter(s => s.userDecision === 'excluded').length;
 
   return (
     <div className={`glass-card rounded-2xl p-5 border transition-all text-left relative ${
@@ -257,40 +332,211 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         )}
       </div>
 
-      {/* Extracted Deep Subtopics from PDF / Full-Text Analysis */}
-      <div className="mt-3 p-3.5 rounded-xl bg-[#241710]/95 border border-[#E6E0F0]/25 space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold text-[#FAF9F8] uppercase tracking-wider flex items-center space-x-1.5 font-mono">
-            <Layers className="w-3.5 h-3.5 text-amber-300" />
-            <span>Analyzed Subtopics in this Paper ({subtopics.length}):</span>
-          </span>
-          <span className="text-[10px] text-[#E5E4E2]/60 hidden sm:inline">Categorized Clinical & Methodological Features</span>
+      {/* Extracted Deep Subtopics with Gemini AI Sorting & Subtopic Inclusion/Exclusion */}
+      <div className="mt-3.5 p-4 rounded-2xl bg-[#241710]/95 border border-[#E6E0F0]/25 space-y-3 shadow-md">
+        {/* Header with Title, Tally, AI Sort Button & Key Config */}
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-[#E6E0F0]/15">
+          <div className="flex items-center space-x-2">
+            <Layers className="w-4 h-4 text-amber-300" />
+            <div>
+              <span className="text-xs font-bold text-[#FAF9F8] uppercase tracking-wider block font-mono">
+                Analyzed Subtopics in this Paper ({currentSubtopics.length}):
+              </span>
+              <span className="text-[11px] text-[#E5E4E2]/70">
+                <strong className="text-emerald-300">{includedSubCount} Included</strong> • <strong className="text-rose-300">{excludedSubCount} Excluded</strong> • {currentSubtopics.length - includedSubCount - excludedSubCount} Unscreened
+              </span>
+            </div>
+          </div>
+
+          {/* Action Toolbar: AI Sort Button, Bulk Actions, Key Config */}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Gemini AI Sort Button */}
+            <button
+              onClick={handleSortWithGemini}
+              disabled={isSortingSubtopics}
+              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 hover:from-indigo-500 hover:to-purple-500 text-white flex items-center space-x-1.5 shadow-md cursor-pointer transition-all disabled:opacity-50"
+              title="Use Google Gemini 3.5 Flash-Lite AI with your API key to sort subtopics by clinical and systematic review priority"
+            >
+              {isSortingSubtopics ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>AI Sorting Subtopics...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                  <span>AI Sort Subtopics (Gemini)</span>
+                </>
+              )}
+            </button>
+
+            {/* API Key Config Button */}
+            <button
+              onClick={() => setShowKeyConfig(!showKeyConfig)}
+              className="px-2.5 py-1.5 rounded-xl text-xs font-semibold bg-[#2E1C12] hover:bg-[#3E271A] text-[#E6E0F0] border border-[#E6E0F0]/25 flex items-center space-x-1 cursor-pointer transition-all"
+              title="Configure or view active Gemini API key"
+            >
+              <Key className="w-3 h-3 text-amber-300" />
+              <span className="hidden sm:inline">API Key</span>
+            </button>
+
+            {/* Quick Bulk Actions */}
+            <button
+              onClick={handleIncludeAllSubtopics}
+              className="px-2 py-1.5 rounded-xl text-[11px] font-semibold bg-[#2E1C12] hover:bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 cursor-pointer"
+              title="Include all subtopics"
+            >
+              Include All
+            </button>
+            <button
+              onClick={handleResetSubtopics}
+              className="px-2 py-1.5 rounded-xl text-[11px] font-semibold bg-[#2E1C12] hover:bg-[#3E271A] text-[#E5E4E2]/70 border border-[#E6E0F0]/15 cursor-pointer"
+              title="Reset all subtopic choices"
+            >
+              Reset
+            </button>
+          </div>
         </div>
 
-        {/* Categorized Subtopics Pills */}
-        <div className="flex flex-wrap gap-1.5 items-center">
-          {subtopics.map((sub, si) => {
-            const badgeStyle = 
-              sub.category === 'Condition'
-                ? 'bg-rose-950/70 text-rose-200 border-rose-500/40'
-                : (sub.category === 'Biomarkers'
-                    ? 'bg-cyan-950/70 text-cyan-200 border-cyan-500/40'
-                    : (sub.category === 'Population'
-                        ? 'bg-amber-950/70 text-amber-200 border-amber-500/40'
-                        : (sub.category === 'Methodology'
-                            ? 'bg-indigo-950/70 text-indigo-200 border-indigo-500/40'
-                            : 'bg-emerald-950/70 text-emerald-200 border-emerald-500/40')));
-            return (
-              <span
-                key={si}
-                className={`px-2.5 py-1 rounded-lg text-[10px] font-medium border flex items-center space-x-1 ${badgeStyle}`}
-                title={`${sub.category}: ${sub.name}`}
-              >
-                <span className="font-bold opacity-75 font-mono">[{sub.category.toUpperCase()}]</span>
-                <span>{sub.name}</span>
+        {/* Gemini API Key Configuration Drawer */}
+        {showKeyConfig && (
+          <div className="p-3.5 rounded-xl bg-[#1C110B] border border-amber-500/40 text-xs space-y-2 animate-fade-in shadow-xl">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-amber-200 flex items-center space-x-1.5">
+                <Key className="w-3.5 h-3.5 text-amber-300" />
+                <span>Google Gemini AI API Key Configuration</span>
               </span>
-            );
-          })}
+              <button
+                type="button"
+                onClick={() => setShowKeyConfig(false)}
+                className="text-[#E5E4E2]/70 hover:text-white cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-[11px] text-[#E5E4E2]/80 leading-relaxed">
+              Active Gemini API key for clinical subtopic sorting: <code className="bg-[#2B1B12] px-1.5 py-0.5 rounded text-amber-300 font-mono text-[10px]">{geminiKeyInput ? `${geminiKeyInput.slice(0, 8)}...` : 'Using Project Key'}</code>
+            </p>
+            <form onSubmit={handleSaveGeminiKey} className="flex gap-2">
+              <input
+                type="password"
+                value={geminiKeyInput}
+                onChange={(e) => setGeminiKeyInput(e.target.value)}
+                placeholder="Enter Gemini API key"
+                className="flex-1 glass-input rounded-lg px-2.5 py-1.5 text-xs text-[#FAF9F8] font-mono"
+              />
+              <button
+                type="submit"
+                className="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-[#241710] hover:bg-amber-400 cursor-pointer shadow"
+              >
+                {keySaveSuccess ? 'Saved ✓' : 'Save Key'}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* AI Sort Feedback Banner */}
+        {sortSummary && (
+          <div className="p-2.5 rounded-xl bg-purple-950/70 border border-purple-500/50 text-xs text-purple-200 flex items-center space-x-2 animate-fade-in shadow-md">
+            <Sparkles className="w-4 h-4 text-purple-300 shrink-0" />
+            <span className="leading-snug">{sortSummary}</span>
+          </div>
+        )}
+
+        {/* Subtopic Decision Prompt Header */}
+        <div className="flex items-center justify-between text-xs text-[#E5E4E2]/85 pt-1">
+          <span className="font-semibold text-amber-200 flex items-center space-x-1">
+            <HelpCircle className="w-3.5 h-3.5 text-amber-300" />
+            <span>Subtopic Screening: Review each subtopic and choose to Include (✓) or Exclude (✕):</span>
+          </span>
+          <span className="text-[10px] text-[#E5E4E2]/60 hidden sm:inline font-mono">
+            Click ✓ or ✕ on each subtopic
+          </span>
+        </div>
+
+        {/* Interactive Subtopics List with Include / Exclude Buttons */}
+        <div className="space-y-1.5 max-h-72 overflow-y-auto pr-1">
+          {currentSubtopics.map((sub, si) => (
+            <div
+              key={si}
+              className={`p-2.5 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 transition-all ${
+                sub.userDecision === 'included'
+                  ? 'bg-emerald-950/60 border-emerald-500/70 text-emerald-100 shadow-sm'
+                  : (sub.userDecision === 'excluded'
+                      ? 'bg-rose-950/60 border-rose-500/70 text-rose-200 opacity-80'
+                      : 'bg-[#291A11] border-[#E6E0F0]/15 text-[#FAF9F8]')
+              }`}
+            >
+              {/* Left Details */}
+              <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
+                <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase font-mono border shrink-0 ${getCategoryBadgeStyle(sub.category)}`}>
+                  {sub.category}
+                </span>
+
+                <span className={`text-xs font-semibold ${sub.userDecision === 'excluded' ? 'line-through text-rose-300' : 'text-[#FAF9F8]'}`}>
+                  {sub.name}
+                </span>
+
+                {/* AI Score Badge if sorted */}
+                {sub.relevanceScore !== undefined && (
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-[#1B110B] text-amber-300 border border-amber-400/30" title="Gemini AI Clinical Relevance Score">
+                    Score: {sub.relevanceScore}%
+                  </span>
+                )}
+
+                {/* AI Priority */}
+                {sub.aiPriority && (
+                  <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                    sub.aiPriority === 'High'
+                      ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/40'
+                      : (sub.aiPriority === 'Medium'
+                          ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+                          : 'bg-slate-900 text-slate-300 border border-slate-700')
+                  }`}>
+                    {sub.aiPriority} Priority
+                  </span>
+                )}
+
+                {/* AI Reasoning tooltip */}
+                {sub.aiReasoning && (
+                  <span className="text-[10px] text-[#E5E4E2]/60 italic truncate max-w-xs hidden md:inline" title={sub.aiReasoning}>
+                    — {sub.aiReasoning}
+                  </span>
+                )}
+              </div>
+
+              {/* Right: Direct Ask to Include or Exclude this Subtopic */}
+              <div className="flex items-center space-x-1.5 shrink-0 self-end sm:self-center">
+                <button
+                  type="button"
+                  onClick={() => handleToggleSubtopic(si, 'included')}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center space-x-1 cursor-pointer transition-all ${
+                    sub.userDecision === 'included'
+                      ? 'bg-emerald-600 text-white shadow-sm ring-1 ring-emerald-400'
+                      : 'bg-[#1C110B] hover:bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                  }`}
+                  title="Include this subtopic in review criteria"
+                >
+                  <Check className="w-3 h-3" />
+                  <span>{sub.userDecision === 'included' ? '✓ Included' : 'Include'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleToggleSubtopic(si, 'excluded')}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center space-x-1 cursor-pointer transition-all ${
+                    sub.userDecision === 'excluded'
+                      ? 'bg-rose-600 text-white shadow-sm ring-1 ring-rose-400'
+                      : 'bg-[#1C110B] hover:bg-rose-950 text-rose-300 border border-rose-500/40'
+                  }`}
+                  title="Exclude this subtopic from review criteria"
+                >
+                  <X className="w-3 h-3" />
+                  <span>{sub.userDecision === 'excluded' ? '✕ Excluded' : 'Exclude'}</span>
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -336,6 +582,17 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             <div className="text-[11px] leading-relaxed">
               <strong className="text-amber-200">Screening Rationale: </strong>
               <span className="text-[#E5E4E2]/90">{paper.aiScreeningReason}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Dynamic Subtopic Impact on Screening */}
+        {excludedSubCount > 0 && (
+          <div className="p-2.5 rounded-xl bg-rose-950/80 border border-rose-500/50 text-xs text-rose-200 flex items-start space-x-2 animate-fade-in">
+            <X className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+            <div className="text-[11px] leading-relaxed">
+              <strong>Subtopic Reviewer Flag: </strong>
+              <span>You have marked {excludedSubCount} subtopic(s) as Excluded ({currentSubtopics.filter(s => s.userDecision === 'excluded').map(s => s.name).slice(0, 3).join(', ')}). Consider excluding this study if these criteria are mandatory for your review.</span>
             </div>
           </div>
         )}
