@@ -116,7 +116,7 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
       <div 
         ref={modalRef}
-        className="w-full max-w-4xl bg-[#362419] text-[#E8D8CE] border border-[#E6E0F0]/25 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-left"
+        className="w-full max-w-4xl bg-[#2D2836] text-[#E2DDE7] border border-[#E6E0F0]/25 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden text-left"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -127,14 +127,14 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-base font-bold text-[#E8D8CE]">
+                <h2 className="text-base font-bold text-[#E2DDE7]">
                   Related Literature Recommender
                 </h2>
-                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/25">
+                <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#383242] text-[#E6E0F0] border border-[#E6E0F0]/25">
                   Multi-Database Discovery
                 </span>
               </div>
-              <p className="text-xs text-[#E8D8CE]/80">
+              <p className="text-xs text-[#E2DDE7]/80">
                 Recommending related papers from Scopus, Web of Science, PubMed/MEDLINE & IEEE Xplore based on your uploaded research file
               </p>
             </div>
@@ -142,32 +142,32 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
 
           <button 
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#E8D8CE] hover:text-white hover:bg-[#4A3324] transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#E2DDE7] hover:text-white hover:bg-[#383242] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Query & Database Controls */}
-        <div className="p-6 border-b border-[#E6E0F0]/15 bg-[#2B1B12]/70 space-y-4">
+        <div className="p-6 border-b border-[#E6E0F0]/15 bg-[#201C27]/80 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {/* Seed selector from uploaded files */}
             <div className="md:col-span-2">
-              <label className="block text-xs font-semibold text-[#E8D8CE] mb-1.5 flex items-center space-x-1.5">
+              <label className="block text-xs font-semibold text-[#E2DDE7] mb-1.5 flex items-center space-x-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-[#E6E0F0]" />
                 <span>Base Recommendations on Uploaded Paper:</span>
               </label>
               <select
                 value={selectedSeedId}
                 onChange={(e) => setSelectedSeedId(e.target.value)}
-                className="w-full bg-[#241710] border border-[#E6E0F0]/30 text-[#E8D8CE] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#E6E0F0]"
+                className="w-full bg-[#292531] border border-[#E6E0F0]/30 text-[#E2DDE7] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#E6E0F0]"
               >
                 {allProjectPapers.map((p, idx) => (
-                  <option key={p.id} value={p.id} className="bg-[#241710] text-[#E8D8CE]">
+                  <option key={p.id} value={p.id} className="bg-[#292531] text-[#E2DDE7]">
                     Paper #{idx + 1}: {p.title.slice(0, 75)}... ({p.year})
                   </option>
                 ))}
-                <option value="custom" className="bg-[#241710] text-[#E8D8CE]">✏️ Enter Custom Title / Abstract Manually</option>
+                <option value="custom" className="bg-[#292531] text-[#E2DDE7]">✏️ Enter Custom Title / Abstract Manually</option>
               </select>
             </div>
 
@@ -176,7 +176,7 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
               <button
                 onClick={handleDiscover}
                 disabled={loading}
-                className="w-full h-[38px] px-4 rounded-xl font-bold text-xs bg-gradient-to-r from-[#E8D8CE] to-[#E6E0F0] text-[#2C1E16] hover:brightness-105 shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
+                className="w-full h-[38px] px-4 rounded-xl font-bold text-xs bg-gradient-to-r from-[#E2DDE7] to-[#E6E0F0] text-[#25212C] hover:brightness-105 shadow-md flex items-center justify-center space-x-2 transition-all cursor-pointer"
               >
                 <Search className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                 <span>{loading ? 'Searching Databases...' : 'Search 4 Databases'}</span>
@@ -186,11 +186,11 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
 
           {/* Show Current Seed Details */}
           {currentSeedObject && (
-            <div className="p-3 rounded-xl bg-[#241710] border border-[#E6E0F0]/15 text-xs text-[#E8D8CE]/90 flex items-start space-x-2.5">
-              <span className="font-bold text-[#E8D8CE] shrink-0">Selected Seed:</span>
+            <div className="p-3 rounded-xl bg-[#292531] border border-[#E6E0F0]/15 text-xs text-[#E2DDE7]/90 flex items-start space-x-2.5">
+              <span className="font-bold text-[#E2DDE7] shrink-0">Selected Seed:</span>
               <div className="truncate">
-                <span className="font-semibold text-[#E8D8CE]">{currentSeedObject.title}</span>
-                <span className="text-[11px] text-[#E8D8CE]/70 block truncate mt-0.5">{currentSeedObject.abstract}</span>
+                <span className="font-semibold text-[#E2DDE7]">{currentSeedObject.title}</span>
+                <span className="text-[11px] text-[#E2DDE7]/70 block truncate mt-0.5">{currentSeedObject.abstract}</span>
               </div>
             </div>
           )}
@@ -203,21 +203,21 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
                 placeholder="Enter seed paper title..."
                 value={customTitle}
                 onChange={(e) => setCustomTitle(e.target.value)}
-                className="w-full bg-[#241710] border border-[#E6E0F0]/25 rounded-xl px-3 py-1.5 text-xs text-[#E8D8CE] placeholder-[#C5BFB8]/60"
+                className="w-full bg-[#292531] border border-[#E6E0F0]/25 rounded-xl px-3 py-1.5 text-xs text-[#E2DDE7] placeholder-[#C5BFB8]/60"
               />
               <input
                 type="text"
                 placeholder="Enter core abstract or focus keywords..."
                 value={customAbstract}
                 onChange={(e) => setCustomAbstract(e.target.value)}
-                className="w-full bg-[#241710] border border-[#E6E0F0]/25 rounded-xl px-3 py-1.5 text-xs text-[#E8D8CE] placeholder-[#C5BFB8]/60"
+                className="w-full bg-[#292531] border border-[#E6E0F0]/25 rounded-xl px-3 py-1.5 text-xs text-[#E2DDE7] placeholder-[#C5BFB8]/60"
               />
             </div>
           )}
 
           {/* Exact 4 Database Selector Badges from handwritten note */}
           <div>
-            <span className="text-[11px] font-semibold text-[#E8D8CE]/80 block mb-2">
+            <span className="text-[11px] font-semibold text-[#E2DDE7]/80 block mb-2">
               Target Scholarly Databases (Image 4):
             </span>
             <div className="flex flex-wrap gap-2">
@@ -235,8 +235,8 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
                     onClick={() => handleToggleDb(db.id as any)}
                     className={`px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center space-x-1.5 transition-all border cursor-pointer ${
                       isActive 
-                        ? 'bg-[#4A3324] text-[#E8D8CE] border-[#E6E0F0]/40 shadow-sm' 
-                        : 'bg-[#241710]/60 text-[#E8D8CE]/50 border-transparent hover:text-[#E8D8CE]'
+                        ? 'bg-[#383242] text-[#E2DDE7] border-[#E6E0F0]/40 shadow-sm' 
+                        : 'bg-[#292531]/60 text-[#E2DDE7]/50 border-transparent hover:text-[#E2DDE7]'
                     }`}
                   >
                     <IconComponent className={`w-3.5 h-3.5 ${isActive ? db.color : 'text-gray-400'}`} />
@@ -250,10 +250,10 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
         </div>
 
         {/* Results List */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#2C1E16]/90">
-          <div className="flex items-center justify-between text-xs text-[#E8D8CE]/80 pb-1">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#25212C]/90">
+          <div className="flex items-center justify-between text-xs text-[#E2DDE7]/80 pb-1">
             <span>
-              Found <strong className="text-[#E8D8CE]">{results.length}</strong> Seminal Recommendations from Scopus, WoS, PubMed & IEEE
+              Found <strong className="text-[#E2DDE7]">{results.length}</strong> Seminal Recommendations from Scopus, WoS, PubMed & IEEE
             </span>
             <span>Sorted by Citation Concordance</span>
           </div>
@@ -264,7 +264,7 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
               return (
                 <div 
                   key={rec.id}
-                  className="bg-[#362419] border border-[#E6E0F0]/20 hover:border-[#E6E0F0]/50 rounded-xl p-4 transition-all hover:bg-[#442E20] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="bg-[#2D2836] border border-[#E6E0F0]/20 hover:border-[#E6E0F0]/50 rounded-xl p-4 transition-all hover:bg-[#442E20] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="space-y-2 flex-1">
                     {/* Database & Fit Score Pills */}
@@ -272,7 +272,7 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
                       {rec.databases.map(d => (
                         <span 
                           key={d}
-                          className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/25"
+                          className="px-2 py-0.5 rounded-md text-[10px] font-bold tracking-wide uppercase bg-[#383242] text-[#E6E0F0] border border-[#E6E0F0]/25"
                         >
                           {d === 'web_of_science' ? 'Web of Science' : d.replace('_', ' ')}
                         </span>
@@ -282,18 +282,18 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
                         {rec.similarityScore}% Fit Score
                       </span>
 
-                      <span className="text-[11px] text-[#E8D8CE]/70">
+                      <span className="text-[11px] text-[#E2DDE7]/70">
                         • {rec.citationCount} Citations
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-sm font-bold text-[#E8D8CE] leading-snug">
+                    <h3 className="text-sm font-bold text-[#E2DDE7] leading-snug">
                       {rec.title}
                     </h3>
 
                     {/* Authors & Journal */}
-                    <div className="text-xs text-[#E8D8CE]/80 flex items-center space-x-2">
+                    <div className="text-xs text-[#E2DDE7]/80 flex items-center space-x-2">
                       <span>{rec.authors.join(', ')}</span>
                       <span>•</span>
                       <span className="italic text-[#E6E0F0]">{rec.journal}</span>
@@ -302,10 +302,10 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
                     </div>
 
                     {/* Recommendation Reason */}
-                    <div className="p-2.5 rounded-lg bg-[#271911] border border-[#E6E0F0]/15 text-xs text-[#E8D8CE] flex items-start space-x-2">
+                    <div className="p-2.5 rounded-lg bg-[#1E1B24] border border-[#E6E0F0]/15 text-xs text-[#E2DDE7] flex items-start space-x-2">
                       <Sparkles className="w-3.5 h-3.5 text-[#E6E0F0] shrink-0 mt-0.5" />
                       <p className="leading-relaxed">
-                        <strong className="text-[#E8D8CE]">Why Suggested:</strong> {rec.recommendationReason}
+                        <strong className="text-[#E2DDE7]">Why Suggested:</strong> {rec.recommendationReason}
                       </p>
                     </div>
                   </div>
@@ -318,7 +318,7 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
                       className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 transition-all cursor-pointer ${
                         isAdded
                           ? 'bg-emerald-950 text-emerald-200 border border-emerald-700/60 cursor-default'
-                          : 'bg-[#E8D8CE] text-[#2C1E16] hover:bg-white shadow-md'
+                          : 'bg-[#E2DDE7] text-[#25212C] hover:bg-white shadow-md'
                       }`}
                     >
                       {isAdded ? (
@@ -339,7 +339,7 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
                         href={`https://doi.org/${rec.doi}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-xl text-[11px] font-medium text-[#E8D8CE] hover:text-white bg-[#241710] border border-[#E6E0F0]/20 flex items-center justify-center space-x-1 hover:border-[#E6E0F0]/40"
+                        className="px-3 py-1.5 rounded-xl text-[11px] font-medium text-[#E2DDE7] hover:text-white bg-[#292531] border border-[#E6E0F0]/20 flex items-center justify-center space-x-1 hover:border-[#E6E0F0]/40"
                       >
                         <span>View DOI</span>
                         <ExternalLink className="w-3 h-3" />
@@ -353,13 +353,13 @@ export const LiteratureRecommenderModal: React.FC<LiteratureRecommenderModalProp
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 border-t border-[#E6E0F0]/20 bg-[#271911] flex items-center justify-between text-xs text-[#E8D8CE]/70">
+        <div className="px-6 py-3 border-t border-[#E6E0F0]/20 bg-[#1E1B24] flex items-center justify-between text-xs text-[#E2DDE7]/70">
           <span>
             Scopus • Web of Science • PubMed / MEDLINE • IEEE Xplore Digital Library
           </span>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-lg text-xs font-bold text-[#E8D8CE] hover:bg-[#4A3324] transition-colors cursor-pointer"
+            className="px-4 py-1.5 rounded-lg text-xs font-bold text-[#E2DDE7] hover:bg-[#383242] transition-colors cursor-pointer"
           >
             Done
           </button>

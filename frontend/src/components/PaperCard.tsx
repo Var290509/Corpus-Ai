@@ -239,7 +239,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       case 'Outcomes':
         return 'bg-emerald-950/70 text-emerald-200 border-emerald-500/40';
       default:
-        return 'bg-[#4A3324] text-[#E6E0F0] border-[#E6E0F0]/30';
+        return 'bg-[#383242] text-[#E6E0F0] border-[#E6E0F0]/30';
     }
   };
 
@@ -268,8 +268,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
               : status === 'exclude'
               ? 'bg-rose-950 text-rose-200 border border-rose-600'
               : status === 'maybe'
-              ? 'bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/30'
-              : 'bg-[#271911] text-[#E8D8CE] border border-[#E6E0F0]/20'
+              ? 'bg-[#383242] text-[#E6E0F0] border border-[#E6E0F0]/30'
+              : 'bg-[#1E1B24] text-[#E2DDE7] border border-[#E6E0F0]/20'
           }`}>
             <span>{status}</span>
             {decision?.isOverridden && (
@@ -282,7 +282,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
           {/* AI Paper Rating Badge (Prominently Clickable) */}
           <button
             onClick={() => setShowRatingWhy(!showRatingWhy)}
-            className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#4A3324] text-amber-300 border border-amber-400/40 hover:bg-[#5C3F2D] flex items-center space-x-1 cursor-pointer transition-colors"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#383242] text-amber-300 border border-amber-400/40 hover:bg-[#463E53] flex items-center space-x-1 cursor-pointer transition-colors"
             title="Click to see WHY the AI gave this rating with quote evidence"
           >
             <Star className="w-3 h-3 fill-amber-300 text-amber-300" />
@@ -292,21 +292,21 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
           {/* Duplicate Group Indicator */}
           {duplicateGroupMembersCount > 1 && (
-            <span className="px-2 py-0.5 rounded-md bg-[#271911] text-[#E6E0F0] border border-[#E6E0F0]/25 text-[10px] flex items-center space-x-1 font-mono">
-              <Layers className="w-3 h-3 text-[#E8D8CE]" />
+            <span className="px-2 py-0.5 rounded-md bg-[#1E1B24] text-[#E6E0F0] border border-[#E6E0F0]/25 text-[10px] flex items-center space-x-1 font-mono">
+              <Layers className="w-3 h-3 text-[#E2DDE7]" />
               <span>{duplicateGroupMembersCount} duplicates merged</span>
             </span>
           )}
 
           {/* Source Tag */}
-          <span className="text-[10px] uppercase font-mono text-[#E8D8CE]/70">
+          <span className="text-[10px] uppercase font-mono text-[#E2DDE7]/70">
             {paper.source}
           </span>
         </div>
 
         {/* Journal and Year */}
-        <div className="text-xs text-[#E8D8CE]/80 flex items-center space-x-2">
-          <span className="font-semibold text-[#E8D8CE]">{displayJournal}</span>
+        <div className="text-xs text-[#E2DDE7]/80 flex items-center space-x-2">
+          <span className="font-semibold text-[#E2DDE7]">{displayJournal}</span>
           <span>•</span>
           <span>{displayYear}</span>
         </div>
@@ -314,7 +314,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
       {/* WHY AI GAVE THIS RATING (Expanded or Toggled) */}
       {showRatingWhy && (
-        <div className="mb-3 p-3.5 rounded-xl bg-[#271911] border border-amber-400/40 text-xs space-y-2.5 animate-fade-in shadow-xl">
+        <div className="mb-3 p-3.5 rounded-xl bg-[#1E1B24] border border-amber-400/40 text-xs space-y-2.5 animate-fade-in shadow-xl">
           <div className="flex items-center justify-between text-amber-300 font-bold border-b border-amber-400/20 pb-2">
             <span className="flex items-center space-x-1.5">
               <Award className="w-4 h-4 text-amber-300" />
@@ -322,13 +322,13 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             </span>
             <button 
               onClick={() => setShowRatingWhy(false)} 
-              className="text-[#E8D8CE]/60 hover:text-white cursor-pointer"
+              className="text-[#E2DDE7]/60 hover:text-white cursor-pointer"
             >
               ✕
             </button>
           </div>
 
-          <div className="text-[#E8D8CE] leading-relaxed whitespace-pre-line text-xs">
+          <div className="text-[#E2DDE7] leading-relaxed whitespace-pre-line text-xs">
             {ratingRationale}
           </div>
 
@@ -337,7 +337,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
               <span className="text-[10px] uppercase font-mono text-amber-300/80 font-bold block">
                 Extracted Study Evidence from Manuscript:
               </span>
-              <blockquote className="p-2.5 rounded-lg bg-[#1E130E] border-l-2 border-amber-400 text-[11px] text-[#E8D8CE]/95 italic leading-relaxed">
+              <blockquote className="p-2.5 rounded-lg bg-[#1E130E] border-l-2 border-amber-400 text-[11px] text-[#E2DDE7]/95 italic leading-relaxed">
                 <Quote className="w-3.5 h-3.5 text-amber-300 inline mr-1 -mt-0.5" />
                 "{ratingQuoteEvidence}"
               </blockquote>
@@ -347,12 +347,12 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       )}
 
       {/* Paper Title */}
-      <h4 className="text-sm font-bold text-[#E8D8CE] leading-snug hover:text-white transition-colors">
+      <h4 className="text-sm font-bold text-[#E2DDE7] leading-snug hover:text-white transition-colors">
         {displayTitle}
       </h4>
 
       {/* Authors & Identifiers */}
-      <div className="text-xs text-[#E8D8CE]/70 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="text-xs text-[#E2DDE7]/70 mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
         <span>{displayAuthors.slice(0, 3).join(', ')}{displayAuthors.length > 3 ? ' et al.' : ''}</span>
         {paper.doi && (
           <a
@@ -366,23 +366,23 @@ export const PaperCard: React.FC<PaperCardProps> = ({
           </a>
         )}
         {paper.pmid && (
-          <span className="font-mono text-[11px] text-[#E8D8CE]/60">
+          <span className="font-mono text-[11px] text-[#E2DDE7]/60">
             PMID:{paper.pmid}
           </span>
         )}
       </div>
 
       {/* Extracted Deep Subtopics with Gemini AI Sorting & Subtopic Inclusion/Exclusion */}
-      <div className="mt-3.5 p-4 rounded-2xl bg-[#241710]/95 border border-[#E6E0F0]/25 space-y-3 shadow-md">
+      <div className="mt-3.5 p-4 rounded-2xl bg-[#292531]/95 border border-[#E6E0F0]/25 space-y-3 shadow-md">
         {/* Header with Title, Tally, AI Sort Button & Key Config */}
         <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-[#E6E0F0]/15">
           <div className="flex items-center space-x-2">
             <Layers className="w-4 h-4 text-amber-300" />
             <div>
-              <span className="text-xs font-bold text-[#E8D8CE] uppercase tracking-wider block font-mono">
+              <span className="text-xs font-bold text-[#E2DDE7] uppercase tracking-wider block font-mono">
                 Analyzed Subtopics in this Paper ({currentSubtopics.length}):
               </span>
-              <span className="text-[11px] text-[#E8D8CE]/70">
+              <span className="text-[11px] text-[#E2DDE7]/70">
                 <strong className="text-emerald-300">{includedSubCount} Included</strong> • <strong className="text-rose-300">{excludedSubCount} Excluded</strong> • {currentSubtopics.length - includedSubCount - excludedSubCount} Unscreened
               </span>
             </div>
@@ -420,7 +420,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             </button>
             <button
               onClick={handleResetSubtopics}
-              className="px-2 py-1.5 rounded-xl text-[11px] font-semibold bg-[#2E1C12] hover:bg-[#3E271A] text-[#E8D8CE]/70 border border-[#E6E0F0]/15 cursor-pointer"
+              className="px-2 py-1.5 rounded-xl text-[11px] font-semibold bg-[#2E1C12] hover:bg-[#3E271A] text-[#E2DDE7]/70 border border-[#E6E0F0]/15 cursor-pointer"
               title="Reset all subtopic choices"
             >
               Reset
@@ -437,12 +437,12 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         )}
 
         {/* Subtopic Decision Prompt Header */}
-        <div className="flex items-center justify-between text-xs text-[#E8D8CE]/85 pt-1">
+        <div className="flex items-center justify-between text-xs text-[#E2DDE7]/85 pt-1">
           <span className="font-semibold text-amber-200 flex items-center space-x-1">
             <HelpCircle className="w-3.5 h-3.5 text-amber-300" />
             <span>Subtopic Screening: Review each subtopic and choose to Include (✓) or Exclude (✕):</span>
           </span>
-          <span className="text-[10px] text-[#E8D8CE]/60 hidden sm:inline font-mono">
+          <span className="text-[10px] text-[#E2DDE7]/60 hidden sm:inline font-mono">
             Click ✓ or ✕ on each subtopic
           </span>
         </div>
@@ -457,7 +457,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
                   ? 'bg-emerald-950/60 border-emerald-500/70 text-emerald-100 shadow-sm'
                   : (sub.userDecision === 'excluded'
                       ? 'bg-rose-950/60 border-rose-500/70 text-rose-200 opacity-80'
-                      : 'bg-[#291A11] border-[#E6E0F0]/15 text-[#E8D8CE]')
+                      : 'bg-[#291A11] border-[#E6E0F0]/15 text-[#E2DDE7]')
               }`}
             >
               {/* Left Details */}
@@ -467,7 +467,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
                     {sub.category}
                   </span>
 
-                  <span className={`text-xs font-semibold ${sub.userDecision === 'excluded' ? 'line-through text-rose-300' : 'text-[#E8D8CE]'}`}>
+                  <span className={`text-xs font-semibold ${sub.userDecision === 'excluded' ? 'line-through text-rose-300' : 'text-[#E2DDE7]'}`}>
                     {sub.name}
                   </span>
 
@@ -494,9 +494,9 @@ export const PaperCard: React.FC<PaperCardProps> = ({
 
                 {/* Clear, Understandable AI Reason for this Topic Badge */}
                 {sub.aiReasoning && (
-                  <div className="text-[11px] text-[#E8D8CE]/90 bg-[#1A1009]/90 px-2.5 py-1.5 rounded-lg border border-[#E6E0F0]/15 flex items-start space-x-1.5">
+                  <div className="text-[11px] text-[#E2DDE7]/90 bg-[#1A1009]/90 px-2.5 py-1.5 rounded-lg border border-[#E6E0F0]/15 flex items-start space-x-1.5">
                     <span className="text-amber-300 font-bold text-[10px] uppercase font-mono shrink-0 mt-0.5">Why this badge:</span>
-                    <span className="leading-relaxed text-[#E8D8CE]">{sub.aiReasoning}</span>
+                    <span className="leading-relaxed text-[#E2DDE7]">{sub.aiReasoning}</span>
                   </div>
                 )}
               </div>
@@ -509,7 +509,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
                   className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center space-x-1 cursor-pointer transition-all ${
                     sub.userDecision === 'included'
                       ? 'bg-emerald-600 text-white shadow-sm ring-1 ring-emerald-400'
-                      : 'bg-[#1C110B] hover:bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                      : 'bg-[#1E1B24] hover:bg-emerald-950 text-emerald-300 border border-emerald-500/40'
                   }`}
                   title="Include this subtopic in review criteria"
                 >
@@ -523,7 +523,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
                   className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center space-x-1 cursor-pointer transition-all ${
                     sub.userDecision === 'excluded'
                       ? 'bg-rose-600 text-white shadow-sm ring-1 ring-rose-400'
-                      : 'bg-[#1C110B] hover:bg-rose-950 text-rose-300 border border-rose-500/40'
+                      : 'bg-[#1E1B24] hover:bg-rose-950 text-rose-300 border border-rose-500/40'
                   }`}
                   title="Exclude this subtopic from review criteria"
                 >
@@ -543,7 +543,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
         <div className="mt-3 flex justify-end">
           <button
             onClick={() => onDiscoverSimilar(paper)}
-            className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-[#4A3324] text-[#E8D8CE] border border-[#E6E0F0]/30 hover:bg-[#5C3F2D] hover:border-[#E6E0F0]/50 transition-all flex items-center space-x-1.5 cursor-pointer shadow-sm"
+            className="px-3 py-1.5 rounded-xl text-[11px] font-bold bg-[#383242] text-[#E2DDE7] border border-[#E6E0F0]/30 hover:bg-[#463E53] hover:border-[#E6E0F0]/50 transition-all flex items-center space-x-1.5 cursor-pointer shadow-sm"
             title="Suggest related research papers from Scopus, Web of Science, PubMed & IEEE Xplore"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
@@ -553,7 +553,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       )}
 
       {/* Abstract with PICO Span Highlighting */}
-      <div className="mt-3 text-xs text-[#E8D8CE]/90 leading-relaxed">
+      <div className="mt-3 text-xs text-[#E2DDE7]/90 leading-relaxed">
         <div className={`relative ${isExpanded ? '' : 'line-clamp-3'}`}>
           {renderAbstractWithSpans()}
         </div>
@@ -569,29 +569,29 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       {/* Deep Analysis Quantitative Metrics Bar */}
       {paper.deepAnalysis && (
         <div className="mt-3.5 pt-3 border-t border-[#E6E0F0]/15 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
-          <div className="bg-[#271911]/80 p-2 rounded-lg border border-[#E6E0F0]/15">
-            <span className="text-[9px] text-[#E8D8CE]/70 block uppercase font-mono">Sample Size</span>
-            <span className="font-semibold text-[#E8D8CE]">
+          <div className="bg-[#1E1B24]/80 p-2 rounded-lg border border-[#E6E0F0]/15">
+            <span className="text-[9px] text-[#E2DDE7]/70 block uppercase font-mono">Sample Size</span>
+            <span className="font-semibold text-[#E2DDE7]">
               {paper.deepAnalysis.sampleSize ? `N=${paper.deepAnalysis.sampleSize.toLocaleString()}` : 'N/A'}
             </span>
           </div>
 
-          <div className="bg-[#271911]/80 p-2 rounded-lg border border-[#E6E0F0]/15">
-            <span className="text-[9px] text-[#E8D8CE]/70 block uppercase font-mono">Primary Effect</span>
+          <div className="bg-[#1E1B24]/80 p-2 rounded-lg border border-[#E6E0F0]/15">
+            <span className="text-[9px] text-[#E2DDE7]/70 block uppercase font-mono">Primary Effect</span>
             <span className="font-semibold text-[#E6E0F0] truncate block" title={paper.deepAnalysis.primaryEffectMetric}>
               {paper.deepAnalysis.primaryEffectMetric || 'Stabilization'}
             </span>
           </div>
 
-          <div className="bg-[#271911]/80 p-2 rounded-lg border border-[#E6E0F0]/15">
-            <span className="text-[9px] text-[#E8D8CE]/70 block uppercase font-mono">Rigor Score</span>
-            <span className="font-semibold text-[#E8D8CE]">
+          <div className="bg-[#1E1B24]/80 p-2 rounded-lg border border-[#E6E0F0]/15">
+            <span className="text-[9px] text-[#E2DDE7]/70 block uppercase font-mono">Rigor Score</span>
+            <span className="font-semibold text-[#E2DDE7]">
               {paper.deepAnalysis.statisticalRigorScore}/100
             </span>
           </div>
 
-          <div className="bg-[#271911]/80 p-2 rounded-lg border border-[#E6E0F0]/15">
-            <span className="text-[9px] text-[#E8D8CE]/70 block uppercase font-mono">Consensus State</span>
+          <div className="bg-[#1E1B24]/80 p-2 rounded-lg border border-[#E6E0F0]/15">
+            <span className="text-[9px] text-[#E2DDE7]/70 block uppercase font-mono">Consensus State</span>
             <span className={`font-semibold truncate block ${
               paper.deepAnalysis.consensusAlignment === 'Contradicts Prevailing Data'
                 ? 'text-rose-400'
@@ -611,7 +611,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
       )}
 
       {/* Rayyan-Style Bottom Screening Decision Bar */}
-      <div className="mt-4 pt-3 border-t border-[#E8D8CE]/10 flex flex-wrap items-center justify-between gap-3">
+      <div className="mt-4 pt-3 border-t border-[#E2DDE7]/10 flex flex-wrap items-center justify-between gap-3">
         {/* Left: Review Status & Decision Indicator */}
         <div className="flex items-center space-x-2 text-xs">
           {status === 'include' && (
@@ -627,26 +627,26 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             </span>
           )}
           {status === 'maybe' && (
-            <span className="px-2.5 py-1 rounded-lg bg-[#3D281C] text-amber-200 border border-amber-500/40 font-bold flex items-center space-x-1 text-[11px] shadow-sm">
+            <span className="px-2.5 py-1 rounded-lg bg-[#3E374A] text-amber-200 border border-amber-500/40 font-bold flex items-center space-x-1 text-[11px] shadow-sm">
               <HelpCircle className="w-3.5 h-3.5" />
               <span>Maybe</span>
             </span>
           )}
           {status === 'unscreened' && (
-            <span className="text-[11px] text-[#E8D8CE]/50 italic flex items-center space-x-1">
+            <span className="text-[11px] text-[#E2DDE7]/50 italic flex items-center space-x-1">
               <span>Unscreened</span>
             </span>
           )}
 
           {/* Decision Auditor / Origin */}
-          <div className="text-[11px] text-[#E8D8CE]/50 flex items-center space-x-1 pl-1">
+          <div className="text-[11px] text-[#E2DDE7]/50 flex items-center space-x-1 pl-1">
             {decision?.decidedBy === 'human' ? (
-              <span className="flex items-center text-[#E8D8CE]/80 font-medium" title="Decided by reviewer">
+              <span className="flex items-center text-[#E2DDE7]/80 font-medium" title="Decided by reviewer">
                 <UserCheck className="w-3 h-3 mr-1 text-[#E6E0F0]" />
                 Human
               </span>
             ) : (
-              <span className="flex items-center text-[#E8D8CE]/45" title="Automated classification">
+              <span className="flex items-center text-[#E2DDE7]/45" title="Automated classification">
                 <Bot className="w-3 h-3 mr-1" />
                 Auto
               </span>
@@ -662,7 +662,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm ${
               status === 'include'
                 ? 'bg-emerald-600 text-white ring-2 ring-emerald-400 shadow-emerald-950/60'
-                : 'bg-[#1C110B] hover:bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400'
+                : 'bg-[#1E1B24] hover:bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400'
             }`}
             title="Include this paper in systematic review"
           >
@@ -677,7 +677,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
               className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-sm ${
                 status === 'exclude'
                   ? 'bg-rose-600 text-white ring-2 ring-rose-400 shadow-rose-950/60'
-                  : 'bg-[#1C110B] hover:bg-rose-950/80 text-rose-300 border border-rose-500/40 hover:border-rose-400'
+                  : 'bg-[#1E1B24] hover:bg-rose-950/80 text-rose-300 border border-rose-500/40 hover:border-rose-400'
               }`}
               title="Exclude this paper and select reason"
             >
@@ -687,8 +687,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             </button>
 
             {showReasonDropdown && (
-              <div className="absolute right-0 bottom-full mb-2 w-72 bg-[#2D1B11] border border-[#E8D8CE]/20 rounded-xl shadow-2xl p-2 z-40 text-xs animate-fade-in backdrop-blur-md">
-                <span className="text-[10px] font-mono text-[#E8D8CE]/60 px-2 py-1 block border-b border-[#E8D8CE]/10 mb-1">
+              <div className="absolute right-0 bottom-full mb-2 w-72 bg-[#292531] border border-[#E2DDE7]/20 rounded-xl shadow-2xl p-2 z-40 text-xs animate-fade-in backdrop-blur-md">
+                <span className="text-[10px] font-mono text-[#E2DDE7]/60 px-2 py-1 block border-b border-[#E2DDE7]/10 mb-1">
                   Select Reason for Exclusion:
                 </span>
                 {exclusionOptions.map((opt) => (
@@ -701,7 +701,7 @@ export const PaperCard: React.FC<PaperCardProps> = ({
                     className="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-rose-950/80 hover:text-rose-200 transition-colors block text-[11px] cursor-pointer"
                   >
                     <span className="font-mono font-bold mr-1.5 text-rose-300">{opt.code}</span>
-                    <span className="text-[#E8D8CE]">{opt.label}</span>
+                    <span className="text-[#E2DDE7]">{opt.label}</span>
                   </button>
                 ))}
               </div>
@@ -713,8 +713,8 @@ export const PaperCard: React.FC<PaperCardProps> = ({
             onClick={() => onDecide(paper.id, 'maybe', 'Requires full-text appraisal')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center space-x-1 transition-all cursor-pointer shadow-sm ${
               status === 'maybe'
-                ? 'bg-[#4A3324] text-amber-200 ring-2 ring-amber-400/50 shadow-md'
-                : 'bg-[#1C110B] hover:bg-[#3D281C] text-[#E8D8CE]/80 border border-[#E8D8CE]/20 hover:text-white'
+                ? 'bg-[#383242] text-amber-200 ring-2 ring-amber-400/50 shadow-md'
+                : 'bg-[#1E1B24] hover:bg-[#3E374A] text-[#E2DDE7]/80 border border-[#E2DDE7]/20 hover:text-white'
             }`}
             title="Mark as Maybe for consensus / full-text review"
           >

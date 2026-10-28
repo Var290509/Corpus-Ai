@@ -218,7 +218,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             {/* Record A */}
-            <div className="bg-white p-3 rounded-xl border border-[#E8D8CE] space-y-1">
+            <div className="bg-white p-3 rounded-xl border border-[#E2DDE7] space-y-1">
               <span className="text-[10px] font-mono uppercase text-[#7E7A72]">Record A (V1)</span>
               <div className="font-semibold text-[#462E1E]">{simulatedConflicts[0].paperA.title}</div>
               <div className="text-[11px] text-emerald-700 font-medium">Status: Included</div>
@@ -226,7 +226,7 @@ export const Level2DiffModal: React.FC<Level2DiffModalProps> = ({
             </div>
 
             {/* Record B */}
-            <div className="bg-white p-3 rounded-xl border border-[#E8D8CE] space-y-1">
+            <div className="bg-white p-3 rounded-xl border border-[#E2DDE7] space-y-1">
               <span className="text-[10px] font-mono uppercase text-[#7E7A72]">Record B (V2 duplicate match)</span>
               <div className="font-semibold text-[#462E1E]">{simulatedConflicts[0].paperB.title}</div>
               <div className="text-[11px] text-rose-700 font-medium">Status: Excluded</div>

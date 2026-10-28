@@ -161,7 +161,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
         <div className="flex flex-col items-center space-y-3 max-w-xl mx-auto">
           
           {/* Phase 1: Identification */}
-          <div className="w-full bg-white p-4 rounded-xl border border-[#E8D8CE] text-center shadow-2xs">
+          <div className="w-full bg-white p-4 rounded-xl border border-[#E2DDE7] text-center shadow-2xs">
             <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Identification</span>
             <div className="text-sm font-bold text-[#462E1E] mt-0.5">
               Records identified from databases (n = {totalIdentified.toLocaleString()})
@@ -174,7 +174,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
           <ArrowDown className="w-4 h-4 text-[#6F4E37]" />
 
           {/* Phase 2: Deduplication */}
-          <div className="w-full bg-white p-4 rounded-xl border border-[#E8D8CE] text-center shadow-2xs">
+          <div className="w-full bg-white p-4 rounded-xl border border-[#E2DDE7] text-center shadow-2xs">
             <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Deduplication</span>
             <div className="text-sm font-bold text-[#462E1E] mt-0.5">
               Duplicate records marked & hidden (n = {duplicateRecordsHidden.toLocaleString()})
@@ -188,7 +188,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
 
           {/* Phase 3: Screening */}
           <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="bg-white p-4 rounded-xl border border-[#E8D8CE] text-center shadow-2xs">
+            <div className="bg-white p-4 rounded-xl border border-[#E2DDE7] text-center shadow-2xs">
               <span className="text-[10px] uppercase font-mono font-bold text-[#6F4E37]">Screening</span>
               <div className="text-sm font-bold text-[#462E1E] mt-0.5">
                 Records screened (n = {screenedCount.toLocaleString()})
@@ -242,7 +242,7 @@ export const PRISMAReviewDesk: React.FC<PRISMAReviewDeskProps> = ({
 
         <div className="max-h-60 overflow-y-auto space-y-2 pr-1 font-mono text-xs">
           {auditLogs.map((log) => (
-            <div key={log.id} className="p-2.5 rounded-lg bg-white/70 border border-[#E8D8CE] flex items-center justify-between text-[11px]">
+            <div key={log.id} className="p-2.5 rounded-lg bg-white/70 border border-[#E2DDE7] flex items-center justify-between text-[11px]">
               <div className="flex items-center space-x-2.5">
                 <span className="text-[#7E7A72]">{log.timestamp}</span>
                 <span className="px-1.5 py-0.5 rounded bg-[#E6E0F0] text-[#5A3D29] font-semibold">

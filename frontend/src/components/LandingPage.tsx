@@ -156,7 +156,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   };
 
   return (
-    <div ref={heroRef} className="min-h-screen flex flex-col font-sans bg-[#60433D] text-[#E8D8CE] relative overflow-hidden">
+    <div ref={heroRef} className="min-h-screen flex flex-col font-sans bg-[#716879] text-[#E2DDE7] relative overflow-hidden">
       
       {/* 1. Fluid simulation canvas (z-0) */}
       <canvas 
@@ -175,7 +175,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
       />
 
       {/* 3. Top Navbar (z-20) */}
-      <header className="landing-nav sticky top-0 z-30 w-full border-b border-[#E6E0F0]/20 bg-[#352318]/80 backdrop-blur-xl">
+      <header className="landing-nav sticky top-0 z-30 w-full border-b border-[#E6E0F0]/20 bg-[#292531]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             
@@ -185,10 +185,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
                 C
               </div>
               <div className="flex items-center">
-                <span className="font-extrabold text-base tracking-tight text-[#E8D8CE]">
+                <span className="font-extrabold text-base tracking-tight text-[#E2DDE7]">
                   CORPUS <span className="text-[#E6E0F0] font-light">AI</span>
                 </span>
-                <span className="ml-2.5 hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#4A3324] text-[#E6E0F0] border border-[#E6E0F0]/25">
+                <span className="ml-2.5 hidden sm:inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#383242] text-[#E6E0F0] border border-[#E6E0F0]/25">
                   Autonomous Agentic RAG
                 </span>
               </div>
@@ -196,21 +196,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
             {/* Cloud Status & Auth Actions */}
             <div className="flex items-center space-x-3">
-              <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#4A3324] border border-emerald-400/40 text-emerald-200 text-xs font-medium">
+              <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#383242] border border-emerald-400/40 text-emerald-200 text-xs font-medium">
                 <Cloud className="w-3.5 h-3.5" />
                 <span>Google Cloud Firestore Integrated</span>
               </div>
 
               <button
                 onClick={() => { setIsSignUp(false); setShowAuthModal(true); }}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#E8D8CE] hover:text-white hover:bg-[#4A3324] transition-all cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-[#E2DDE7] hover:text-white hover:bg-[#383242] transition-all cursor-pointer"
               >
                 Sign In
               </button>
 
               <button
                 onClick={handleQuickDemoLogin}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E8D8CE] hover:bg-white text-[#2C1E16] shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-[#E2DDE7] hover:bg-white text-[#25212C] shadow-md transition-all flex items-center space-x-1.5 cursor-pointer"
               >
                 <span>Enter Workspace</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -225,13 +225,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 flex flex-col items-center text-center relative z-10">
         
         {/* Badge Pill */}
-        <div className="landing-badge inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#4A3324]/85 border border-[#E6E0F0]/25 text-[#E6E0F0] text-xs font-medium backdrop-blur-md shadow-md mb-6">
-          <Sparkles className="w-3.5 h-3.5 text-[#E8D8CE]" />
+        <div className="landing-badge inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#383242]/85 border border-[#E6E0F0]/25 text-[#E6E0F0] text-xs font-medium backdrop-blur-md shadow-md mb-6">
+          <Sparkles className="w-3.5 h-3.5 text-[#E2DDE7]" />
           <span>Next-Generation Systematic Review & Multi-Index Recommender</span>
         </div>
 
         {/* Word-by-Word Revealed Heading */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#E8D8CE] tracking-tight max-w-4xl leading-[1.12]">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-[#E2DDE7] tracking-tight max-w-4xl leading-[1.12]">
           {headingText.split(" ").map((word, index) => (
             <span
               key={index}
@@ -244,7 +244,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         </h1>
 
         {/* Word-by-Word Revealed Subline */}
-        <p className="mt-5 text-sm sm:text-base lg:text-lg text-[#E8D8CE] max-w-2xl leading-relaxed opacity-90">
+        <p className="mt-5 text-sm sm:text-base lg:text-lg text-[#E2DDE7] max-w-2xl leading-relaxed opacity-90">
           {sublineText.split(" ").map((word, index) => (
             <span
               key={index}
@@ -260,7 +260,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         <div className="landing-cta-group mt-9 flex flex-wrap items-center justify-center gap-3.5">
           <button
             onClick={handleQuickDemoLogin}
-            className="px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-[#E8D8CE] to-[#E6E0F0] text-[#2C1E16] hover:brightness-105 shadow-xl flex items-center space-x-2 cursor-pointer transition-all"
+            className="px-7 py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-[#E2DDE7] to-[#E6E0F0] text-[#25212C] hover:brightness-105 shadow-xl flex items-center space-x-2 cursor-pointer transition-all"
           >
             <span>Launch Review Studio</span>
             <ArrowRight className="w-4 h-4" />
@@ -268,7 +268,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
           <button
             onClick={() => { setIsSignUp(true); setShowAuthModal(true); }}
-            className="px-6 py-3 rounded-xl font-semibold text-sm bg-[#4A3324]/80 text-[#E8D8CE] border border-[#E6E0F0]/30 hover:bg-[#5C3F2D] hover:border-[#E6E0F0]/50 shadow-md flex items-center space-x-2 cursor-pointer transition-all"
+            className="px-6 py-3 rounded-xl font-semibold text-sm bg-[#383242]/80 text-[#E2DDE7] border border-[#E6E0F0]/30 hover:bg-[#463E53] hover:border-[#E6E0F0]/50 shadow-md flex items-center space-x-2 cursor-pointer transition-all"
           >
             <User className="w-4 h-4 text-[#E6E0F0]" />
             <span>Create Account / Sign In</span>
@@ -282,8 +282,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             <div className="w-8 h-8 rounded-lg bg-[#5A3D29] text-[#E6E0F0] flex items-center justify-center">
               <Cpu className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-bold text-[#E8D8CE]">Autonomous Agentic RAG</h3>
-            <p className="text-xs text-[#E8D8CE]/80 leading-relaxed">
+            <h3 className="text-sm font-bold text-[#E2DDE7]">Autonomous Agentic RAG</h3>
+            <p className="text-xs text-[#E2DDE7]/80 leading-relaxed">
               Reads the full text of thousands of research papers, identifies consensus versus contradictions, and provides quotation evidence.
             </p>
           </div>
@@ -292,8 +292,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             <div className="w-8 h-8 rounded-lg bg-[#5A3D29] text-amber-300 flex items-center justify-center">
               <Database className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-bold text-[#E8D8CE]">Multi-Database Discovery</h3>
-            <p className="text-xs text-[#E8D8CE]/80 leading-relaxed">
+            <h3 className="text-sm font-bold text-[#E2DDE7]">Multi-Database Discovery</h3>
+            <p className="text-xs text-[#E2DDE7]/80 leading-relaxed">
               Autonomous recommender queries Scopus, Web of Science, PubMed/MEDLINE, and IEEE Xplore Digital Library based on your papers.
             </p>
           </div>
@@ -302,8 +302,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             <div className="w-8 h-8 rounded-lg bg-[#5A3D29] text-emerald-300 flex items-center justify-center">
               <Cloud className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-bold text-[#E8D8CE]">Google Cloud Firestore</h3>
-            <p className="text-xs text-[#E8D8CE]/80 leading-relaxed">
+            <h3 className="text-sm font-bold text-[#E2DDE7]">Google Cloud Firestore</h3>
+            <p className="text-xs text-[#E2DDE7]/80 leading-relaxed">
               Backed by Google Cloud Firestore (Spark Free Tier) for zero-cost, real-time persistence with offline-first synchronization.
             </p>
           </div>
@@ -313,7 +313,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
       </main>
 
       {/* Footer (z-20) */}
-      <footer className="border-t border-[#E6E0F0]/15 bg-[#2B1B12]/80 py-6 text-center text-xs text-[#C5BFB8] relative z-20">
+      <footer className="border-t border-[#E6E0F0]/15 bg-[#292531]/90 py-6 text-center text-xs text-[#E2DDE7]/70 relative z-20">
         © 2026 Corpus AI — Autonomous Systematic Literature Review & Agentic RAG Platform.
       </footer>
 
@@ -322,17 +322,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
           <div 
             ref={authModalRef}
-            className="w-full max-w-md bg-[#3B281D] border border-[#E6E0F0]/30 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-left"
+            className="w-full max-w-md bg-[#292531] border border-[#E6E0F0]/30 rounded-2xl shadow-2xl p-6 sm:p-8 space-y-5 text-left"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="text-center space-y-1 pb-2">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#6F4E37] to-[#9E88BE] flex items-center justify-center mx-auto text-white shadow-md">
                 <Sparkles className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-[#E8D8CE]">
+              <h3 className="text-lg font-bold text-[#E2DDE7]">
                 {isSignUp ? 'Create Corpus AI Account' : 'Sign In to Review Workspace'}
               </h3>
-              <p className="text-xs text-[#E8D8CE]/80">
+              <p className="text-xs text-[#E2DDE7]/80">
                 {isSignUp 
                   ? 'Access multi-database screening and agentic synthesis'
                   : 'Welcome back! Enter your research credentials'}
@@ -350,48 +350,48 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             <form onSubmit={handleAuthSubmit} className="space-y-3.5">
               {isSignUp && (
                 <div>
-                  <label className="block text-xs font-semibold text-[#E8D8CE] mb-1">Full Name</label>
+                  <label className="block text-xs font-semibold text-[#E2DDE7] mb-1">Full Name</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => { setName(e.target.value); setAuthError(null); }}
                     placeholder="Dr. Eleanor Vance"
-                    className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#E8D8CE]"
+                    className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#E2DDE7]"
                     required
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-semibold text-[#E8D8CE] mb-1">Email Address</label>
+                <label className="block text-xs font-semibold text-[#E2DDE7] mb-1">Email Address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setAuthError(null); }}
                   placeholder="researcher@university.edu"
-                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#E8D8CE]"
+                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#E2DDE7]"
                   required
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-semibold text-[#E8D8CE]">Password</label>
-                  <span className="text-[10px] text-[#E8D8CE]/60">min 6 characters</span>
+                  <label className="text-xs font-semibold text-[#E2DDE7]">Password</label>
+                  <span className="text-[10px] text-[#E2DDE7]/60">min 6 characters</span>
                 </div>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setAuthError(null); }}
                   placeholder="••••••••••••"
-                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#E8D8CE]"
+                  className="w-full glass-input rounded-xl px-3 py-2 text-xs text-[#E2DDE7]"
                   required
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl font-semibold text-xs bg-[#E8D8CE] text-[#2C1E16] hover:bg-white shadow-md transition-all cursor-pointer mt-2"
+                className="w-full py-2.5 rounded-xl font-semibold text-xs bg-[#E2DDE7] text-[#25212C] hover:bg-white shadow-md transition-all cursor-pointer mt-2"
               >
                 {isSignUp ? 'Create Free Account' : 'Sign In to Workspace'}
               </button>
@@ -399,13 +399,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
             {/* Quick Demo Credentials Pill */}
             {!isSignUp && (
-              <div className="p-2 rounded-xl bg-[#241710]/90 border border-[#E6E0F0]/15 text-[11px] text-[#E8D8CE]/70 flex items-center justify-between">
-                <span>Demo: <strong className="text-[#E8D8CE]">demo@corpus.ai</strong></span>
-                <span>Pass: <strong className="text-[#E8D8CE]">Password123!</strong></span>
+              <div className="p-2 rounded-xl bg-[#292531]/90 border border-[#E6E0F0]/15 text-[11px] text-[#E2DDE7]/70 flex items-center justify-between">
+                <span>Demo: <strong className="text-[#E2DDE7]">demo@corpus.ai</strong></span>
+                <span>Pass: <strong className="text-[#E2DDE7]">Password123!</strong></span>
               </div>
             )}
 
-            <div className="pt-2 border-t border-[#E6E0F0]/15 flex items-center justify-between text-xs text-[#E8D8CE]/80">
+            <div className="pt-2 border-t border-[#E6E0F0]/15 flex items-center justify-between text-xs text-[#E2DDE7]/80">
               <button
                 type="button"
                 onClick={() => {
