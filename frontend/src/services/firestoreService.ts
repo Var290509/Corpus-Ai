@@ -47,9 +47,9 @@ class FirestoreService {
 
       this.db = getFirestore(this.app);
       this.isConnected = true;
-      console.log('⚡ Google Cloud Firestore (Firebase Spark Free Tier) initialized successfully.');
+      console.log('⚡ Cloud persistence initialized successfully.');
     } catch (err) {
-      console.warn('⚡ Firestore initialized in offline-first mode with local persistence fallback:', err);
+      console.warn('⚡ Initialized in offline-first mode with local persistence fallback:', err);
       this.isConnected = false;
     }
   }
@@ -57,7 +57,7 @@ class FirestoreService {
   public getStatus(): { isConnected: boolean; tier: string } {
     return {
       isConnected: this.isConnected,
-      tier: 'Google Cloud Firestore Free Spark Tier (1 GiB / 50k reads/day)'
+      tier: 'Cloud Storage & Sync Active'
     };
   }
 
