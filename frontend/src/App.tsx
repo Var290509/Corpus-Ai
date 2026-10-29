@@ -5,7 +5,6 @@ import { Navbar } from './components/Navbar';
 import { SearchStudio } from './components/SearchStudio';
 import { ScreeningDesk } from './components/ScreeningDesk';
 import { AgenticRAGDesk } from './components/AgenticRAGDesk';
-import { Level2DiffModal } from './components/Level2DiffModal';
 import { PRISMAReviewDesk } from './components/PRISMAReviewDesk';
 import { AIBadgeModal } from './components/AIBadgeModal';
 import { AuditLogModal } from './components/AuditLogModal';
@@ -357,11 +356,6 @@ export const App: React.FC = () => {
     updateActiveProject({ decisions: autoDecisions });
   };
 
-  // Level 2 Revert to previous version
-  const handleRevertToVersion = (targetVersionNumber: number) => {
-    alert(`Reverted project state to Version ${targetVersionNumber}`);
-  };
-
   // Resolve duplicate merge conflicts
   const handleResolveConflict = (groupId: string, chosenStatus: 'include' | 'exclude' | 'maybe') => {
     const updated = { ...decisions };
@@ -585,18 +579,7 @@ export const App: React.FC = () => {
           <AgenticRAGDesk papers={papers} />
         )}
 
-        {/* Tab 4: Level 2 Diff & Loop Engine */}
-        {activeTab === 'level2_loop' && (
-          <Level2DiffModal
-            queryVersions={queryVersions}
-            allPapers={papers}
-            activeDecisions={decisions}
-            onRevertToVersion={handleRevertToVersion}
-            onResolveConflict={handleResolveConflict}
-          />
-        )}
-
-        {/* Tab 5: PRISMA & Export */}
+        {/* Tab 4: PRISMA & Export */}
         {activeTab === 'review_export' && (
           <PRISMAReviewDesk
             papers={papers}

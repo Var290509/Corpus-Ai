@@ -4,7 +4,6 @@ import {
   Search, 
   CheckSquare, 
   Cpu, 
-  GitBranch, 
   Download, 
   Activity,
   Sparkles,
@@ -64,7 +63,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'recommender', label: 'AI Recommender', tooltip: 'AI Recommender (Scopus, Web of Science, PubMed, IEEE)', icon: Sparkles, isSpecial: true },
     { id: 'screening', label: 'Screening', tooltip: 'Screening & Systematic Review Desk', icon: CheckSquare },
     { id: 'agentic_rag', label: 'RAG Copilot', tooltip: 'Agentic RAG Systematic Review Copilot', icon: Cpu },
-    { id: 'level2_loop', label: 'Level 2 Diff', tooltip: 'Level 2 Differential Loop Analysis', icon: GitBranch },
     { id: 'review_export', label: 'PRISMA', tooltip: 'PRISMA 2020 Flow & Synthesis Export', icon: Download },
   ];
 
