@@ -105,6 +105,20 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
   // Search state for filtering review tasks
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Online / Connection Status
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const cardsContainerRef = useRef<HTMLDivElement>(null);
   const createModalRef = useRef<HTMLDivElement>(null);
 
@@ -334,9 +348,16 @@ export const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({
           </div>
 
           <div className="flex items-center space-x-4">
-            <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#24143D] border border-emerald-400/40 text-emerald-200 text-xs">
-              <Cloud className="w-3.5 h-3.5" />
-              <span>Google Cloud Firestore: Spark Free Tier Active</span>
+            <div 
+              className={`hidden sm:flex items-center space-x-2 px-3 py-1 rounded-full bg-[#24143D] text-xs font-medium shadow-sm transition-all ${
+                isOnline 
+                  ? 'border border-emerald-400/40 text-emerald-200' 
+                  : 'border border-rose-500/40 text-rose-300'
+              }`}
+              title={isOnline ? "System Status: Online" : "System Status: Offline"}
+            >
+              <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`}></span>
+              <span>{isOnline ? 'Online' : 'Offline'}</span>
             </div>
 
             <div className="text-right">

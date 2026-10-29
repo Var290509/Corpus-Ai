@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Compass, 
   Search, 
@@ -45,6 +45,19 @@ export const Navbar: React.FC<NavbarProps> = ({
   onLogout,
   onOpenAuditLog
 }) => {
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const tabs = [
     { id: 'overview', label: 'Protocol', tooltip: 'Protocol & Systematic Review Setup', icon: Compass },
     { id: 'search', label: 'Search & Upload', tooltip: 'Search & Literature Upload', icon: Search },
@@ -142,14 +155,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Cloud Status Pill */}
+            {/* Status Pill */}
             <div 
-              className="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-[#170A26]/90 border border-emerald-500/30 text-emerald-300 text-[11px] font-medium shadow-sm"
-              title="Real-time Firestore cloud synchronization active"
+              className={`hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-xl bg-[#170A26]/90 text-[11px] font-medium shadow-sm transition-all ${
+                isOnline 
+                  ? 'border border-emerald-500/30 text-emerald-300' 
+                  : 'border border-rose-500/30 text-rose-300'
+              }`}
+              title={isOnline ? "System Status: Online" : "System Status: Offline"}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <Cloud className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Cloud Sync</span>
+              <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`}></span>
+              <span>{isOnline ? 'Online' : 'Offline'}</span>
             </div>
 
             {/* Total Papers Count Badge */}

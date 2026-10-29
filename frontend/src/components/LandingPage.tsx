@@ -33,6 +33,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
   const [name, setName] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
 
+  // Online / Connection Status
+  const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const headingWordsRef = useRef<HTMLSpanElement[]>([]);
@@ -196,9 +210,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
             {/* Cloud Status & Auth Actions */}
             <div className="flex items-center space-x-3">
-              <div className="hidden md:flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#24143D] border border-emerald-400/40 text-emerald-200 text-xs font-medium">
-                <Cloud className="w-3.5 h-3.5" />
-                <span>Google Cloud Firestore Integrated</span>
+              <div 
+                className={`hidden md:flex items-center space-x-2 px-3 py-1 rounded-full bg-[#24143D] text-xs font-medium shadow-sm transition-all ${
+                  isOnline 
+                    ? 'border border-emerald-400/40 text-emerald-200' 
+                    : 'border border-rose-500/40 text-rose-300'
+                }`}
+                title={isOnline ? "System Status: Online" : "System Status: Offline"}
+              >
+                <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`}></span>
+                <span>{isOnline ? 'Online' : 'Offline'}</span>
               </div>
 
               <button
@@ -302,9 +323,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
             <div className="w-8 h-8 rounded-lg bg-[#2B1544] text-emerald-300 flex items-center justify-center">
               <Cloud className="w-4 h-4" />
             </div>
-            <h3 className="text-sm font-bold text-[#FAF5FF]">Google Cloud Firestore</h3>
+            <h3 className="text-sm font-bold text-[#FAF5FF]">Cloud Sync & Persistence</h3>
             <p className="text-xs text-[#FAF5FF]/80 leading-relaxed">
-              Backed by Google Cloud Firestore (Spark Free Tier) for zero-cost, real-time persistence with offline-first synchronization.
+              Real-time cloud persistence with offline-first synchronization and audit logging.
             </p>
           </div>
 

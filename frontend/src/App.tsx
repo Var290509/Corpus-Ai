@@ -647,7 +647,7 @@ export const App: React.FC = () => {
             <span>Review: {currentProject.name}</span>
           </div>
           <div className="flex items-center space-x-4 text-[11px] text-[#FAF5FF]/80">
-            <span>Google Cloud Firestore Integrated</span>
+            <span>System Status: Online</span>
             <span>•</span>
             <span>Theme: Cosmic Galaxy & Nebula • Starlight #FAF5FF • Nebula Peach #E8BA9B</span>
           </div>
